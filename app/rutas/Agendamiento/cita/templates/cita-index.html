@@ -1,0 +1,284 @@
+{% extends 'base.html' %}
+
+{% block titulo %}
+Citas
+{% endblock %}
+
+{% block contenido %}
+<div class="row">
+  <div class="col-md-4">
+      <div class="card">
+          <div class="card-body">
+              <h5>Citas de Hoy</h5>
+          </div>
+      </div>
+  </div>
+  <div class="col-md-4">
+      <div class="card">
+          <div class="card-body">
+              <h5>Pacientes Registrados</h5>
+          </div>
+      </div>
+  </div>
+  <div class="col-md-4">
+      <div class="card">
+          <div class="card-body">
+              <h5>Médicos Disponibles</h5>
+          </div>
+      </div>
+  </div>
+</div>
+
+<div class="row my-4">
+  <div class="col-md-4">
+      <a href="#" class="btn btn-info btn-block" id="btnAgregar">Nueva Cita</a>
+  </div>
+  <div class="col-md-4">
+      <a href="#" class="btn btn-primary btn-block">Ver Citas</a>
+  </div>
+  <div class="col-md-4">
+      <a href="/registrar-paciente" class="btn btn-warning btn-block">Registrar Paciente</a>
+  </div>
+</div>
+<div class="container mt-4">
+    <h3>Listar Citas</h3>
+
+    <div class="card">
+        <div class="card-body">
+            <table class="table table-striped" id="tbl">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Paciente</th>
+                        <th>Motivo de Consulta</th>
+                        <th>Médico</th>
+                        <th>Fecha</th>
+                        <th>Hora</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="modal" id="modalFormulario">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="modalTitle"></h4>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+
+                <div class="modal-body">
+                    <div class="form-group">
+                        <input type="hidden" id="txtIdCita">
+                        <label for="txtPaciente">Paciente:</label>
+                        <input type="text" class="form-control" id="txtPaciente" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="txtMotivoConsulta">Motivo de Consulta:</label>
+                        <input type="text" class="form-control" id="txtMotivoConsulta" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="txtMedico">Médico:</label>
+                        <input type="text" class="form-control" id="txtMedico" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="txtFecha">Fecha:</label>
+                        <input type="date" class="form-control" id="txtFecha" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="txtHora">Hora:</label>
+                        <input type="time" class="form-control" id="txtHora" required>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-success" id="btnGuardar">Guardar</button>
+                    <button type="button" class="btn btn-outline-warning" data-dismiss="modal">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-4 d-none" id="rowAlerta">
+        <div class="col col-md-12">
+            <div class="alert alert-success">
+                <strong>Registro Exitoso!</strong>
+                <div class="row" id="mostrarAlerta"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Librerías de jQuery y jQuery UI -->
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+
+{% endblock %}
+
+{% block js %}
+<script>
+  const initDatatable = () => {
+    $('#tbl').DataTable({
+      language: {
+        url: "{{ url_for('static', filename='vendor/datatables/es-ES.json') }}",
+      },
+      ajax: '/api/v1/citas',
+      columns: [
+        { data: 'id' },  // Asegúrate de que el ID esté en la respuesta de la API
+        { data: 'nombrepaciente' },
+        { data: 'motivoconsulta' },
+        { data: 'medico' },
+        { data: 'fecha' },
+        { data: 'hora' },
+        { data: function(row) {
+            return `
+              <button type="button" name="btn_editar" class="btn btn-primary" data-id="${row.id}">Editar</button>
+              <button type="button" name="btn_eliminar" class="btn btn-warning" data-id="${row.id}">Eliminar</button>`;
+          }
+        }
+      ]
+    });
+  }
+
+  const agregar = () => {
+    $('#btnAgregar').on('click', function() {
+      $('#modalTitle').text("Agregar una Cita");
+      $('#txtIdCita').val("");
+      $('#txtPaciente').val("");
+      $('#txtMotivoConsulta').val("");
+      $('#txtMedico').val("");
+      $('#txtFecha').val("");
+      $('#txtHora').val("");
+      $('#modalFormulario').modal();
+    });
+  }
+
+  const guardar = () => {
+    $('#btnGuardar').on('click', function() {
+      const nombrepaciente = $('#txtPaciente').val(); 
+      const motivoconsulta = $('#txtMotivoConsulta').val();
+      const medico = $('#txtMedico').val();
+      const fecha = $('#txtFecha').val();
+      const hora = $('#txtHora').val();
+
+      // Validar que todos los campos sean obligatorios
+      if (!nombrepaciente || !motivoconsulta || !medico || !fecha || !hora) {
+        Swal.fire("Error", "Todos los campos son obligatorios.", "error");
+        return;
+      }
+
+      const idCita = $('#txtIdCita').val();
+      const tabla = $('#tbl').DataTable();
+
+      const method = idCita ? 'PUT' : 'POST';
+      const url = idCita ? `/api/v1/citas/${idCita}` : `/api/v1/citas`;
+
+      fetch(url, {
+        method: method,
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ 
+          nombrepaciente, 
+          motivoconsulta,
+          medico,
+          fecha, 
+          hora
+        })
+      })
+      .then(resp => resp.json())
+      .then(data => {
+        if (data && data.success) {
+          tabla.ajax.reload();
+          Swal.fire("Éxito", idCita ? "La cita ha sido actualizada correctamente." : "La cita ha sido agregada correctamente.", "success");
+        } else {
+          Swal.fire("Error", data.error || "Ocurrió un error al procesar la solicitud.", "error");
+        }
+      })
+      .catch(err => {
+        console.error(err);
+        Swal.fire("Error", "Ocurrió un error inesperado.", "error");
+      })
+      .finally(() => {
+        $('#modalFormulario').modal("hide");
+      });
+    });
+  }
+
+  const editar = () => {
+    $('#tbl tbody').on('click', 'button[name="btn_editar"]', function() {
+      const id = $(this).data('id');
+      const tabla = $('#tbl').DataTable();
+
+      fetch(`/api/v1/citas/${id}`)
+        .then(resp => resp.json())
+        .then(data => {
+          if (data.success) {
+            $('#modalTitle').text("Editar Cita");
+            $('#txtIdCita').val(data.data.id);
+            $('#txtPaciente').val(data.data.nombrepaciente); 
+            $('#txtMotivoConsulta').val(data.data.motivoconsulta);
+            $('#txtMedico').val(data.data.medico); 
+            $('#txtFecha').val(data.data.fecha);
+            $('#txtHora').val(data.data.hora);
+            $('#modalFormulario').modal();
+          } else {
+            Swal.fire("Error", data.error, "error");
+          }
+        })
+        .catch(err => {
+          console.error(err);
+          Swal.fire("Error", "Ocurrió un error inesperado.", "error");
+        });
+    });
+  }
+
+  const eliminar = () => {
+    $('#tbl tbody').on('click', 'button[name="btn_eliminar"]', function() {
+      const id = $(this).data('id');
+      const tabla = $('#tbl').DataTable();
+
+      Swal.fire({
+        title: '¿Estás seguro?',
+        text: "¡No podrás recuperar este registro!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Sí, eliminar'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          fetch(`/api/v1/citas/${id}`, {
+            method: 'DELETE'
+          })
+          .then(resp => resp.json())
+          .then(data => {
+            if (data.success) {
+              tabla.ajax.reload();
+              Swal.fire("Eliminado", "La cita ha sido eliminada correctamente.", "success");
+            } else {
+              Swal.fire("Error", data.error || "Ocurrió un error al procesar la solicitud.", "error");
+            }
+          })
+          .catch(err => {
+            console.error(err);
+            Swal.fire("Error", "Ocurrió un error inesperado.", "error");
+          });
+        }
+      });
+    });
+  }
+
+  $(document).ready(() => {
+    initDatatable();
+    agregar();
+    guardar();
+    editar();
+    eliminar();
+  });
+</script>
+{% endblock %}

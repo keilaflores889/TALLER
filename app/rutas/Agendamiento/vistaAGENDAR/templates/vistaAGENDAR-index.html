@@ -1,0 +1,425 @@
+{% extends 'base.html' %}
+
+{% block titulo %}
+Agenda Odontólogica
+{% endblock %}
+
+{% block contenido %}
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        text-align: center;
+        background-color: #f9f9f9;
+        margin: 0;
+        padding: 0;
+    }
+
+    h2 {
+        color: #000000;
+        margin-top: 20px;
+        text-align: center;
+        font-family:Century; 
+    }
+
+    h1 {
+        color: #333;
+        margin-top: 20px;
+        font-family:Century; 
+    }
+
+    /* espacio entre los botones de los mese y año con el calendario */
+    #controls { 
+        margin: 5px;      
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+   
+    /* boton de seleccion de mes y añor*/
+    #month-select, #year-select, button {
+        margin: 0 10px;
+        padding: 12px;
+        font-size: 13px;
+        background-color: #297ba0;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        width: auto; /* Ancho ajustado al contenido */
+        text-align: center; /* Centra el texto dentro del botón */
+        white-space: nowrap; /* Evita que el texto se divida en varias líneas */
+    }
+
+    /* boton anterior y siguiente*/
+    #prev-month:disabled, #next-month:disabled {
+        background-color: #cccccc;
+        cursor: not-allowed;
+        
+    }
+
+    /* calendario*/
+    #calendar {
+        margin: 20px auto;
+        width: 90%;
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        gap: 5px;
+        background-color: #f0f0f0;
+        border: 1px solid #ddd;
+        border-radius: 10px;
+        padding: 10px;
+    }
+
+    /* contenedores de los dias de la semana y ajustes de las fechas*/
+    .day, .day-header {
+        background-color: #ffffff;
+        border: 1px solid #ddd;
+        padding: 27px;
+        box-sizing: border-box;
+        border-radius: 5px;
+        position: relative;
+        cursor: pointer;
+    }
+
+    /* contenedores de los dias de la semana */
+    .day-header {
+        font-weight: bold;
+        background-color: #297ba0;
+        color: white;
+    }
+
+    /* diseño registro de citas*/
+    .appointment {
+        background-color: #ffb909b4;
+        color: #121109;
+        margin-top: 5px;
+        padding: 5px;
+        border-radius: 3px;
+        font-size: 12px;
+        font-family:Arial; 
+    }
+    
+     /* boton eliminar*/
+    .modify-btn, .delete-btn {
+        background-color: #ffcc00;
+        border: none;
+        cursor: pointer;
+        padding: 3px 6px;
+        font-size: 10px;
+        color: white;
+        border-radius: 3px;
+    }
+
+    .delete-btn {
+        background-color: #f44336;
+    }
+
+    /* estilo del modal */
+    .modal {
+        display: none;
+        position: fixed;
+        z-index: 1;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.4);
+        padding-top: 60px;
+    }
+
+    /* estilo del contenido modal */
+    .modal-content {
+        background-color: #fefefe;
+        margin: 5% auto;
+        padding: 20px;
+        border: 1px solid #888;
+        width: 80%;
+        max-width: 500px;
+        text-align: left;
+        border-radius: 5px;
+    }
+
+    /* estilo de la 'X' */
+    .close {
+        color: #9c3333;
+        font-size: 28px;
+        font-weight: bold;
+        float: right;
+        text-align: right;
+    }
+
+    .close:hover,
+    .close:focus {
+        color: black;
+        text-decoration: none;
+        cursor: pointer;
+    }
+
+    /* estilo del boton antes y despues */
+    input, select, button {
+        width: 100%;
+        padding: 10px;
+        margin: 5px 0;
+        box-sizing: border-box;
+    }
+
+    /* Estilo para los botones de modificar y eliminar juntos */
+    .modal-buttons {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 10px;
+    }
+
+    .modal-buttons button {
+        width: 48%;
+    }
+</style>
+
+<body>
+    <h1>Agenda Odontológica</h1>
+
+    <!-- Botón Nueva Cita -->
+    <div style="text-align: center; margin-bottom: 20px;">
+        <button id="new-appointment" style="background-color: #297ba0; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer;">Nueva Cita</button>
+    </div>
+
+    <!-- Control de navegación del calendario -->
+    <div id="controls">
+        <button id="prev-month">&lt;</button>
+        <select id="month-select"></select>
+        <select id="year-select"></select>
+        <button id="next-month">&gt;</button>
+    </div>
+
+    <!-- Contenedor del calendario -->
+    <div id="calendar" style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px;"></div>
+
+    <!-- Modal para gestionar citas -->
+    <div id="cita-modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+
+            <h2>Cita</h2>
+            <form id="cita-form">
+                <label for="cita-date">Fecha:</label>
+                <input type="date" id="cita-date"><br>
+
+                <label for="nomb_paciente">Nombre del Paciente:</label>
+                <input type="text" id="nomb_paciente"><br>
+
+                <label for="doctor-select">Doctor/a:</label>
+                <select id="doctor-select">
+                    <option value="">Doctor/a</option>
+                    <option value="Dra. Diana Barreto">Dra. Diana Barreto</option>
+                    <option value="Dra. Nuri Gonzalez">Dra. Nuri González</option>
+                    <option value="Dr. Alexander Ayala">Dr. Alexander Ayala</option>
+                </select><br>
+
+                <label for="cita-time">Hora:</label>
+                <input type="time" id="cita-time"><br>
+
+                <label for="turno-select">Turno:</label>
+                <select id="turno-select">
+                    <option value="">Seleccione el turno</option>
+                    <option value="Mañana">Mañana</option>
+                    <option value="Tarde">Tarde</option>
+                    <option value="Noche">Noche</option>
+                </select><br>
+
+                <div class="modal-buttons">
+                    <button type="button" id="guardar">Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const citaModal = document.getElementById('cita-modal');
+        const newAppointmentButton = document.getElementById('new-appointment');
+        const closeModal = document.querySelector('.close');
+        const guardarButton = document.getElementById('guardar');
+        const citaDate = document.getElementById('cita-date');
+        const nombPaciente = document.getElementById('nomb_paciente');
+        const doctorSelect = document.getElementById('doctor-select');
+        const citaTime = document.getElementById('cita-time');
+        const turnoSelect = document.getElementById('turno-select');
+        const monthSelect = document.getElementById('month-select');
+        const yearSelect = document.getElementById('year-select');
+        const calendar = document.getElementById('calendar');
+
+        let appointments = JSON.parse(localStorage.getItem('appointments')) || {};
+        let editingDate = null; // Para rastrear la cita que se está editando
+
+        // Llenar selectores de mes y año
+        function populateMonthYearSelectors() {
+            const months = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+            const currentYear = new Date().getFullYear();
+
+            months.forEach((month, index) => {
+                const option = document.createElement('option');
+                option.value = index;
+                option.textContent = month;
+                monthSelect.appendChild(option);
+            });
+
+            for (let year = currentYear - 5; year <= currentYear + 5; year++) {
+                const option = document.createElement('option');
+                option.value = year;
+                option.textContent = year;
+                yearSelect.appendChild(option);
+            }
+
+            monthSelect.value = new Date().getMonth();
+            yearSelect.value = currentYear;
+        }
+
+        // Renderizar el calendario
+        function renderCalendar() {
+            calendar.innerHTML = ''; // Limpiar el calendario
+
+            const daysOfWeek = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
+            daysOfWeek.forEach(day => {
+                const dayHeader = document.createElement('div');
+                dayHeader.className = 'day-header';
+                dayHeader.textContent = day;
+                calendar.appendChild(dayHeader);
+            });
+
+            const selectedMonth = parseInt(monthSelect.value);
+            const selectedYear = parseInt(yearSelect.value);
+            const firstDay = new Date(selectedYear, selectedMonth, 1).getDay();
+            const daysInMonth = new Date(selectedYear, selectedMonth + 1, 0).getDate();
+
+            // Espacios vacíos antes del primer día
+            for (let i = 0; i < firstDay; i++) {
+                const emptyCell = document.createElement('div');
+                emptyCell.className = 'day';
+                calendar.appendChild(emptyCell);
+            }
+
+            // Días del mes
+            for (let i = 1; i <= daysInMonth; i++) {
+                const dayCell = document.createElement('div');
+                dayCell.className = 'day';
+                dayCell.textContent = i;
+
+                const dateKey = `${selectedYear}-${String(selectedMonth + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
+                if (appointments[dateKey]) {
+                    const appointmentDiv = document.createElement('div');
+                    appointmentDiv.className = 'appointment';
+                    appointmentDiv.textContent = appointments[dateKey].patient + " - " + appointments[dateKey].time;
+                    appointmentDiv.dataset.date = dateKey; // Almacena la fecha en el div
+                    appointmentDiv.addEventListener('click', () => openEditModal(dateKey));
+                    dayCell.appendChild(appointmentDiv);
+                }
+
+                calendar.appendChild(dayCell);
+            }
+        }
+
+        // Abrir modal para editar cita
+        function openEditModal(date) {
+            editingDate = date; // Guardar la fecha de la cita actual
+            const appointment = appointments[date];
+
+            citaDate.value = date;
+            nombPaciente.value = appointment.patient;
+            doctorSelect.value = appointment.doctor;
+            citaTime.value = appointment.time;
+            turnoSelect.value = appointment.shift;
+
+            guardarButton.textContent = 'Guardar Cambios'; // Cambia el texto del botón
+            citaModal.style.display = 'block';
+        }
+
+        // Guardar o editar cita
+        guardarButton.addEventListener('click', () => {
+            console.log("Guardando cita...");
+
+            const date = citaDate.value; // Captura la fecha en formato YYYY-MM-DD
+            const patient = nombPaciente.value.trim();
+            const doctor = doctorSelect.value;
+            const time = citaTime.value;
+            const shift = turnoSelect.value;
+
+            console.log("Fecha:", date);
+            console.log("Paciente:", patient);
+            console.log("Doctor:", doctor);
+            console.log("Hora:", time);
+            console.log("Turno:", shift);
+
+            if (date && patient && doctor && time) {
+                if (editingDate && editingDate !== date) {
+                    delete appointments[editingDate]; // Elimina la cita original si cambió la fecha
+                }
+
+                appointments[date] = { patient, doctor, time, shift };
+                localStorage.setItem('appointments', JSON.stringify(appointments)); // Actualizar localStorage
+                renderCalendar(); // Re-renderizar calendario
+                citaModal.style.display = 'none'; // Cerrar modal
+                resetModal();
+            } else {
+                alert("Por favor, complete todos los campos.");
+            }
+        });
+
+        // Eliminar cita
+        const deleteButton = document.createElement('button');
+        deleteButton.textContent = 'Eliminar';
+        deleteButton.className = 'delete-btn';
+        deleteButton.style.marginTop = '10px';
+        deleteButton.addEventListener('click', () => {
+            if (editingDate) {
+                delete appointments[editingDate];
+                localStorage.setItem('appointments', JSON.stringify(appointments));
+                renderCalendar();
+                citaModal.style.display = 'none';
+                resetModal();
+            }
+        });
+        document.querySelector('.modal-buttons').appendChild(deleteButton);
+
+        // Resetear modal
+        function resetModal() {
+            editingDate = null;
+            citaDate.value = '';
+            nombPaciente.value = '';
+            doctorSelect.value = '';
+            citaTime.value = '';
+            turnoSelect.value = '';
+            guardarButton.textContent = 'Guardar';
+        }
+
+        // Cerrar modal
+        closeModal.addEventListener('click', () => {
+            citaModal.style.display = 'none';
+            resetModal();
+        });
+
+        // Cerrar modal si se hace clic fuera del contenido del modal
+        window.addEventListener('click', (event) => {
+            if (event.target === citaModal) {
+                citaModal.style.display = 'none';
+                resetModal();
+            }
+        });
+
+        // Inicializar calendario y selectores
+        populateMonthYearSelectors();
+        renderCalendar();
+
+        // Cambio de mes o año
+        monthSelect.addEventListener('change', renderCalendar);
+        yearSelect.addEventListener('change', renderCalendar);
+
+        // Nuevo botón de cita
+        newAppointmentButton.addEventListener('click', () => {
+            citaModal.style.display = 'block';
+        });
+    });
+    </script>
+</body>
+
+
+{%endblock%}
