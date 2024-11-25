@@ -1,0 +1,200 @@
+{% extends 'base.html' %}
+
+{% block titulo %}
+Agenda Médica
+{% endblock %}
+
+{% block contenido %}
+<div class="container mt-4">
+  <h3>Listar Agenda Médica</h3>
+
+  <!-- Tarjeta -->
+  <div class="card">
+    <div class="card-header">
+      <button type="button" class="btn btn-outline-info" id="btnAgregar">Agregar</button>
+    </div>
+    <div class="card-body">
+      <table class="table table-striped" id="tbl">
+        <thead>
+          <tr>
+            <th>Médico</th>
+            <th>Día</th>
+            <th>Turno</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+  <!-- /Tarjeta -->
+
+  <!-- Modal -->
+  <div class="modal" id="modalFormulario">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <!-- Header -->
+        <div class="modal-header">
+          <h4 class="modal-title" id="modalTitle">Nueva Agenda</h4>
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+        </div>
+        <!-- Cuerpo -->
+        <div class="modal-body">
+          <div class="form-group">
+            <label for="doctor">Doctor/a:</label>
+            <select id="doctor" class="form-control">
+              <option value="">Seleccione al Dr. o Dra.</option>
+              <option value="Dra. Diana Barreto">Dra. Diana Barreto</option>
+              <option value="Dra. Nuri González">Dra. Nuri González</option>
+              <option value="Dr. Alexander Ayala">Dr. Alexander Ayala</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="dia">Día:</label>
+            <select id="dia" class="form-control">
+              <option value="">Seleccione el dia</option>
+              <option value="Lunes">Lunes</option>
+              <option value="Martes">Martes</option>
+              <option value="Miércoles">Miércoles</option>
+              <option value="Jueves">Jueves</option>
+              <option value="Viernes">Viernes</option>
+              <option value="Sábado">Sábado</option>
+              <option value="Sábado">Lunes a Viernes</option>
+              <option value="Sábado">Lunes a Sábado</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="turno">Turno:</label>
+            <select id="turno" class="form-control">
+              <option value="">Seleccione el turno</option>
+              <option value="Mañana">Mañana</option>
+              <option value="Tarde">Tarde</option>
+              <option value="Noche">Noche</option>
+              <option value="Noche">Mañana, Tarde y Noche</option>
+              <option value="Noche">Mañana y Tarde</option>
+              <option value="Noche">Tarde y Noche</option>
+            </select>
+          </div>
+        </div>
+        <!-- Footer -->
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary" id="btnGuardar">Guardar</button>
+          <button type="button" class="btn btn-danger" data-dismiss="modal">Cerrar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- Librerías necesarias -->
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+{% endblock %}
+
+{% block js %}
+<script>
+  $(document).ready(function () {
+    const STORAGE_KEY = 'agendaMedica'; // Clave para localStorage
+    let agenda = JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; // Cargar datos existentes o iniciar vacío
+
+    // Inicializar DataTable
+    const tabla = $('#tbl').DataTable({
+      columns: [
+        { title: 'Médico' },
+        { title: 'Día' },
+        { title: 'Turno' },
+        { title: 'Acciones' },
+      ],
+    });
+
+    // Función para cargar datos en la tabla
+    const cargarTabla = () => {
+      tabla.clear();
+      agenda.forEach((item, index) => {
+        tabla.row.add([
+          item.medico,
+          item.dia,
+          item.turno,
+          `<button class="btn btn-info btnEditar" data-index="${index}">Editar</button>
+           <button class="btn btn-danger btnEliminar" data-index="${index}">Eliminar</button>`,
+        ]);
+      });
+      tabla.draw();
+    };
+
+    // Guardar cambios en localStorage
+    const guardarLocalStorage = () => {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(agenda));
+    };
+
+    // Cargar tabla al iniciar
+    cargarTabla();
+
+    // Abrir modal para agregar
+    $('#btnAgregar').on('click', function () {
+      $('#modalFormulario').data('index', undefined).modal('show');
+      $('#doctor').val('');
+      $('#dia').val('');
+      $('#turno').val('');
+    });
+
+    // Guardar datos del modal
+    $('#btnGuardar').on('click', function () {
+      const medico = $('#doctor').val();
+      const dia = $('#dia').val();
+      const turno = $('#turno').val();
+      const index = $('#modalFormulario').data('index');
+
+      if (!medico || !dia || !turno) {
+        Swal.fire('Error', 'Por favor complete todos los campos.', 'error');
+        return;
+      }
+
+      const nuevoRegistro = { medico, dia, turno };
+
+      if (index !== undefined) {
+        agenda[index] = nuevoRegistro; // Actualizar
+      } else {
+        agenda.push(nuevoRegistro); // Agregar nuevo
+      }
+
+      guardarLocalStorage(); // Guardar cambios en almacenamiento local
+      $('#modalFormulario').modal('hide');
+      cargarTabla(); // Recargar tabla con los datos actualizados
+    });
+
+    // Editar registro
+    $('#tbl').on('click', '.btnEditar', function () {
+      const index = $(this).data('index');
+      const registro = agenda[index];
+      $('#modalFormulario').data('index', index).modal('show');
+      $('#doctor').val(registro.medico);
+      $('#dia').val(registro.dia);
+      $('#turno').val(registro.turno);
+    });
+
+    // Eliminar registro
+    $('#tbl').on('click', '.btnEliminar', function () {
+      const index = $(this).data('index');
+      Swal.fire({
+        title: '¿Está seguro de eliminar este registro?',
+        showCancelButton: true,
+        confirmButtonText: 'Sí',
+        cancelButtonText: 'No',
+      }).then((result) => {
+        if (result.isConfirmed) {
+          agenda.splice(index, 1);
+          guardarLocalStorage(); // Guardar cambios en almacenamiento local
+          cargarTabla(); // Actualizar la tabla después de eliminar
+          Swal.fire('Eliminado', 'El registro ha sido eliminado.', 'success');
+        }
+      });
+    });
+  });
+</script>
+
+{% endblock %}
