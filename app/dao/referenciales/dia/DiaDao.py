@@ -5,9 +5,8 @@ from app.conexion.Conexion import Conexion
 class DiaDao:
 
     def getDias(self):
-
         diaSQL = """
-        SELECT id, descripcion
+        SELECT id_dia, descripcion
         FROM dias
         """
         # objeto conexion
@@ -16,10 +15,10 @@ class DiaDao:
         cur = con.cursor()
         try:
             cur.execute(diaSQL)
-            dias = cur.fetchall() # trae datos de la bd
+            dias = cur.fetchall()  # trae datos de la bd
 
             # Transformar los datos en una lista de diccionarios
-            return [{'id': dia[0], 'descripcion': dia[1]} for dia in dias]
+            return [{'id_dia': dia[0], 'descripcion': dia[1]} for dia in dias]
 
         except Exception as e:
             app.logger.error(f"Error al obtener todos los dias: {str(e)}")
@@ -30,10 +29,9 @@ class DiaDao:
             con.close()
 
     def getDiaById(self, id):
-
         diaSQL = """
-        SELECT id, descripcion
-        FROM dias WHERE id=%s
+        SELECT id_dia, descripcion
+        FROM dias WHERE id_dia=%s
         """
         # objeto conexion
         conexion = Conexion()
@@ -41,14 +39,14 @@ class DiaDao:
         cur = con.cursor()
         try:
             cur.execute(diaSQL, (id,))
-            diaEncontrada = cur.fetchone() # Obtener una sola fila
+            diaEncontrada = cur.fetchone()  # Obtener una sola fila
             if diaEncontrada:
                 return {
-                        "id": diaEncontrada[0],
-                        "descripcion": diaEncontrada[1]
-                    }  # Retornar los datos de los dias
+                    "id_dia": diaEncontrada[0],
+                    "descripcion": diaEncontrada[1]
+                }  # Retornar los datos de los dias
             else:
-                return None # Retornar None si no se encuentra el dia
+                return None  # Retornar None si no se encuentra el dia
         except Exception as e:
             app.logger.error(f"Error al obtener dia: {str(e)}")
             return None
@@ -58,9 +56,8 @@ class DiaDao:
             con.close()
 
     def guardarDia(self, descripcion):
-
         insertDiaSQL = """
-        INSERT INTO dias(descripcion) VALUES(%s) RETURNING id
+        INSERT INTO dias(descripcion) VALUES(%s) RETURNING id_dia
         """
 
         conexion = Conexion()
@@ -71,13 +68,13 @@ class DiaDao:
         try:
             cur.execute(insertDiaSQL, (descripcion,))
             dia_id = cur.fetchone()[0]
-            con.commit() # se confirma la insercion
+            con.commit()  # se confirma la insercion
             return dia_id
 
         # Si algo fallo entra aqui
         except Exception as e:
             app.logger.error(f"Error al insertar dia: {str(e)}")
-            con.rollback() # retroceder si hubo error
+            con.rollback()  # retroceder si hubo error
             return False
 
         # Siempre se va ejecutar
@@ -86,11 +83,10 @@ class DiaDao:
             con.close()
 
     def updateDia(self, id, descripcion):
-
         updateDiaSQL = """
         UPDATE dias
         SET descripcion=%s
-        WHERE id=%s
+        WHERE id_dia=%s
         """
 
         conexion = Conexion()
@@ -99,10 +95,10 @@ class DiaDao:
 
         try:
             cur.execute(updateDiaSQL, (descripcion, id,))
-            filas_afectadas = cur.rowcount # Obtener el número de filas afectadas
+            filas_afectadas = cur.rowcount  # Obtener el número de filas afectadas
             con.commit()
 
-            return filas_afectadas > 0 # Retornar True si se actualizó al menos una fila
+            return filas_afectadas > 0  # Retornar True si se actualizó al menos una fila
 
         except Exception as e:
             app.logger.error(f"Error al actualizar dia: {str(e)}")
@@ -114,10 +110,9 @@ class DiaDao:
             con.close()
 
     def deleteDia(self, id):
-
-        updateDiaSQL = """
+        deleteDiaSQL = """
         DELETE FROM dias
-        WHERE id=%s
+        WHERE id_dia=%s
         """
 
         conexion = Conexion()
@@ -125,7 +120,7 @@ class DiaDao:
         cur = con.cursor()
 
         try:
-            cur.execute(updateDiaSQL, (id,))
+            cur.execute(deleteDiaSQL, (id,))
             rows_affected = cur.rowcount
             con.commit()
 
