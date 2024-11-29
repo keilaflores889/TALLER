@@ -43,24 +43,24 @@ Agenda Médica
           <div class="form-group">
             <label for="doctor">Doctor/a:</label>
             <select id="doctor" class="form-control">
-              <option value="">Seleccione al Dr. o Dra.</option>
-              <option value="Dra. Diana Barreto">Dra. Diana Barreto</option>
-              <option value="Dra. Nuri González">Dra. Nuri González</option>
-              <option value="Dr. Alexander Ayala">Dr. Alexander Ayala</option>
+              <option value="" data-especialidad="">Seleccione al Dr. o Dra.</option>
+              <option value="Dra. Diana Barreto" data-especialidad="Ortodoncia">Dra. Diana Barreto - Ortodoncia</option>
+              <option value="Dra. Nuri González" data-especialidad="Rehabilitación oral">Dra. Nuri González - Rehabilitación oral</option>
+              <option value="Dr. Alexander Ayala" data-especialidad="Cirugía oral">Dr. Alexander Ayala - Cirugía oral</option>
             </select>
           </div>
           <div class="form-group">
             <label for="dia">Día:</label>
             <select id="dia" class="form-control">
-              <option value="">Seleccione el dia</option>
+              <option value="">Seleccione el día</option>
               <option value="Lunes">Lunes</option>
               <option value="Martes">Martes</option>
               <option value="Miércoles">Miércoles</option>
               <option value="Jueves">Jueves</option>
               <option value="Viernes">Viernes</option>
               <option value="Sábado">Sábado</option>
-              <option value="Sábado">Lunes a Viernes</option>
-              <option value="Sábado">Lunes a Sábado</option>
+              <option value="Lunes a Viernes">Lunes a Viernes</option>
+              <option value="Lunes a Sábado">Lunes a Sábado</option>
             </select>
           </div>
           <div class="form-group">
@@ -70,9 +70,9 @@ Agenda Médica
               <option value="Mañana">Mañana</option>
               <option value="Tarde">Tarde</option>
               <option value="Noche">Noche</option>
-              <option value="Noche">Mañana, Tarde y Noche</option>
-              <option value="Noche">Mañana y Tarde</option>
-              <option value="Noche">Tarde y Noche</option>
+              <option value="Mañana, Tarde y Noche">Mañana, Tarde y Noche</option>
+              <option value="Mañana y Tarde">Mañana y Tarde</option>
+              <option value="Tarde y Noche">Tarde y Noche</option>
             </select>
           </div>
         </div>
@@ -85,7 +85,6 @@ Agenda Médica
     </div>
   </div>
 </div>
-
 
 <!-- Librerías necesarias -->
 <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
@@ -103,6 +102,9 @@ Agenda Médica
 
     // Inicializar DataTable
     const tabla = $('#tbl').DataTable({
+      language: {
+        url: "https://cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json"
+      },
       columns: [
         { title: 'Médico' },
         { title: 'Día' },
@@ -115,12 +117,17 @@ Agenda Médica
     const cargarTabla = () => {
       tabla.clear();
       agenda.forEach((item, index) => {
+        const medicoCompleto = `${item.medico} - ${item.especialidad}`;
         tabla.row.add([
-          item.medico,
+          medicoCompleto,
           item.dia,
           item.turno,
-          `<button class="btn btn-info btnEditar" data-index="${index}">Editar</button>
-           <button class="btn btn-danger btnEliminar" data-index="${index}">Eliminar</button>`,
+          `<button class="btn btn-info btnEditar" data-index="${index}" title="Editar">
+          <i class="fas fa-pencil-alt"></i>
+          </button>
+          <button class="btn btn-danger btnEliminar" data-index="${index}" title="Eliminar">
+          <i class="fas fa-trash"></i>
+          </button>`,
         ]);
       });
       tabla.draw();
@@ -144,7 +151,8 @@ Agenda Médica
 
     // Guardar datos del modal
     $('#btnGuardar').on('click', function () {
-      const medico = $('#doctor').val();
+      const medico = $('#doctor').val(); // Nombre del doctor
+      const especialidad = $('#doctor option:selected').data('especialidad'); // Especialidad
       const dia = $('#dia').val();
       const turno = $('#turno').val();
       const index = $('#modalFormulario').data('index');
@@ -154,7 +162,7 @@ Agenda Médica
         return;
       }
 
-      const nuevoRegistro = { medico, dia, turno };
+      const nuevoRegistro = { medico, especialidad, dia, turno };
 
       if (index !== undefined) {
         agenda[index] = nuevoRegistro; // Actualizar
@@ -165,6 +173,7 @@ Agenda Médica
       guardarLocalStorage(); // Guardar cambios en almacenamiento local
       $('#modalFormulario').modal('hide');
       cargarTabla(); // Recargar tabla con los datos actualizados
+      Swal.fire('Registrado correctamente', '', 'success');
     });
 
     // Editar registro
@@ -196,5 +205,6 @@ Agenda Médica
     });
   });
 </script>
+
 
 {% endblock %}

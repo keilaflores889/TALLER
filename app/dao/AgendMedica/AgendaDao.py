@@ -6,7 +6,7 @@ class AgendaDao:
 
     def getAgendas(self):
         agendaSQL = """
-        SELECT id_agenda_medica, nombre_medico, dia, turno
+        SELECT id_agenda_medica, id_medico, id_dia, id_turno
         FROM agenda_medica
         """
         conexion = Conexion()
@@ -20,9 +20,9 @@ class AgendaDao:
             return [
                 {
                     'id_agenda_medica': fila[0],
-                    'nombre_medico': fila[1],
-                    'dia': fila[2],
-                    'turno': fila[3],
+                    'id_medico': fila[1],
+                    'id_dia': fila[2],
+                    'id_turno': fila[3],
                 }
                 for fila in resultados
             ]
@@ -38,8 +38,8 @@ class AgendaDao:
 
     def getAgendaById(self, id_agenda_medica):
         agendaSQL = """
-        SELECT id_agenda_medica, nombre_medico, dia, turno
-        FROM agenda_medica
+       SELECT id_agenda_medica, id_medico, id_dia, id_turno
+        FROM agenda_medica 
         WHERE id_agenda_medica=%s
         """
         conexion = Conexion()
@@ -51,9 +51,9 @@ class AgendaDao:
             if fila:
                 return {
                     "id_agenda_medica": fila[0],
-                    "nombre_medico": fila[1],
-                    "dia": fila[2],
-                    "turno": fila[3],
+                    "id_medico": fila[1],
+                    "id_dia": fila[2],
+                    "id_turno": fila[3],
                 }
             else:
                 return None
@@ -66,9 +66,9 @@ class AgendaDao:
             cur.close()
             con.close()
 
-    def guardarAgenda(self, nombre_medico, dia, turno):
+    def guardarAgenda(self, id_medico, id_dia, id_turno):
         insertAgendaSQL = """
-        INSERT INTO agenda_medica (nombre_medico, dia, turno)
+        INSERT INTO agenda_medica (id_medico, id_dia, id_turno)
         VALUES (%s, %s, %s)
         RETURNING id_agenda_medica
         """
@@ -76,10 +76,11 @@ class AgendaDao:
         con = conexion.getConexion()
         cur = con.cursor()
         try:
-            cur.execute(insertAgendaSQL, (nombre_medico, dia, turno))
+            cur.execute(insertAgendaSQL, (id_medico, id_dia, id_turno))
             agenda_id = cur.fetchone()[0]
             con.commit()
             return agenda_id
+
 
         except Exception as e:
             app.logger.error(f"Error al insertar agenda: {str(e)}")
@@ -90,17 +91,17 @@ class AgendaDao:
             cur.close()
             con.close()
 
-    def updateAgenda(self, id_agenda_medica, nombre_medico, dia, turno):
+    def updateAgenda(self, id_agenda_medica, id_medico, id_dia, id_turno):
         updateAgendaSQL = """
         UPDATE agenda_medica
-        SET nombre_medico=%s, dia=%s, turno=%s
+        SET id_medico=%s, id_dia=%s, id_turno=%s
         WHERE id_agenda_medica=%s
         """
         conexion = Conexion()
         con = conexion.getConexion()
         cur = con.cursor()
         try:
-            cur.execute(updateAgendaSQL, (nombre_medico, dia, turno, id_agenda_medica))
+            cur.execute(updateAgendaSQL, (id_medico, id_dia, id_turno, id_agenda_medica))
             filas_afectadas = cur.rowcount
             con.commit()
             return filas_afectadas > 0
