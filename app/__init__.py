@@ -26,7 +26,7 @@ from app.rutas.referenciales.diagnostico.diagnostico_routes import diagmod  #dia
 from app.rutas.Agendamiento.cita.cita_routes import citamod   # Cita
 from app.rutas.Agendamiento.vistaAGENDAR.vistaAGENDAR_routes import vistagendamod
 from app.rutas.Agendamiento.AgendMedica.Agenda_routes import agendmod
-
+from app.rutas.Agendamiento.RegisPaciente.RegistroP_routes import registropmod
 # registrar referenciales
 modulo0 = '/referenciales' 
 app.register_blueprint(loginmod, url_prefix=f'{modulo0}/login') 
@@ -53,7 +53,7 @@ app.register_blueprint(citamod, url_prefix=f'{modulo0}/cita')  # cita
 
 app.register_blueprint(vistagendamod, url_prefix=f'{modulo0}/cita')  # cita
 app.register_blueprint(agendmod, url_prefix=f'{modulo0}/AgendMedica')  # cita
-
+app.register_blueprint(registropmod, url_prefix=f'{modulo0}/RegisPaciente')
 #ciudad
 from app.rutas.referenciales.ciudad.ciudad_api import ciuapi
 
@@ -103,6 +103,7 @@ from app.rutas.referenciales.diagnostico.diagnostico_api import diagapi
 from app.rutas.Agendamiento.cita.cita_api import citaapi
 
 from app.rutas.Agendamiento.AgendMedica.Agenda_api import agendaapi
+from app.rutas.Agendamiento.RegisPaciente.RegistrarP_api import registropapi
 
 # APIS v1
 #Ciudad
@@ -173,8 +174,8 @@ app.register_blueprint(citaapi, url_prefix=version1)
 version1 = '/api/v1'
 app.register_blueprint(agendaapi, url_prefix=version1)
 
-
-
+version1 = '/api/v1'
+app.register_blueprint(registropapi, url_prefix=version1)
 
 
 

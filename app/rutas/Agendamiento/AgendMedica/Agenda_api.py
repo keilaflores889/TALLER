@@ -54,7 +54,7 @@ def addAgenda():
     agendadao = AgendaDao()
 
     # Validar campos requeridos
-    campos_requeridos = ['nombre_medico', 'dia', 'turno']
+    campos_requeridos = ['id_medico', 'id_dia', 'id_turno']
     for campo in campos_requeridos:
         if not data.get(campo) or not isinstance(data[campo], str) or not data[campo].strip():
             return jsonify({
@@ -63,16 +63,16 @@ def addAgenda():
             }), 400
 
     try:
-        nombre_medico = data['nombre_medico'].strip()
-        dia = data['dia'].strip()
-        turno = data['turno'].strip()
+        id_medico = data['id_medico'].strip()
+        id_dia = data['id_dia'].strip()
+        id_turno = data['id_turno'].strip()
 
-        agenda_medica_id = agendadao.guardarAgenda(nombre_medico, dia, turno)
+        agenda_medica_id = agendadao.guardarAgenda(id_medico, id_dia, id_turno)
         if agenda_medica_id:
             app.logger.info(f"Agenda médica creada con ID {agenda_medica_id}.")
             return jsonify({
                 'success': True,
-                'data': {'id_agenda_medica': agenda_medica_id, 'nombre_medico': nombre_medico, 'dia': dia, 'turno': turno},
+                'data': {'id_agenda_medica': agenda_medica_id, 'id_medico': id_medico, 'id_dia': id_dia, 'id_turno': id_turno},
                 'error': None
             }), 201
         else:
@@ -92,7 +92,7 @@ def updateAgenda(agenda_medica_id):
     agendadao = AgendaDao()
 
     # Validar campos requeridos
-    campos_requeridos = ['nombre_medico', 'dia', 'turno']
+    campos_requeridos = ['id_medico', 'id_dia', 'id_turno']
     for campo in campos_requeridos:
         if not data.get(campo) or not isinstance(data[campo], str) or not data[campo].strip():
             return jsonify({
@@ -101,15 +101,15 @@ def updateAgenda(agenda_medica_id):
             }), 400
 
     try:
-        nombre_medico = data['nombre_medico'].strip()
-        dia = data['dia'].strip()
-        turno = data['turno'].strip()
+        id_medico = data['id_medico'].strip()
+        id_dia = data['id_dia'].strip()
+        id_turno = data['id_turno'].strip()
 
-        if agendadao.updateAgenda(agenda_medica_id, nombre_medico, dia, turno):
+        if agendadao.updateAgenda(agenda_medica_id, id_medico, id_dia, id_turno):
             app.logger.info(f"Agenda médica con ID {agenda_medica_id} actualizada exitosamente.")
             return jsonify({
                 'success': True,
-                'data': {'id_agenda_medica': agenda_medica_id, 'nombre_medico': nombre_medico, 'dia': dia, 'turno': turno},
+                'data': {'id_agenda_medica': agenda_medica_id, 'id_medico': id_medico, 'id_dia': id_dia, 'id_turno': id_turno},
                 'error': None
             }), 200
         else:
