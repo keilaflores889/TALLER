@@ -6,7 +6,7 @@ class RegistroPDao:
 
     def getRegistrosP(self):
         registropSQL = """
-        SELECT id_persona, nombre, apellido, cedula_identidad, fecha_nacimiento, fecha_registro, telefono, ciudad, barrio
+        SELECT id_persona, nombre, apellido, cedula_identidad, fecha_nacimiento, fecha_registro, telefono, id_ciudad, id_barrio
         FROM persona
         """
         conexion = Conexion()
@@ -14,22 +14,22 @@ class RegistroPDao:
         cur = con.cursor()
         try:
             cur.execute(registropSQL)
-            resultados = cur.fetchall()  # Trae todos los datos del registro
+            personas = cur.fetchall()  # Trae todos los datos del registro
 
             # Transformar los datos en una lista de diccionarios
             return [
                 {
-                    'id_persona': fila[0],
-                    'nombre': fila[1],
-                    'apellido': fila[2],
-                    'cedula_identidad': fila[3],
-                    'fecha_nacimiento': fila[4],
-                    'fecha_registro': fila[5],
-                    'telefono': fila[6],
-                    'ciudad': fila[7],
-                    'barrio': fila[8],
+                    'id_persona': persona[0]
+                    ,'nombre': persona[1]
+                    ,'apellido': persona[2]
+                    ,'cedula_identidad': persona[3]
+                    ,'fecha_nacimiento': persona[4]
+                    ,'fecha_registro': persona[5]
+                    ,'telefono': persona[6]
+                    ,'id_ciudad': persona[7]
+                    ,'id_barrio': persona[8]
                 }
-                for fila in resultados
+                for persona in personas
             ]
 
 
@@ -43,7 +43,7 @@ class RegistroPDao:
 
     def getRegistroPById(self, id_persona):
         registropSQL = """
-        SELECT id_persona, nombre, apellido, cedula_identidad, fecha_nacimiento, fecha_registro, telefono, ciudad, barrio
+        SELECT id_persona, nombre, apellido, cedula_identidad, fecha_nacimiento, fecha_registro, telefono, id_ciudad, id_barrio
         FROM persona 
         WHERE id_persona=%s
         """
@@ -52,17 +52,18 @@ class RegistroPDao:
         cur = con.cursor()
         try:
             cur.execute(registropSQL, (id_persona,))
-            fila = cur.fetchone()  # Obtener una sola fila
-            if fila:
+            personaEncontrada = cur.fetchone()  # Obtener una sola fila
+            if personaEncontrada:
                 return {
-                    'id_persona': fila[0],
-                    'nombre': fila[1],
-                    'apellido': fila[2],
-                    'cedula_identidad': fila[3],
-                    'fecha_nacimiento': fila[4],
-                    'fecha_registro': fila[5],
-                    'telefono': fila[6],
-                    'ciudad': fila[7],
+                    'id_persona': personaEncontrada[0],
+                    'nombre': personaEncontrada[1],
+                    'apellido': personaEncontrada[2],
+                    'cedula_identidad': personaEncontrada[3],
+                    'fecha_nacimiento': personaEncontrada[4],
+                    'fecha_registro': personaEncontrada[5],
+                    'telefono': personaEncontrada[6],
+                    'id_ciudad': personaEncontrada[7],
+                    'id_barrio': personaEncontrada[8],
                 }
             else:
                 return None
@@ -75,17 +76,17 @@ class RegistroPDao:
             cur.close()
             con.close()
 
-    def guardarRegistroP(self, nombre, apellido, cedula_identidad, fecha_nacimiento, fecha_registro, telefono, ciudad, barrio):
+    def guardarRegistroP(self, nombre, apellido, cedula_identidad, fecha_nacimiento, fecha_registro, telefono, id_ciudad, id_barrio):
         insertRegistropSQL = """
-        INSERT INTO persona (nombre, apellido, cedula_identidad, fecha_nacimiento, fecha_registro, telefono, ciudad, barrio)
-        VALUES (%s, %s, %s, %s, %s, %s, %s, %s,)
+        INSERT INTO persona (nombre, apellido, cedula_identidad, fecha_nacimiento, fecha_registro, telefono, id_ciudad, id_barrio)
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
         RETURNING id_persona
         """
         conexion = Conexion()
         con = conexion.getConexion()
         cur = con.cursor()
         try:
-            cur.execute(insertRegistropSQL, (nombre, apellido, cedula_identidad, fecha_nacimiento, fecha_registro, telefono, ciudad, barrio))
+            cur.execute(insertRegistropSQL, (nombre, apellido, cedula_identidad, fecha_nacimiento, fecha_registro, telefono, id_ciudad, id_barrio))
             registrop_id = cur.fetchone()[0]
             con.commit()
             return registrop_id
@@ -100,17 +101,17 @@ class RegistroPDao:
             cur.close()
             con.close()
 
-    def updateRegistroP(self, nombre, apellido, cedula_identidad, fecha_nacimiento, fecha_registro, telefono, ciudad, barrio, id_persona):
+    def updateRegistroP(self, nombre, apellido, cedula_identidad, fecha_nacimiento, fecha_registro, telefono, id_ciudad, id_barrio, id_persona):
         updateAgendaSQL = """
         UPDATE persona
-        SET nombre=%s, apellido=%s, cedula_identidad=%s, fecha_nacimiento=%s, fecha_registro=%s, telefono=%s, ciudad=%s, barrio=%s
+        SET nombre=%s, apellido=%s, cedula_identidad=%s, fecha_nacimiento=%s, fecha_registro=%s, telefono=%s, id_ciudad=%s, id_barrio=%s
         WHERE id_persona=%s
         """
         conexion = Conexion()
         con = conexion.getConexion()
         cur = con.cursor()
         try:
-            cur.execute(updateAgendaSQL, (nombre, apellido, cedula_identidad, fecha_nacimiento, fecha_registro, telefono, ciudad, barrio, id_persona))
+            cur.execute(updateAgendaSQL, (nombre, apellido, cedula_identidad, fecha_nacimiento, fecha_registro, telefono, id_ciudad, id_barrio, id_persona))
             filas_afectadas = cur.rowcount
             con.commit()
             return filas_afectadas > 0

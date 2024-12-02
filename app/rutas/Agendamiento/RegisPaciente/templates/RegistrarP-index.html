@@ -129,7 +129,6 @@ Registrar Paciente
         { title: 'Fecha Nacimiento' },
         { title: 'Teléfono' },
         { title: 'Fecha Registro' },
-       
         { title: 'Acciones', orderable: false }
       ],
     });
@@ -145,12 +144,11 @@ Registrar Paciente
           item.fechaNacimiento,
           item.telefono,
           item.fechaRegistro,
-          
           `<button class="btn btn-info btnEditar" data-index="${index}" title="Editar">
-          <i class="fas fa-pencil-alt"></i>
+            <i class="fas fa-pencil-alt"></i>
           </button>
           <button class="btn btn-danger btnEliminar" data-index="${index}" title="Eliminar">
-          <i class="fas fa-trash"></i>
+            <i class="fas fa-trash"></i>
           </button>`,
         ]);
       });
@@ -164,6 +162,11 @@ Registrar Paciente
 
     // Cargar tabla al iniciar
     cargarTabla();
+
+    // Restricción: solo números en los campos Documento y Teléfono
+    $('#documento, #telefono').on('input', function () {
+      this.value = this.value.replace(/[^0-9]/g, ''); // Permitir solo números
+    });
 
     // Abrir modal para agregar
     $('#btnAgregar').on('click', function () {
@@ -235,6 +238,7 @@ Registrar Paciente
     });
   });
 </script>
+
 {% endblock %}
 
 

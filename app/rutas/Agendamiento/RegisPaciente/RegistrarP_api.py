@@ -54,7 +54,7 @@ def addRegistroP():
     registropdao = RegistroPDao()
 
     # Validar campos requeridos
-    campos_requeridos = ['nombre', 'apellido', 'cedula_identidad', 'fecha_nacimiento', 'fecha_registro', 'telefono', 'ciudad', 'barrio']
+    campos_requeridos = ['nombre', 'apellido', 'cedula_identidad', 'fecha_nacimiento', 'fecha_registro', 'telefono', 'id_ciudad', 'id_barrio']
     for campo in campos_requeridos:
         if not data.get(campo) or not isinstance(data[campo], str) or not data[campo].strip():
             return jsonify({
@@ -63,21 +63,20 @@ def addRegistroP():
             }), 400
 
     try:
-        nombre = data['nombre'].strip()
-        apellido = data['apellido'].strip()
+        nombre = data['nombre'].upper()
+        apellido = data['apellido'].upper()
         cedula_identidad = data['cedula_identidad']
         fecha_nacimiento = data['fecha_nacimiento']
         fecha_registro = data['fecha_registro']
         telefono = data['telefono']
-        ciudad = data['ciudad'].strip()
-        barrio = data['barrio'].strip()
+        id_ciudad = data['id_ciudad']
+        id_barrio = data['id_barrio']
 
-        persona_id = registropdao.guardarRegistroP(nombre, apellido, cedula_identidad, fecha_nacimiento, fecha_registro, telefono, ciudad, barrio)
-        if persona_id:
-            app.logger.info(f"Registro de persona creada con ID {persona_id}.")
+        persona_id = registropdao.guardarRegistroP(nombre, apellido, cedula_identidad, fecha_nacimiento, fecha_registro, telefono, id_ciudad, id_barrio)
+        if persona_id is not None:
             return jsonify({
                 'success': True,
-                'data': {'id_persona': persona_id, 'nombre': nombre, 'apellido': apellido, 'cedula_identidad': cedula_identidad, 'fecha_nacimiento': fecha_nacimiento, 'fecha_registro': fecha_registro, 'telefono':telefono, 'ciudad':ciudad, 'barrio': barrio},
+                'data': {'id': persona_id, 'nombre': nombre, 'apellido': apellido, 'cedula_identidad': cedula_identidad, 'fecha_nacimiento': fecha_nacimiento, 'fecha_registro': fecha_registro, 'telefono':telefono, 'id_ciudad': id_ciudad, 'id_barrio': id_barrio,},
                 'error': None
             }), 201
         else:
@@ -97,7 +96,7 @@ def updateRegistroP(persona_id):
     registropdao = RegistroPDao()
 
     # Validar campos requeridos
-    campos_requeridos = ['nombre', 'apellido', 'cedula_identidad', 'fecha_nacimiento', 'fecha_registro', 'telefono', 'ciudad', 'barrio']
+    campos_requeridos = ['nombre', 'apellido', 'cedula_identidad', 'fecha_nacimiento', 'fecha_registro', 'telefono', 'id_ciudad', 'id_barrio']
     for campo in campos_requeridos:
         if not data.get(campo) or not isinstance(data[campo], str) or not data[campo].strip():
             return jsonify({
@@ -106,21 +105,21 @@ def updateRegistroP(persona_id):
             }), 400
 
     try:
-        nombre = data['nombre'].strip()
-        apellido = data['apellido'].strip()
+        nombre = data['nombre'].strip().upper()
+        apellido = data['apellido'].strip().upper()
         cedula_identidad = data['cedula_identidad']
         fecha_nacimiento = data['fecha_nacimiento']
         fecha_registro = data['fecha_registro']
         telefono = data['telefono']
-        ciudad = data['ciudad'].strip()
-        barrio = data['barrio'].strip()
+        id_ciudad = data['id_ciudad']
+        id_barrio = data['id_barrio']
 
 
-        if registropdao.updateRegistroP(persona_id, nombre, apellido, cedula_identidad, fecha_nacimiento, fecha_registro, telefono, ciudad, barrio):
+        if registropdao.updateRegistroP(persona_id, nombre.strip().upper(), apellido.strip().upper(), cedula_identidad, fecha_nacimiento, fecha_registro, telefono, id_ciudad, id_barrio):
             app.logger.info(f"Registro de persona con ID {persona_id} actualizada exitosamente.")
             return jsonify({
                 'success': True,
-                'data': {'id_persona': persona_id, 'nombre': nombre, 'apellido': apellido, 'cedula_identidad': cedula_identidad, 'fecha_nacimiento': fecha_nacimiento, 'fecha_registro': fecha_registro, 'telefono':telefono, 'ciudad':ciudad, 'barrio': barrio},
+                'data': {'id': persona_id, 'nombre': nombre, 'apellido': apellido, 'cedula_identidad': cedula_identidad, 'fecha_nacimiento': fecha_nacimiento, 'fecha_registro': fecha_registro, 'telefono':telefono, 'id_ciudad':id_ciudad, 'id_barrio': id_barrio},
                 'error': None
             }), 200
         else:
