@@ -17,7 +17,7 @@ Ciudades
         <table class="table table-striped" id="tbl">
           <thead>
             <tr>
-              <th>Descripción</th>
+              <th>Ciudades</th>
               <th>Acciones</th>
             </tr>
           </thead>
@@ -43,8 +43,8 @@ Ciudades
           <div class="modal-body">
             <div class="form-group">
               <input type="hidden" id="txtIdCiudad">
-              <label for="txtDescripcion">Descripción:</label>
-              <input type="text" class="form-control" placeholder="Ingrese alguna ciudad" id="txtDescripcion">
+              <label for="txtCiudad">Ciudad:</label>
+              <input type="text" class="form-control" placeholder="Ingrese alguna ciudad" id="txtCiudad">
             </div>
           </div>
 
@@ -81,8 +81,8 @@ Ciudades
       columns: [
         { data: 'descripcion' },
         { data: function(row) {
-            return `<button type="button" name="btn_editar" class="btn btn-info" data-id="${row.id}">Editar</button>
-                    <button type="button" name="btn_eliminar" class="btn btn-warning" data-id="${row.id}">Eliminar</button>`
+            return `<button type="button" name="btn_editar" class="btn btn-info" data-id_ciudad="${row.id_ciudad}">Editar</button>
+                    <button type="button" name="btn_eliminar" class="btn btn-warning" data-id_ciudad="${row.id_ciudad}">Eliminar</button>`
           }
         }
       ]
@@ -95,7 +95,7 @@ Ciudades
       $('#modalTitle').text("Agregar una Ciudad");
       // inicia ventana modal
       $('#txtIdCiudad').val("");
-      $('#txtDescripcion').val("");
+      $('#txtCiudad').val("");
       $('#modalFormulario').modal();
     });
   }
@@ -103,7 +103,7 @@ Ciudades
   const guardar = () => {
     $('#btnGuardar').on('click', function() {
       const idCiudad = $('#txtIdCiudad').val();
-      const nuevaDescripcion = $('#txtDescripcion').val();
+      const nuevaDescripcion = $('#txtCiudad').val();
       const tabla = $('#tbl').DataTable();
 
       if(idCiudad) {
@@ -138,7 +138,7 @@ Ciudades
         .then(data => {
           if(data && !data.error && data.success) {
             tabla.ajax.reload();
-            Swal.fire("Actualizado", "La ciudad ha sido agregada correctamente.", "success");
+            Swal.fire("Registrado", "La ciudad ha sido agregada correctamente.", "success");
           } else {
             Swal.fire(data.error);
           }
@@ -147,7 +147,7 @@ Ciudades
           Swal.fire("Error", "Ocurrió un error al guardar la ciudad.", "error");
         });
       }
-      $('#txtDescripcion').val("");
+      $('#txtCiudad').val("");
       $('#modalFormulario').modal("hide");
     });
   }
@@ -165,7 +165,7 @@ Ciudades
           //Swal.fire("Saved!", "", "success");
           $('#modalTitle').text("Editar una Ciudad");
 
-          const idCiudad = $(this).data('id');
+          const idCiudad = $(this).data('id_ciudad');
           $('#txtIdCiudad').val(idCiudad);
 
           // Necesitamos obtener la descripción del backend
@@ -177,7 +177,7 @@ Ciudades
           })
           .then(resp => resp.json())
           .then(data => {
-            $('#txtDescripcion').val(data.data.descripcion);
+            $('#txtCiudad').val(data.data.descripcion);
             $('#modalFormulario').modal();
           });
         }
@@ -187,7 +187,7 @@ Ciudades
 
   const eliminar = () => {
     $('#tbl').on('click', 'button[name="btn_eliminar"]',function(){
-      const idCiudad = $(this).data('id');
+      const idCiudad = $(this).data('id_ciudad');
       // Mostrar mensaje de confirmación usando sweetalert
       Swal.fire({
         title: "¿Deseas eliminar este registro?",
