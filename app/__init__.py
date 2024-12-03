@@ -17,10 +17,9 @@ from app.rutas.referenciales.persona.persona_routes import persmod  #persona
 from app.rutas.referenciales.especialidad.especialidad_routes import especimod  #especialidad
 from app.rutas.referenciales.dia.dia_routes import diamod  #dia
 from app.rutas.referenciales.duracion_consulta.duracion_consulta_routes import duraconsumod  #duracion de la consulta
-from app.rutas.referenciales.instrumento.instrumento_routes import instmod  #instrumento utilizado
+
 from app.rutas.referenciales.turno.turno_routes import turmod  #turno
-from app.rutas.referenciales.tratamiento.tratamiento_routes import tratmod  #tratamiento
-from app.rutas.referenciales.diagnostico.diagnostico_routes import diagmod  #diagnostico
+
 
 #importacion de cita
 from app.rutas.Agendamiento.cita.cita_routes import citamod   # Cita
@@ -42,10 +41,9 @@ app.register_blueprint(persmod, url_prefix=f'{modulo0}/persona') #persona
 app.register_blueprint(especimod, url_prefix=f'{modulo0}/especialidad') #especialidad
 app.register_blueprint(diamod, url_prefix=f'{modulo0}/dia') #dia
 app.register_blueprint(duraconsumod, url_prefix=f'{modulo0}/duracionconsulta') #duracion de la consulta
-app.register_blueprint(instmod, url_prefix=f'{modulo0}/instrumento') #instrumento utilizado
+
 app.register_blueprint(turmod, url_prefix=f'{modulo0}/turno') #turno
-app.register_blueprint(tratmod, url_prefix=f'{modulo0}/tratamiento') #tratamiento
-app.register_blueprint(diagmod, url_prefix=f'{modulo0}/diagnostico') #diagnostico
+
 
 # registrar agendamientos
 modulo0 = '/agendamientos'
@@ -87,17 +85,14 @@ from app.rutas.referenciales.dia.dia_api import diaapi
 #duracion de la consulta
 from app.rutas.referenciales.duracion_consulta.duracion_consulta_api import duraconsuapi
 
-#instrumento utilizado
-from app.rutas.referenciales.instrumento.instrumento_api import instapi
+
 
 #turno
 from app.rutas.referenciales.turno.turno_api import turnoapi
 
-#tratamiento
-from app.rutas.referenciales.tratamiento.tratamiento_api import tratapi
 
-#diagnostico
-from app.rutas.referenciales.diagnostico.diagnostico_api import diagapi
+
+
 
 #cita
 from app.rutas.Agendamiento.cita.cita_api import citaapi
@@ -150,21 +145,13 @@ app.register_blueprint(diaapi, url_prefix=version1)
 version1 = '/api/v1'
 app.register_blueprint(duraconsuapi, url_prefix=version1)
 
-#instrumento utilizado
-version1 = '/api/v1'
-app.register_blueprint(instapi, url_prefix=version1)
+
 
 #turno
 version1 = '/api/v1'
 app.register_blueprint(turnoapi, url_prefix=version1)
 
-#tratamiento
-version1 = '/api/v1'
-app.register_blueprint(tratapi, url_prefix=version1)
 
-#diagnostico
-version1 = '/api/v1'
-app.register_blueprint(diagapi, url_prefix=version1)
 
 # Cita
 version1 = '/api/v1'
