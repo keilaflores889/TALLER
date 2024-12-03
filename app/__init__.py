@@ -7,6 +7,7 @@ app = Flask(__name__)
 from app.rutas.login.login_routes import loginmod
 from app.rutas.login.vista_routes import vistamod
 from app.rutas.referenciales.ciudad.ciudad_routes import ciumod #ciudad
+from app.rutas.referenciales.Barrio.barrio_routes import barriomod
 from app.rutas.referenciales.paises.pais_routes import paimod   #pais
 from app.rutas.referenciales.nacionalidad.nacionalidad_routes import naciomod  #nacionalidad
 from app.rutas.referenciales.ocupacion.ocupacion_routes import ocupmod  #ocupacion
@@ -31,6 +32,7 @@ modulo0 = '/referenciales'
 app.register_blueprint(loginmod, url_prefix=f'{modulo0}/login') 
 app.register_blueprint(vistamod, url_prefix=f'{modulo0}/login') 
 app.register_blueprint(ciumod, url_prefix=f'{modulo0}/ciudad') #ciudad
+app.register_blueprint(barriomod, url_prefix=f'{modulo0}/barrio')
 app.register_blueprint(paimod, url_prefix=f'{modulo0}/paises') #pais
 app.register_blueprint(naciomod, url_prefix=f'{modulo0}/nacionalidad')  #nacionalidad
 app.register_blueprint(ocupmod, url_prefix=f'{modulo0}/ocupacion')  #ocupacion
@@ -57,6 +59,8 @@ from app.rutas.referenciales.ciudad.ciudad_api import ciuapi
 
 #pais
 from app.rutas.referenciales.paises.pais_api import paisapi
+
+from app.rutas.referenciales.Barrio.barrio_api import barrioapi
 
 #nacionalidad
 from app.rutas.referenciales.nacionalidad.nacionalidad_api import nacioapi
@@ -104,6 +108,9 @@ from app.rutas.Agendamiento.RegisPaciente.RegistrarP_api import registropapi
 #Ciudad
 version1 = '/api/v1'
 app.register_blueprint(ciuapi, url_prefix=version1)
+
+version1 = '/api/v1'
+app.register_blueprint(barrioapi, url_prefix=version1)
 
 #Pais
 version1 = '/api/v1'
