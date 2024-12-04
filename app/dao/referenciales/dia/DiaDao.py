@@ -7,7 +7,7 @@ class DiaDao:
     def getDias(self):
         diaSQL = """
         SELECT id_dia, descripcion
-        FROM dias
+        FROM dia
         """
         # objeto conexion
         conexion = Conexion()
@@ -28,17 +28,17 @@ class DiaDao:
             cur.close()
             con.close()
 
-    def getDiaById(self, id):
+    def getDiaById(self, id_dia):
         diaSQL = """
         SELECT id_dia, descripcion
-        FROM dias WHERE id_dia=%s
+        FROM dia WHERE id_dia=%s
         """
         # objeto conexion
         conexion = Conexion()
         con = conexion.getConexion()
         cur = con.cursor()
         try:
-            cur.execute(diaSQL, (id,))
+            cur.execute(diaSQL, (id_dia,))
             diaEncontrada = cur.fetchone()  # Obtener una sola fila
             if diaEncontrada:
                 return {
@@ -57,7 +57,7 @@ class DiaDao:
 
     def guardarDia(self, descripcion):
         insertDiaSQL = """
-        INSERT INTO dias(descripcion) VALUES(%s) RETURNING id_dia
+        INSERT INTO dia(descripcion) VALUES(%s) RETURNING id_dia
         """
 
         conexion = Conexion()
@@ -82,9 +82,9 @@ class DiaDao:
             cur.close()
             con.close()
 
-    def updateDia(self, id, descripcion):
+    def updateDia(self, id_dia, descripcion):
         updateDiaSQL = """
-        UPDATE dias
+        UPDATE dia
         SET descripcion=%s
         WHERE id_dia=%s
         """
@@ -94,7 +94,7 @@ class DiaDao:
         cur = con.cursor()
 
         try:
-            cur.execute(updateDiaSQL, (descripcion, id,))
+            cur.execute(updateDiaSQL, (descripcion, id_dia,))
             filas_afectadas = cur.rowcount  # Obtener el número de filas afectadas
             con.commit()
 
@@ -111,7 +111,7 @@ class DiaDao:
 
     def deleteDia(self, id):
         deleteDiaSQL = """
-        DELETE FROM dias
+        DELETE FROM dia
         WHERE id_dia=%s
         """
 

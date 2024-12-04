@@ -79,7 +79,7 @@ def addDia():
         if dia_id is not None:
             return jsonify({
                 'success': True,
-                'data': {'id': dia_id, 'descripcion': descripcion},
+                'data': {'id_dia': dia_id, 'descripcion': descripcion},
                 'error': None
             }), 201
         else:
@@ -114,7 +114,7 @@ def updateDia(dia_id):
         if diadao.updateDia(dia_id, descripcion.upper()):
             return jsonify({
                 'success': True,
-                'data': {'id': dia_id, 'descripcion': descripcion},
+                'data': {'id_dia': dia_id, 'descripcion': descripcion},
                 'error': None
             }), 200
         else:

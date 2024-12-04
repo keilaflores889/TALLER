@@ -35,29 +35,30 @@ Dia de la Cita
           <!-- Modal Header -->
           <div class="modal-header">
             <h4 class="modal-title" id="modalTitle"></h4>
-            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            <button type="button" class="close" data-dismiss="modal">&times;</button>
           </div>
 
           <input type="hidden" id="txtIdDia" />
           <!-- Combo dia-->
           <div class="form-group">
-            <label for="cbo_dia">Dia:</label>
+            <label for="cbo_dia">Día:</label>
             <select id="cbo_dia" class="custom-select">
-              
-                <option value="1">Domingo</option>
-                <option value="2">Lunes</option>
-                <option value="3">Martes</option>
-                <option value="4">Miércoles</option>
-                <option value="5">Jueves</option>
-                <option value="6">Viernes</option>
-                <option value="7">Sábado</option>
+             
+              <option value="1">Domingo</option>
+              <option value="2">Lunes</option>
+              <option value="3">Martes</option>
+              <option value="4">Miércoles</option>
+              <option value="5">Jueves</option>
+              <option value="6">Viernes</option>
+              <option value="7">Sábado</option>
+              <option value="8">Lunes a Viernes</option>
+              <option value="9">Lunes a Sábado</option>
             </select>
           </div>
-
           <!-- Modal footer -->
           <div class="modal-footer">
             <button type="button" class="btn btn-primary" id="btnGuardar">Guardar</button>
-            <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cerrar</button>
+            <button type="button" class="btn btn-danger" data-dismiss="modal">Cerrar</button>
           </div>
 
         </div>
@@ -86,8 +87,8 @@ Dia de la Cita
       columns: [
         { data: 'descripcion' },
         { data: function(row) {
-            return `<button type="button" name="btn_editar" class="btn btn-info" data-id="${row.id_dia}">Editar</button>
-                    <button type="button" name="btn_eliminar" class="btn btn-warning" data-id="${row.id_dia}">Eliminar</button>`;
+            return `<button type="button" name="btn_editar" class="btn btn-info" data-id_dia="${row.id_dia}">Editar</button>
+                    <button type="button" name="btn_eliminar" class="btn btn-warning" data-id_dia="${row.id_dia}">Eliminar</button>`;
           }
         }
       ]
@@ -178,7 +179,7 @@ Dia de la Cita
         if (result.isConfirmed) {
           $('#modalTitle').text("Editar dia");
 
-          const idDia = $(this).data('id');
+          const idDia = $(this).data('id_dia');
           $('#txtIdDia').val(idDia);
 
           fetch(`/api/v1/dias/${idDia}`, {
@@ -202,7 +203,7 @@ Dia de la Cita
 
   const eliminar = () => {
     $('#tbl').on('click', 'button[name="btn_eliminar"]', function() {
-      const idDia = $(this).data('id');
+      const idDia = $(this).data('id_dia');
       Swal.fire({
         title: "¿Deseas eliminar este registro?",
         showCancelButton: true,
