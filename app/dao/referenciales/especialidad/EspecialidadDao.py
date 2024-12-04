@@ -7,8 +7,8 @@ class EspecialidadDao:
     def getEspecialidades(self):
 
         especialidadSQL = """
-        SELECT id, descripcion
-        FROM especialidades
+        SELECT id_especialidad, descripcion
+        FROM especialidad
         """
         # objeto conexion
         conexion = Conexion()
@@ -19,7 +19,7 @@ class EspecialidadDao:
             especialidades = cur.fetchall() # trae datos de la bd
 
             # Transformar los datos en una lista de diccionarios
-            return [{'id': especialidad[0], 'descripcion': especialidad[1]} for especialidad in especialidades]
+            return [{'id_especialidad': especialidad[0], 'descripcion': especialidad[1]} for especialidad in especialidades]
 
         except Exception as e:
             app.logger.error(f"Error al obtener todas las especialidades: {str(e)}")
@@ -29,22 +29,22 @@ class EspecialidadDao:
             cur.close()
             con.close()
 
-    def getEspecialidadById(self, id):
+    def getEspecialidadById(self, id_especialidad):
 
         especialidadSQL = """
-        SELECT id, descripcion
-        FROM especialidades WHERE id=%s
+        SELECT id_especialidad, descripcion
+        FROM especialidad WHERE id_especialidad=%s
         """
         # objeto conexion
         conexion = Conexion()
         con = conexion.getConexion()
         cur = con.cursor()
         try:
-            cur.execute(especialidadSQL, (id,))
+            cur.execute(especialidadSQL, (id_especialidad,))
             especialidadEncontrada = cur.fetchone() # Obtener una sola fila
             if especialidadEncontrada:
                 return {
-                        "id": especialidadEncontrada[0],
+                        "id_especialidad": especialidadEncontrada[0],
                         "descripcion": especialidadEncontrada[1]
                     }  # Retornar los datos de la ciudad
             else:
@@ -60,7 +60,7 @@ class EspecialidadDao:
     def guardarEspecialidad(self, descripcion):
 
         insertEspecialidadSQL = """
-        INSERT INTO especialidades(descripcion) VALUES(%s) RETURNING id
+        INSERT INTO especialidad(descripcion) VALUES(%s) RETURNING id_especialidad
         """
 
         conexion = Conexion()
@@ -85,12 +85,12 @@ class EspecialidadDao:
             cur.close()
             con.close()
 
-    def updateEspecialidad(self, id, descripcion):
+    def updateEspecialidad(self, id_especialidad, descripcion):
 
         updateEspecialidadSQL = """
-        UPDATE especialidades
+        UPDATE especialidad
         SET descripcion=%s
-        WHERE id=%s
+        WHERE id_especialidad=%s
         """
 
         conexion = Conexion()
@@ -98,7 +98,7 @@ class EspecialidadDao:
         cur = con.cursor()
 
         try:
-            cur.execute(updateEspecialidadSQL, (descripcion, id,))
+            cur.execute(updateEspecialidadSQL, (descripcion, id_especialidad,))
             filas_afectadas = cur.rowcount # Obtener el número de filas afectadas
             con.commit()
 
@@ -113,11 +113,11 @@ class EspecialidadDao:
             cur.close()
             con.close()
 
-    def deleteEspecialidad(self, id):
+    def deleteEspecialidad(self, id_especialidad):
 
         updateEspecialidadSQL = """
-        DELETE FROM especialidades
-        WHERE id=%s
+        DELETE FROM especialidad
+        WHERE id_especialidad=%s
         """
 
         conexion = Conexion()
@@ -125,7 +125,7 @@ class EspecialidadDao:
         cur = con.cursor()
 
         try:
-            cur.execute(updateEspecialidadSQL, (id,))
+            cur.execute(updateEspecialidadSQL, (id_especialidad,))
             rows_affected = cur.rowcount
             con.commit()
 

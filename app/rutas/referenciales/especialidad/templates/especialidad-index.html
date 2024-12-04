@@ -17,7 +17,7 @@ Especialidad
         <table class="table table-striped" id="tbl">
           <thead>
             <tr>
-              <th>Descripción</th>
+              <th>Especialidades</th>
               <th>Acciones</th>
             </tr>
           </thead>
@@ -43,8 +43,8 @@ Especialidad
           <div class="modal-body">
             <div class="form-group">
               <input type="hidden" id="txtIdEspecialidad">
-              <label for="txtDescripcion">Descripción:</label>
-              <input type="text" class="form-control" placeholder="Ingrese la especialidad" id="txtDescripcion">
+              <label for="txtEspecialidad">Especialidad:</label>
+              <input type="text" class="form-control" placeholder="Ingrese la especialidad" id="txtEspecialidad">
             </div>
           </div>
 
@@ -81,8 +81,8 @@ Especialidad
       columns: [
         { data: 'descripcion' },
         { data: function(row) {
-            return `<button type="button" name="btn_editar" class="btn btn-info" data-id="${row.id}">Editar</button>
-                    <button type="button" name="btn_eliminar" class="btn btn-warning" data-id="${row.id}">Eliminar</button>`
+            return `<button type="button" name="btn_editar" class="btn btn-info" data-id_especialidad="${row.id_especialidad}">Editar</button>
+                    <button type="button" name="btn_eliminar" class="btn btn-warning" data-id_especialidad="${row.id_especialidad}">Eliminar</button>`
           }
         }
       ]
@@ -95,7 +95,7 @@ Especialidad
       $('#modalTitle').text("Agregar Especialidad");
       // inicia ventana modal
       $('#txtIdEspecialidad').val("");
-      $('#txtDescripcion').val("");
+      $('#txtEspecialidad').val("");
       $('#modalFormulario').modal();
     });
   }
@@ -103,7 +103,7 @@ Especialidad
   const guardar = () => {
     $('#btnGuardar').on('click', function() {
       const idEspecialidad = $('#txtIdEspecialidad').val();
-      const nuevaDescripcion = $('#txtDescripcion').val();
+      const nuevaDescripcion = $('#txtEspecialidad').val();
       const tabla = $('#tbl').DataTable();
 
       if(idEspecialidad) {
@@ -118,7 +118,7 @@ Especialidad
         .then(data => {
           if(data && !data.error && data.success) {
             tabla.ajax.reload();
-            Swal.fire("Actualizado", "La especialidad ha sido actualizada correctamente.", "success");
+            Swal.fire("Actualizado", "La especialidad ha sido guardada correctamente.", "success");
           } else {
             Swal.fire(data.error);
           }
@@ -138,7 +138,7 @@ Especialidad
         .then(data => {
           if(data && !data.error && data.success) {
             tabla.ajax.reload();
-            Swal.fire("Actualizado", "La especialidad ha sido agregada correctamente.", "success");
+            Swal.fire("Registrado", "La especialidad ha sido guardada correctamente.", "success");
           } else {
             Swal.fire(data.error);
           }
@@ -147,28 +147,28 @@ Especialidad
           Swal.fire("Error", "Ocurrió un error al guardar la especialidad.", "error");
         });
       }
-      $('#txtDescripcion').val("");
+      $('#txtEspecialidad').val("");
       $('#modalFormulario').modal("hide");
     });
   }
 
   const editar = () => {
-    $('#tbl').on('click', 'button[name="btn_editar"]',function(){
+    $('#tbl').on('click', 'button[name="btn_editar"]', function() {
       // Mostrar mensaje de confirmación usando sweetalert
       Swal.fire({
         title: "¿Deseas editar este registro?",
         showCancelButton: true,
-        confirmButtonText: "Si",
-        cancelButtonText: `No`
+        confirmButtonText: "Sí",
+        cancelButtonText: "No"
       }).then((result) => {
         if (result.isConfirmed) {
-          //Swal.fire("Saved!", "", "success");
+          // Cambiar el título del modal a "Editar Especialidad"
           $('#modalTitle').text("Editar Especialidad");
-
-          const idEspecialidad = $(this).data('id');
+  
+          const idEspecialidad = $(this).data('id_especialidad');
           $('#txtIdEspecialidad').val(idEspecialidad);
-
-          // Necesitamos obtener la descripción del backend
+  
+          // Obtener la descripción de la especialidad desde el backend
           fetch(`/api/v1/especialidades/${idEspecialidad}`, {
             method: 'GET',
             headers: {
@@ -177,8 +177,13 @@ Especialidad
           })
           .then(resp => resp.json())
           .then(data => {
-            $('#txtDescripcion').val(data.data.descripcion);
-            $('#modalFormulario').modal();
+            // Asegurarse de que el campo a actualizar es #txtEspecialidad
+            $('#txtEspecialidad').val(data.data.descripcion);
+            $('#modalFormulario').modal(); // Mostrar el modal
+          })
+          .catch(err => {
+            console.error("Error al obtener los datos de la especialidad:", err);
+            Swal.fire("Error", "No se pudo cargar la información de la especialidad.", "error");
           });
         }
       });
@@ -187,7 +192,7 @@ Especialidad
 
   const eliminar = () => {
     $('#tbl').on('click', 'button[name="btn_eliminar"]',function(){
-      const idEspecialidad = $(this).data('id');
+      const idEspecialidad = $(this).data('id_especialidad');
       // Mostrar mensaje de confirmación usando sweetalert
       Swal.fire({
         title: "¿Deseas eliminar este registro?",

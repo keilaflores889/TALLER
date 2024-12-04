@@ -73,7 +73,7 @@ def addEspecialidad():
         if especialidad_id is not None:
             return jsonify({
                 'success': True,
-                'data': {'id': especialidad_id, 'descripcion': descripcion},
+                'data': {'id_especialidad': especialidad_id, 'descripcion': descripcion},
                 'error': None
             }), 201
         else:
@@ -86,7 +86,7 @@ def addEspecialidad():
         }), 500
 
 @especiapi.route('/especialidades/<int:especialidad_id>', methods=['PUT'])
-def updateEspeccialidad(especialidad_id):
+def updateEspecialidad(especialidad_id):
     data = request.get_json()
     especialidaddao = EspecialidadDao()
 
@@ -105,7 +105,7 @@ def updateEspeccialidad(especialidad_id):
         if especialidaddao.updateEspecialidad(especialidad_id, descripcion.upper()):
             return jsonify({
                 'success': True,
-                'data': {'id': especialidad_id, 'descripcion': descripcion},
+                'data': {'id_especialidad': especialidad_id, 'descripcion': descripcion},
                 'error': None
             }), 200
         else:
@@ -144,3 +144,4 @@ def deleteEspecialidad(especialidad_id):
             'success': False,
             'error': 'Ocurrió un error interno. Consulte con el administrador.'
         }), 500
+    
