@@ -4,7 +4,7 @@ from app.dao.referenciales.turno.TurnoDao import TurnoDao
 turnoapi = Blueprint('turnoapi', __name__)
 
 # Lista de turnos validos
-TURNOS_VALIDOS= ['MAÑANA', 'TARDE', 'NOCHE']
+TURNOS_VALIDOS= ['MAÑANA', 'TARDE', 'NOCHE', 'MAÑANA, TARDE Y NOCHE', 'MAÑANA Y TARDE', 'TARDE Y NOCHE']
 
 
 # Trae todos los turnos
@@ -78,7 +78,7 @@ def addTurno():
         if descripcion not in TURNOS_VALIDOS:
             return jsonify({
                 'success': False,
-                'error': 'Turno inválido. Solo se permiten Turnos de Mañana, Tarde y Noche.'
+                'error': 'Turno inválido. Solo se permiten Turnos de "Mañana", "Tarde", "Noche", "Mañana, Tarde y Noche", "Mañana y Tarde", "Tarde y Noche".'
             }), 400
 
 
@@ -86,7 +86,7 @@ def addTurno():
         if turno_id is not None:
             return jsonify({
                 'success': True,
-                'data': {'id': turno_id, 'descripcion': descripcion},
+                'data': {'id_turno': turno_id, 'descripcion': descripcion},
                 'error': None
             }), 201
         else:
@@ -119,14 +119,14 @@ def updateTurno(turno_id):
     if descripcion not in TURNOS_VALIDOS:
             return jsonify({
                 'success': False,
-                'error': 'Turno inválido. Solo se permiten Turnos de Mañana, Tarde y Noche.'
+                'error': 'Turno inválido. Solo se permiten Turnos de "Mañana", "Tarde", "Noche", "Mañana, Tarde y Noche", "Mañana y Tarde", "Tarde y Noche".'
             }), 400
 
     try:
         if turnodao.updateTurno(turno_id, descripcion.upper()):
             return jsonify({
                 'success': True,
-                'data': {'id': turno_id, 'descripcion': descripcion},
+                'data': {'id_turno': turno_id, 'descripcion': descripcion},
                 'error': None
             }), 200
         else:

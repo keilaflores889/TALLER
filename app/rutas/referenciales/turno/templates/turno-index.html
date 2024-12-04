@@ -17,7 +17,7 @@ Turnos
         <table class="table table-striped" id="tbl">
           <thead>
             <tr>
-              <th>Descripción</th>
+              <th>Turnos</th>
               <th>Acciones</th>
             </tr>
           </thead>
@@ -42,7 +42,7 @@ Turnos
           <div class="modal-body">
             <div class="form-group">
               <input type="hidden" id="txtIdTurno">
-              <label for="txtDescripcion">Descripción:</label>
+              <label for="txtDescripcion">Turno:</label>
               <input type="text" class="form-control" placeholder="Ingrese el turno" id="txtDescripcion">
             </div>
           </div>
@@ -80,8 +80,8 @@ Turnos
       columns: [
         { data: 'descripcion' },
         { data: function(row) {
-            return `<button type="button" name="btn_editar" class="btn btn-info" data-id="${row.id}">Editar</button>
-                    <button type="button" name="btn_eliminar" class="btn btn-warning" data-id="${row.id}">Eliminar</button>`
+            return `<button type="button" name="btn_editar" class="btn btn-info" data-id_turno="${row.id_turno}">Editar</button>
+                    <button type="button" name="btn_eliminar" class="btn btn-warning" data-id_turno="${row.id_turno}">Eliminar</button>`
           }
         }
       ]
@@ -160,7 +160,7 @@ Turnos
         if (result.isConfirmed) {
           $('#modalTitle').text("Editar un Turno");
 
-          const idTurno = $(this).data('id');
+          const idTurno = $(this).data('id_turno');
           $('#txtIdTurno').val(idTurno);
 
           fetch(`/api/v1/turnos/${idTurno}`, {
@@ -181,7 +181,7 @@ Turnos
 
   const eliminar = () => {
     $('#tbl').on('click', 'button[name="btn_eliminar"]',function(){
-      const idTurno = $(this).data('id');
+      const idTurno = $(this).data('id_turno');
       Swal.fire({
         title: "¿Deseas eliminar este registro?",
         showCancelButton: true,
