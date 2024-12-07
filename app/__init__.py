@@ -23,7 +23,7 @@ from app.rutas.referenciales.turno.turno_routes import turmod  #turno
 
 
 #importacion de cita
-from app.rutas.Agendamiento.cita.cita_routes import citamod   # Cita
+from app.rutas.Agendamiento.RegistCita.RegistrarC_routes import registrocmod
 from app.rutas.Agendamiento.vistaAGENDAR.vistaAGENDAR_routes import vistagendamod
 from app.rutas.Agendamiento.AgendMedica.Agenda_routes import agendmod
 from app.rutas.Agendamiento.RegisPaciente.RegistroP_routes import registropmod
@@ -49,8 +49,8 @@ app.register_blueprint(turmod, url_prefix=f'{modulo0}/turno') #turno
 
 # registrar agendamientos
 modulo0 = '/agendamientos'
-app.register_blueprint(citamod, url_prefix=f'{modulo0}/cita')  # cita
 
+app.register_blueprint(registrocmod, url_prefix=f'{modulo0}/RegistCita')  # cita
 app.register_blueprint(vistagendamod, url_prefix=f'{modulo0}/cita')  # cita
 app.register_blueprint(agendmod, url_prefix=f'{modulo0}/AgendMedica')  # cita
 app.register_blueprint(registropmod, url_prefix=f'{modulo0}/RegisPaciente')
@@ -99,8 +99,8 @@ from app.rutas.referenciales.turno.turno_api import turnoapi
 
 
 #cita
-from app.rutas.Agendamiento.cita.cita_api import citaapi
 
+from app.rutas.Agendamiento.RegistCita.RegistrarC_api import regiscitaapi
 from app.rutas.Agendamiento.AgendMedica.Agenda_api import agendaapi
 from app.rutas.Agendamiento.RegisPaciente.RegistrarP_api import registropapi
 
@@ -161,9 +161,11 @@ app.register_blueprint(turnoapi, url_prefix=version1)
 
 
 # Cita
-version1 = '/api/v1'
-app.register_blueprint(citaapi, url_prefix=version1)
 
+
+
+version1 = '/api/v1'
+app.register_blueprint(regiscitaapi, url_prefix=version1)
 
 version1 = '/api/v1'
 app.register_blueprint(agendaapi, url_prefix=version1)

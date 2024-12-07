@@ -102,7 +102,7 @@ class RegistroPDao:
             con.close()
 
     def updateRegistroP(self, nombre, apellido, cedula_identidad, fecha_nacimiento, fecha_registro, telefono, id_ciudad, id_barrio, id_persona):
-        updateAgendaSQL = """
+        updateRegistropSQL = """
         UPDATE persona
         SET nombre=%s, apellido=%s, cedula_identidad=%s, fecha_nacimiento=%s, fecha_registro=%s, telefono=%s, id_ciudad=%s, id_barrio=%s
         WHERE id_persona=%s
@@ -111,7 +111,7 @@ class RegistroPDao:
         con = conexion.getConexion()
         cur = con.cursor()
         try:
-            cur.execute(updateAgendaSQL, (nombre, apellido, cedula_identidad, fecha_nacimiento, fecha_registro, telefono, id_ciudad, id_barrio, id_persona))
+            cur.execute(updateRegistropSQL, (nombre, apellido, cedula_identidad, fecha_nacimiento, fecha_registro, telefono, id_ciudad, id_barrio, id_persona))
             filas_afectadas = cur.rowcount
             con.commit()
             return filas_afectadas > 0

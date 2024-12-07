@@ -1,0 +1,251 @@
+{% extends 'base.html' %}
+
+{% block titulo %}
+Registrar Cita
+{% endblock %}
+
+{% block contenido %}
+<div class="container mt-4">
+    <h3>Registro de Citas</h3>
+  
+    <!-- Tarjeta -->
+    <div class="card">
+      <div class="card-header">
+        <button type="button" class="btn btn-outline-info" id="btnAgregarCita">Agregar Cita</button>
+      </div>
+      <div class="card-body">
+        <table class="table table-striped" id="tblCitas">
+          <thead>
+            <tr>
+              <th>Paciente</th>
+              <th>Médico</th>
+              <th>Especialidad</th>
+              <th>Fecha</th>
+              <th>Hora</th>
+              <th>Estado</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+    <!-- /Tarjeta -->
+  
+    <!-- Modal -->
+    <div class="modal" id="modalFormularioCita">
+      <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+          <!-- Header -->
+          <div class="modal-header">
+            <h4 class="modal-title" id="modalTitle">Registrar Cita</h4>
+            <button type="button" class="close" data-dismiss="modal">&times;</button>
+          </div>
+          <!-- Cuerpo -->
+          <div class="modal-body">
+            <div class="row">
+              <!-- Columna izquierda -->
+              <div class="col-md-6">
+                <!-- Campo Paciente -->
+                <div class="form-group">
+                  <label for="paciente">Paciente:</label>
+                  <input type="text" id="paciente" class="form-control" placeholder="Ingrese el nombre del paciente">
+                </div>
+                <!-- Campo Médico -->
+                <div class="form-group">
+                    <label for="medico">Médico:</label>
+                    <select id="medico" class="form-control">
+                      <option value="">Seleccione</option>
+                      <option value="Dr. Juan Pérez">Dra. Diana Barreto</option>
+                      <option value="Dra. María López">Dra. Nuri González</option>
+                      <option value="Dr. Carlos Sánchez">Dr. Alexander Ayala</option>
+                    </select>
+                  </div>
+                <!-- Campo Especialidad -->
+                <div class="form-group">
+                  <label for="especialidad">Especialidad:</label>
+                  <select id="especialidad" class="form-control">
+                    <option value="">Seleccione</option>
+                    <option value="Ortodoncia">Ortodoncia</option>
+                    <option value="Rehabilitación Oral">Rehabilitación Oral</option>
+                    <option value="Cirugía Oral">Cirugía Oral</option>
+                  </select>
+                </div>
+                <!-- Campo Fecha -->
+                <div class="form-group">
+                  <label for="fecha">Fecha:</label>
+                  <input type="date" id="fecha" class="form-control">
+                </div>
+              </div>
+              <!-- Columna derecha -->
+              <div class="col-md-6">
+                <!-- Campo Hora -->
+                <div class="form-group">
+                  <label for="hora">Hora:</label>
+                  <input type="time" id="hora" class="form-control">
+                </div>
+                <!-- Campo Estado -->
+                <div class="form-group">
+                  <label for="estado">Estado:</label>
+                  <select id="estado" class="form-control">
+                    <option value="">Seleccione</option>
+                    <option value="Reservado">Reservado</option>
+                    <option value="Sin Confirmar">Sin Confirmar</option>
+                    <option value="Confirmado">Confirmado</option>
+                    <option value="Cancelado">Cancelado</option>
+                    <option value="Realizado">Realizado</option>
+                  </select>
+                </div>
+                <!-- Campo Motivo de Consulta -->
+                <div class="form-group">
+                  <label for="motivo">Motivo de Consulta:</label>
+                  <textarea id="motivo" class="form-control" rows="4" placeholder="Describa el motivo de la consulta"></textarea>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- Footer -->
+          <div class="modal-footer">
+            <button type="button" class="btn btn-primary" id="btnGuardarCita">Guardar</button>
+            <button type="button" class="btn btn-danger" data-dismiss="modal">Cerrar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+
+  <!-- Librerías necesarias -->
+  <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+</div>
+{% endblock %}
+
+{% block js %}
+<script>
+    $(document).ready(function () {
+      const STORAGE_KEY = 'citas';
+      let citas = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+  
+      // Inicializar DataTable
+      const tabla = $('#tblCitas').DataTable({
+        language: {
+          url: "https://cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json"
+        },
+        columns: [
+          { title: 'Paciente' },
+          { title: 'Médico' },
+          { title: 'Especialidad' },
+          { title: 'Fecha' },
+          { title: 'Hora' },
+          { title: 'Estado' },
+          { title: 'motivo' },
+          { title: 'Acciones', orderable: false }
+        ],
+      });
+  
+      // Función para cargar datos en la tabla
+      const cargarTabla = () => {
+        tabla.clear();
+        citas.forEach((item, index) => {
+          tabla.row.add([
+            item.paciente,
+            item.medico,
+            item.especialidad,
+            item.fecha,
+            item.hora,
+            item.estado,
+            item.motivo,
+            `<button class="btn btn-info btnEditar" data-index="${index}" title="Editar">
+              <i class="fas fa-pencil-alt"></i>
+            </button>
+            <button class="btn btn-danger btnEliminar" data-index="${index}" title="Eliminar">
+              <i class="fas fa-trash"></i>
+            </button>`
+          ]);
+        });
+        tabla.draw();
+      };
+  
+      const guardarLocalStorage = () => {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(citas));
+      };
+  
+      cargarTabla();
+  
+      // Abrir modal para agregar cita
+      $('#btnAgregarCita').on('click', function () {
+        $('#modalFormularioCita').data('index', null).modal('show');
+        $('#paciente, #especialidad, #fecha, #hora, #estado, #motivo').val('');
+        $('#medico').val(''); // Restablecer el combo de médicos
+      });
+  
+      // Guardar cita
+      $('#btnGuardarCita').on('click', function () {
+        const paciente = $('#paciente').val();
+        const medico = $('#medico option:selected').text(); // Obtener el texto seleccionado
+        const especialidad = $('#especialidad').val();
+        const fecha = $('#fecha').val();
+        const hora = $('#hora').val();
+        const estado = $('#estado').val();
+        const motivo = $('#motivo').val();
+        const index = $('#modalFormularioCita').data('index');
+  
+        if (!paciente || !medico || !especialidad || !fecha || !hora || !estado || !motivo) {
+          Swal.fire('Error', 'Por favor complete todos los campos obligatorios.', 'error');
+          return;
+        }
+  
+        const nuevaCita = { paciente, medico, especialidad, fecha, hora, estado, motivo };
+  
+        if (index !== null) {
+          citas[index] = nuevaCita;
+        } else {
+          citas.push(nuevaCita);
+        }
+  
+        guardarLocalStorage();
+        $('#modalFormularioCita').modal('hide');
+        cargarTabla();
+      });
+  
+      // Editar cita
+      $('#tblCitas').on('click', '.btnEditar', function () {
+        const index = $(this).data('index');
+        const cita = citas[index];
+        $('#modalFormularioCita').data('index', index).modal('show');
+        $('#paciente').val(cita.paciente);
+        $('#medico').val(cita.medico); // Selecciona el médico guardado
+        $('#especialidad').val(cita.especialidad);
+        $('#fecha').val(cita.fecha);
+        $('#hora').val(cita.hora);
+        $('#estado').val(cita.estado);
+        $('#motivo').val(cita.motivo);
+      });
+  
+      // Eliminar cita
+      $('#tblCitas').on('click', '.btnEliminar', function () {
+        const index = $(this).data('index');
+        Swal.fire({
+          title: '¿Está seguro de eliminar esta cita?',
+          showCancelButton: true,
+          confirmButtonText: 'Sí',
+          cancelButtonText: 'No',
+        }).then((result) => {
+          if (result.isConfirmed) {
+            citas.splice(index, 1);
+            guardarLocalStorage();
+            cargarTabla();
+            Swal.fire('Eliminado', 'La cita ha sido eliminada.', 'success');
+          }
+        });
+      });
+    });
+  </script>
+  
+  
+  
+  {% endblock %}
