@@ -24,12 +24,12 @@ def getEstadosCita():
             'error': 'Ocurrió un error interno. Consulte con el administrador.'
         }), 500
 
-@estacitapi.route('/estadoscitas/<int:estadocita_id>', methods=['GET'])
-def getEstadoCita(estadocita_id):
+@estacitapi.route('/estadoscitas/<int:estado_id>', methods=['GET'])
+def getEstadoCita(estado_id):
     estacitdao = EstadoCitaDao()
 
     try:
-        estadocita = estacitdao.getEstadoCitaById(estadocita_id)
+        estadocita = estacitdao.getEstadoCitaById(estado_id)
 
         if estadocita:
             return jsonify({
@@ -69,11 +69,11 @@ def addEstadoCita():
 
     try:
         descripcion = data['descripcion'].upper()
-        estadocita_id = estacitdao.guardarEstadoCita(descripcion)
-        if estadocita_id is not None:
+        estado_id = estacitdao.guardarEstadoCita(descripcion)
+        if estado_id is not None:
             return jsonify({
                 'success': True,
-                'data': {'id': estadocita_id, 'descripcion': descripcion},
+                'data': {'estado_id':estado_id, 'descripcion': descripcion},
                 'error': None
             }), 201
         else:
@@ -85,8 +85,8 @@ def addEstadoCita():
             'error': 'Ocurrió un error interno. Consulte con el administrador.'
         }), 500
 
-@estacitapi.route('/estadoscitas/<int:estadocita_id>', methods=['PUT'])
-def updateEstadoCita(estadocita_id):
+@estacitapi.route('/estadoscitas/<int:estado_id>', methods=['PUT'])
+def updateEstadoCita(estado_id):
     data = request.get_json()
     estacitdao = EstadoCitaDao()
 
@@ -102,10 +102,10 @@ def updateEstadoCita(estadocita_id):
                             }), 400
     descripcion = data['descripcion']
     try:
-        if estacitdao.updateEstadoCita(estadocita_id, descripcion.upper()):
+        if estacitdao.updateEstadoCita(estado_id, descripcion.upper()):
             return jsonify({
                 'success': True,
-                'data': {'id': estadocita_id, 'descripcion': descripcion},
+                'data': {'estado_id': estado_id, 'descripcion': descripcion},
                 'error': None
             }), 200
         else:
@@ -120,16 +120,16 @@ def updateEstadoCita(estadocita_id):
             'error': 'Ocurrió un error interno. Consulte con el administrador.'
         }), 500
 
-@estacitapi.route('/estadoscitas/<int:estadocita_id>', methods=['DELETE'])
-def deleteEstadoCita(estadocita_id):
+@estacitapi.route('/estadoscitas/<int:estado_id>', methods=['DELETE'])
+def deleteEstadoCita(estado_id):
     estacitdao = EstadoCitaDao()
 
     try:
         # Usar el retorno de eliminarEstadoCita para determinar el éxito
-        if estacitdao.deleteEstadoCita(estadocita_id):
+        if estacitdao.deleteEstadoCita(estado_id):
             return jsonify({
                 'success': True,
-                'mensaje': f'EstadoCita con ID {estadocita_id} eliminada correctamente.',
+                'mensaje': f'EstadoCita con ID {estado_id} eliminada correctamente.',
                 'error': None
             }), 200
         else:
