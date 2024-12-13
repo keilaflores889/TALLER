@@ -46,6 +46,13 @@ Registrar Cita
             <div class="row">
               <!-- Columna izquierda -->
               <div class="col-md-6">
+
+                <!-- Campo para ingresar la cédula del paciente -->
+              <div class="form-group">
+              <label for="cedula">Cédula del Paciente:</label>
+              <input type="text" id="cedula" class="form-control" placeholder="Ingrese la cédula del paciente">
+              </div>
+
                 <!-- Campo Paciente -->
                 <div class="form-group">
                   <label for="paciente">Paciente:</label>
@@ -113,7 +120,7 @@ Registrar Cita
       </div>
     </div>
   </div>
-  
+
 
   <!-- Librerías necesarias -->
   <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
@@ -121,131 +128,156 @@ Registrar Cita
   <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-</div>
 {% endblock %}
 
 {% block js %}
 <script>
-    $(document).ready(function () {
-      const STORAGE_KEY = 'citas';
-      let citas = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+  $(document).ready(function () {
+    const PACIENTES_STORAGE_KEY = 'pacientes';
+    const STORAGE_KEY = 'citas';
+    const pacientes = [
+      { cedula: '1234567890', nombre: 'Juan Pérez' },
+      { cedula: '5456948', nombre: 'Keila Flores' },
+      { cedula: '3823996', nombre: 'Fredy Aguilera' }
+    ];
   
-      // Inicializar DataTable
-      const tabla = $('#tblCitas').DataTable({
-        language: {
-          url: "https://cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json"
-        },
-        columns: [
-          { title: 'Paciente' },
-          { title: 'Médico' },
-          { title: 'Especialidad' },
-          { title: 'Fecha' },
-          { title: 'Hora' },
-          { title: 'Estado' },
-          { title: 'motivo' },
-          { title: 'Acciones', orderable: false }
-        ],
+    
+    let citas = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+  
+    // Inicializar DataTable
+    const tabla = $('#tblCitas').DataTable({
+      language: {
+        url: "https://cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json"
+      },
+      columns: [
+        { title: 'Paciente' },
+        { title: 'Médico' },
+        { title: 'Especialidad' },
+        { title: 'Fecha' },
+        { title: 'Hora' },
+        { title: 'Estado' },
+        { title: 'Motivo' },
+        { title: 'Acciones', orderable: false }
+      ],
+    });
+  
+    // Función para cargar datos en la tabla
+    const cargarTabla = () => {
+      tabla.clear();
+      citas.forEach((item, index) => {
+        tabla.row.add([
+          item.paciente,
+          item.medico,
+          item.especialidad,
+          item.fecha,
+          item.hora,
+          item.estado,
+          item.motivo,
+          `<button class="btn btn-info btnEditar" data-index="${index}" title="Editar">
+            <i class="fas fa-pencil-alt"></i>
+          </button>
+          <button class="btn btn-danger btnEliminar" data-index="${index}" title="Eliminar">
+            <i class="fas fa-trash"></i>
+          </button>`
+        ]);
       });
+      tabla.draw();
+    };
   
-      // Función para cargar datos en la tabla
-      const cargarTabla = () => {
-        tabla.clear();
-        citas.forEach((item, index) => {
-          tabla.row.add([
-            item.paciente,
-            item.medico,
-            item.especialidad,
-            item.fecha,
-            item.hora,
-            item.estado,
-            item.motivo,
-            `<button class="btn btn-info btnEditar" data-index="${index}" title="Editar">
-              <i class="fas fa-pencil-alt"></i>
-            </button>
-            <button class="btn btn-danger btnEliminar" data-index="${index}" title="Eliminar">
-              <i class="fas fa-trash"></i>
-            </button>`
-          ]);
-        });
-        tabla.draw();
-      };
+    const guardarLocalStorage = () => {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(citas));
+    };
   
-      const guardarLocalStorage = () => {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(citas));
-      };
+    cargarTabla();
   
+    // Buscar paciente por cédula
+    const buscarPacientePorCedula = (cedula) => {
+      return pacientes.find(paciente => paciente.cedula === cedula);
+    };
+  
+    // Evento para buscar paciente al cambiar la cédula
+    $('#cedula').on('change', function () {
+      const cedula = $(this).val();
+      const paciente = buscarPacientePorCedula(cedula);
+  
+      if (paciente) {
+        $('#paciente').val(paciente.nombre); // Rellena el nombre si se encuentra
+      } else {
+        $('#paciente').val(''); // Limpia el campo si no se encuentra
+        Swal.fire('Atención', 'Paciente no encontrado. Regístrelo primero.', 'warning');
+      }
+    });
+  
+    // Abrir modal para agregar cita
+    $('#btnAgregarCita').on('click', function () {
+      $('#modalFormularioCita').data('index', null).modal('show');
+      $('#cedula, #paciente, #especialidad, #fecha, #hora, #estado, #motivo').val('');
+      $('#medico').val(''); // Restablecer el combo de médicos
+    });
+  
+    // Guardar cita
+    $('#btnGuardarCita').on('click', function () {
+      const cedula = $('#cedula').val();
+      const paciente = $('#paciente').val();
+      const medico = $('#medico option:selected').text();
+      const especialidad = $('#especialidad').val();
+      const fecha = $('#fecha').val();
+      const hora = $('#hora').val();
+      const estado = $('#estado').val();
+      const motivo = $('#motivo').val();
+      const index = $('#modalFormularioCita').data('index');
+  
+      if (!cedula || !paciente || !medico || !especialidad || !fecha || !hora || !estado || !motivo) {
+        Swal.fire('Error', 'Por favor complete todos los campos obligatorios.', 'error');
+        return;
+      }
+  
+      const nuevaCita = { cedula, paciente, medico, especialidad, fecha, hora, estado, motivo };
+  
+      if (index !== null) {
+        citas[index] = nuevaCita;
+      } else {
+        citas.push(nuevaCita);
+      }
+  
+      guardarLocalStorage();
+      $('#modalFormularioCita').modal('hide');
       cargarTabla();
+    });
   
-      // Abrir modal para agregar cita
-      $('#btnAgregarCita').on('click', function () {
-        $('#modalFormularioCita').data('index', null).modal('show');
-        $('#paciente, #especialidad, #fecha, #hora, #estado, #motivo').val('');
-        $('#medico').val(''); // Restablecer el combo de médicos
-      });
+    // Editar cita
+    $('#tblCitas').on('click', '.btnEditar', function () {
+      const index = $(this).data('index');
+      const cita = citas[index];
+      $('#modalFormularioCita').data('index', index).modal('show');
+      $('#cedula').val(cita.cedula);
+      $('#paciente').val(cita.paciente);
+      $('#medico').val(cita.medico); // Selecciona el médico guardado
+      $('#especialidad').val(cita.especialidad);
+      $('#fecha').val(cita.fecha);
+      $('#hora').val(cita.hora);
+      $('#estado').val(cita.estado);
+      $('#motivo').val(cita.motivo);
+    });
   
-      // Guardar cita
-      $('#btnGuardarCita').on('click', function () {
-        const paciente = $('#paciente').val();
-        const medico = $('#medico option:selected').text(); // Obtener el texto seleccionado
-        const especialidad = $('#especialidad').val();
-        const fecha = $('#fecha').val();
-        const hora = $('#hora').val();
-        const estado = $('#estado').val();
-        const motivo = $('#motivo').val();
-        const index = $('#modalFormularioCita').data('index');
-  
-        if (!paciente || !medico || !especialidad || !fecha || !hora || !estado || !motivo) {
-          Swal.fire('Error', 'Por favor complete todos los campos obligatorios.', 'error');
-          return;
+    // Eliminar cita
+    $('#tblCitas').on('click', '.btnEliminar', function () {
+      const index = $(this).data('index');
+      Swal.fire({
+        title: '¿Está seguro de eliminar esta cita?',
+        showCancelButton: true,
+        confirmButtonText: 'Sí',
+        cancelButtonText: 'No',
+      }).then((result) => {
+        if (result.isConfirmed) {
+          citas.splice(index, 1);
+          guardarLocalStorage();
+          cargarTabla();
+          Swal.fire('Eliminado', 'La cita ha sido eliminada.', 'success');
         }
-  
-        const nuevaCita = { paciente, medico, especialidad, fecha, hora, estado, motivo };
-  
-        if (index !== null) {
-          citas[index] = nuevaCita;
-        } else {
-          citas.push(nuevaCita);
-        }
-  
-        guardarLocalStorage();
-        $('#modalFormularioCita').modal('hide');
-        cargarTabla();
-      });
-  
-      // Editar cita
-      $('#tblCitas').on('click', '.btnEditar', function () {
-        const index = $(this).data('index');
-        const cita = citas[index];
-        $('#modalFormularioCita').data('index', index).modal('show');
-        $('#paciente').val(cita.paciente);
-        $('#medico').val(cita.medico); // Selecciona el médico guardado
-        $('#especialidad').val(cita.especialidad);
-        $('#fecha').val(cita.fecha);
-        $('#hora').val(cita.hora);
-        $('#estado').val(cita.estado);
-        $('#motivo').val(cita.motivo);
-      });
-  
-      // Eliminar cita
-      $('#tblCitas').on('click', '.btnEliminar', function () {
-        const index = $(this).data('index');
-        Swal.fire({
-          title: '¿Está seguro de eliminar esta cita?',
-          showCancelButton: true,
-          confirmButtonText: 'Sí',
-          cancelButtonText: 'No',
-        }).then((result) => {
-          if (result.isConfirmed) {
-            citas.splice(index, 1);
-            guardarLocalStorage();
-            cargarTabla();
-            Swal.fire('Eliminado', 'La cita ha sido eliminada.', 'success');
-          }
-        });
       });
     });
+  });
   </script>
-  
-  
-  
+
   {% endblock %}

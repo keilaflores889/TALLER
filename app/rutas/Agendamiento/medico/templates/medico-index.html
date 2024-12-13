@@ -1,12 +1,12 @@
 {% extends 'base.html' %}
 
 {% block titulo %}
-Agenda Médica
+Medico
 {% endblock %}
 
 {% block contenido %}
 <div class="container mt-4">
-  <h3>Listar Agenda Médica</h3>
+  <h3>Medicos</h3>
 
   <!-- Tarjeta -->
   <div class="card">
@@ -18,8 +18,7 @@ Agenda Médica
         <thead>
           <tr>
             <th>Médico</th>
-            <th>Día</th>
-            <th>Turno</th>
+            <th>Especialidad</th>
             <th>Acciones</th>
           </tr>
         </thead>
@@ -35,7 +34,7 @@ Agenda Médica
       <div class="modal-content">
         <!-- Header -->
         <div class="modal-header">
-          <h4 class="modal-title" id="modalTitle">Nueva Agenda</h4>
+          <h4 class="modal-title" id="modalTitle">Nuevo Medico</h4>
           <button type="button" class="close" data-dismiss="modal">&times;</button>
         </div>
         <!-- Cuerpo -->
@@ -44,35 +43,18 @@ Agenda Médica
             <label for="doctor">Doctor/a:</label>
             <select id="doctor" class="form-control">
               <option value="" data-especialidad="">Seleccione al Dr. o Dra.</option>
-              <option value="Dra. Diana Barreto" data-especialidad="Ortodoncia">Dra. Diana Barreto - Ortodoncia</option>
-              <option value="Dra. Nuri González" data-especialidad="Rehabilitación oral">Dra. Nuri González - Rehabilitación oral</option>
-              <option value="Dr. Alexander Ayala" data-especialidad="Cirugía oral">Dr. Alexander Ayala - Cirugía oral</option>
+              <option value="Dra. Diana Barreto">Dra. Diana Barreto</option>
+              <option value="Dra. Nuri González" >Dra. Nuri González</option>
+              <option value="Dr. Alexander Ayala">Dr. Alexander Ayala</option>
             </select>
           </div>
           <div class="form-group">
-            <label for="dia">Día:</label>
-            <select id="dia" class="form-control">
-              <option value="">Seleccione el día</option>
-              <option value="Lunes">Lunes</option>
-              <option value="Martes">Martes</option>
-              <option value="Miércoles">Miércoles</option>
-              <option value="Jueves">Jueves</option>
-              <option value="Viernes">Viernes</option>
-              <option value="Sábado">Sábado</option>
-              <option value="Lunes a Viernes">Lunes a Viernes</option>
-              <option value="Lunes a Sábado">Lunes a Sábado</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label for="turno">Turno:</label>
-            <select id="turno" class="form-control">
-              <option value="">Seleccione el turno</option>
-              <option value="Mañana">Mañana</option>
-              <option value="Tarde">Tarde</option>
-              <option value="Noche">Noche</option>
-              <option value="Mañana, Tarde y Noche">Mañana, Tarde y Noche</option>
-              <option value="Mañana y Tarde">Mañana y Tarde</option>
-              <option value="Tarde y Noche">Tarde y Noche</option>
+            <label for="especialidad">Especialidad:</label>
+            <select id="especialidad" class="form-control">
+              <option value="">Seleccione la especialidad</option>
+              <option value="Ortodoncia">Ortodoncia</option>
+              <option value="Rehabilitación Oral">Rehabilitación Oral</option>
+              <option value="Cirugia Oral">Cirugia Oral</option>
             </select>
           </div>
         </div>
@@ -101,16 +83,15 @@ Agenda Médica
       language: {
         url: "{{ url_for('static', filename='vendor/datatables/es-ES.json') }}",
       },
-      ajax: '/api/v1/agenda',
+      ajax: '/api/v1/medico',
       columns: [
         { data: 'medico' },
-        { data: 'dia' },
-        { data: 'turno' },
+        { data: 'especialidad' },
         {
           data: function(row) {
             return `
-              <button type="button" name="btn_editar" class="btn btn-info" data-id_agenda_medica="${row.id_agenda_medica}">Editar</button>
-              <button type="button" name="btn_eliminar" class="btn btn-warning" data-id_agenda_medica="${row.id_agenda_medica}">Eliminar</button>`;
+              <button type="button" name="btn_editar" class="btn btn-info" data-id_medico="${row.id_medico}">Editar</button>
+              <button type="button" name="btn_eliminar" class="btn btn-warning" data-id_medico="${row.id_medico}">Eliminar</button>`;
           }
         }
       ]
@@ -119,63 +100,61 @@ Agenda Médica
 
   const agregar = () => {
     $('#btnAgregar').on('click', function() {
-      $('#modalTitle').text("Agregar Agenda");
+      $('#modalTitle').text("Agregar Medico");
       $('#doctor').val("");
-      $('#dia').val("");
-      $('#turno').val("");
+      $('#especialidad').val("");
       $('#modalFormulario').modal();
     });
   };
 
   const guardar = () => {
     $('#btnGuardar').on('click', function() {
-      const idAgenda = $('#txtIdAgenda').val();
+      const idMedico = $('#txtIdMedico').val();
       const doctor = $('#doctor').val();
-      const dia = $('#dia').val();
-      const turno = $('#turno').val();
+      const especialidad = $('#especialidad').val();
       const tabla = $('#tbl').DataTable();
 
-      if (idAgenda) {
-        fetch(`/api/v1/agenda/${idAgenda}`, {
+      if (idMedico) {
+        fetch(`/api/v1/medico/${idMedico}`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json'
           },
-          body: JSON.stringify({ id_medico: doctor, id_dia: dia, id_turno: turno })
+          body: JSON.stringify({ id_medico: doctor, id_especialidad: especialidad })
         })
         .then(resp => resp.json())
         .then(data => {
           if (data && !data.error && data.success) {
             tabla.ajax.reload();
-            Swal.fire("Actualizado", "La agenda ha sido actualizada correctamente.", "success");
+            Swal.fire("Actualizado", "El médico ha sido registrado correctamente.", "success");
           } else {
             Swal.fire(data.error);
           }
         })
         .catch(err => {
           console.error(err);
-          Swal.fire("Error", "Ocurrió un error al actualizar la agenda.", "error");
+          Swal.fire("Error", "Ocurrió un error al actualizar la médico.", "error");
         });
       } else {
-        fetch(`/api/v1/agenda`, {
+        fetch(`/api/v1/medico`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
           },
-          body: JSON.stringify({ id_medico: doctor, id_dia: dia, id_turno: turno })
+          body: JSON.stringify({ id_medico: doctor, id_especialidad: especialidad })
         })
         .then(resp => resp.json())
         .then(data => {
           if (data && !data.error && data.success) {
             tabla.ajax.reload();
-            Swal.fire("Registrado", "La agenda ha sido registrada correctamente.", "success");
+            Swal.fire("Registrado", "El médico ha sido registrada correctamente.", "success");
           } else {
             Swal.fire(data.error);
           }
         })
         .catch(err => {
           console.error(err);
-          Swal.fire("Error", "Ocurrió un error al guardar la agenda.", "error");
+          Swal.fire("Error", "Ocurrió un error al guardar el médico.", "error");
         });
       }
 
@@ -192,11 +171,11 @@ Agenda Médica
         cancelButtonText: "No"
       }).then((result) => {
         if (result.isConfirmed) {
-          $('#modalTitle').text("Editar Agenda");
-          const idAgenda = $(this).data('id_agenda_medica');
-          $('#txtIdAgenda').val(idAgenda);
+          $('#modalTitle').text("Editar Medico");
+          const idMedico = $(this).data('id_medico');
+          $('#txtIdMedico').val(idMedico);
 
-          fetch(`/api/v1/agenda/${idAgenda}`, {
+          fetch(`/api/v1/medico/${idMedico}`, {
             method: 'GET',
             headers: {
               'Content-Type': 'application/json'
@@ -205,8 +184,7 @@ Agenda Médica
           .then(resp => resp.json())
           .then(data => {
             $('#doctor').val(data.data.medico);
-            $('#dia').val(data.data.dia);
-            $('#turno').val(data.data.turno);
+            $('#especialidad').val(data.data.especialidad);
             $('#modalFormulario').modal();
           });
         }
@@ -216,7 +194,7 @@ Agenda Médica
 
   const eliminar = () => {
     $('#tbl').on('click', 'button[name="btn_eliminar"]', function() {
-      const idAgenda = $(this).data('id_agenda_medica');
+      const idMedico = $(this).data('id_medico');
       Swal.fire({
         title: "¿Deseas eliminar este registro?",
         showCancelButton: true,
@@ -224,7 +202,7 @@ Agenda Médica
         cancelButtonText: "No"
       }).then((result) => {
         if (result.isConfirmed) {
-          fetch(`/api/v1/agenda/${idAgenda}`, {
+          fetch(`/api/v1/medico/${idMedico}`, {
             method: 'DELETE',
             headers: {
               'Content-Type': 'application/json'
@@ -242,7 +220,7 @@ Agenda Médica
             }
           })
           .catch(err => {
-            Swal.fire("Error", "Ocurrió un error al eliminar la agenda.", "error");
+            Swal.fire("Error", "Ocurrió un error al eliminar el médico.", "error");
           });
         }
       });
@@ -261,6 +239,5 @@ Agenda Médica
     addEvents();
   });
 </script>
-
-
 {% endblock %}
+

@@ -76,7 +76,7 @@ class AgendaDao:
         con = conexion.getConexion()
         cur = con.cursor()
         try:
-            cur.execute(insertAgendaSQL, (id_medico, id_dia, id_turno))
+            cur.execute(insertAgendaSQL, (id_medico, id_dia, id_turno,))
             agenda_id = cur.fetchone()[0]
             con.commit()
             return agenda_id

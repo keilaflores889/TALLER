@@ -1,10 +1,9 @@
 from flask import Blueprint, request, jsonify, current_app as app
-from app.dao.AgendMedica.AgendaDao import AgendaDao
-
+from app.dao.agendmedica.AgendaDao import AgendaDao
 agendaapi = Blueprint('agendaapi', __name__)
 
 # Obtener todas las agendas médicas
-@agendaapi.route('/Agenda', methods=['GET'])
+@agendaapi.route('/agenda', methods=['GET'])
 def getAgendas():
     agendadao = AgendaDao()
     try:
@@ -23,7 +22,7 @@ def getAgendas():
 
 
 # Obtener una agenda específica por ID
-@agendaapi.route('/Agenda/<int:agenda_medica_id>', methods=['GET'])
+@agendaapi.route('/agenda/<int:agenda_medica_id>', methods=['GET'])
 def getAgenda(agenda_medica_id):
     agendadao = AgendaDao()
     try:
@@ -48,13 +47,13 @@ def getAgenda(agenda_medica_id):
 
 
 # Agregar una nueva agenda
-@agendaapi.route('/Agenda', methods=['POST'])
+@agendaapi.route('/agenda', methods=['POST'])
 def addAgenda():
     data = request.get_json()
     agendadao = AgendaDao()
 
     # Validar campos requeridos
-    campos_requeridos = ['id_medico', 'id_dia', 'id_turno']
+    campos_requeridos = ['id_medico', 'id_dia', 'id_turno',]
     for campo in campos_requeridos:
         if not data.get(campo) or not isinstance(data[campo], str) or not data[campo].strip():
             return jsonify({
@@ -86,7 +85,7 @@ def addAgenda():
 
 
 # Actualizar una agenda existente
-@agendaapi.route('/Agenda/<int:agenda_medica_id>', methods=['PUT'])
+@agendaapi.route('/agenda/<int:agenda_medica_id>', methods=['PUT'])
 def updateAgenda(agenda_medica_id):
     data = request.get_json()
     agendadao = AgendaDao()
@@ -126,7 +125,7 @@ def updateAgenda(agenda_medica_id):
 
 
 # Eliminar una agenda
-@agendaapi.route('/Agenda/<int:agenda_medica_id>', methods=['DELETE'])
+@agendaapi.route('/agenda/<int:agenda_medica_id>', methods=['DELETE'])
 def deleteAgenda(agenda_medica_id):
     agendadao = AgendaDao()
     try:

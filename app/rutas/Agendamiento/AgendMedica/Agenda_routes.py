@@ -1,8 +1,8 @@
 from flask import Blueprint, render_template
 
-agendmod = Blueprint('AgendMedica', __name__, template_folder='templates')
+agendmod = Blueprint('agendmedica', __name__, template_folder='templates')
 
 
-@agendmod.route('/Agenda-index')
+@agendmod.route('/agenda-index')
 def agendaIndex():
-    return render_template('Agenda-index.html')
+    return render_template('agenda-index.html')
