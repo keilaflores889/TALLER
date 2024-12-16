@@ -1,0 +1,103 @@
+{% extends 'base.html' %}
+    
+{% block titulo %}
+Inicio
+{% endblock %}
+
+{% block contenido %}
+
+<style>
+    body {
+        font-family: 'Poppins', sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #f4f7f9; /* Fondo limpio y profesional */
+        color: #333;
+    }
+
+    .welcome-banner {
+        display: flex;
+        flex-wrap: wrap; /* Apilar contenedores si es necesario */
+        justify-content: space-between;
+        align-items: flex-start;
+        background: linear-gradient(90deg, #2daebe, #0288d1); /* Degradado elegante */
+        color: #fff;
+        padding: 20px 40px;
+        border-radius: 20px;
+        margin: 30px auto; /* Centrado */
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        max-width: 1200px; /* Limitar el ancho */
+        gap: 20px; /* Separación entre contenedores */
+    }
+
+    .container {
+        flex: 1; /* Todos los contenedores ocupan el mismo espacio */
+        margin: 10px;
+        padding: 15px;
+        border-radius: 10px;
+        background-color: rgba(48, 140, 190, 0.1); /* Fondo semitransparente */
+        text-align: center; /* Centrar contenido */
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .container.horarios {
+        flex-basis: 70%; /* Ocupa todo el ancho en la fila inferior */
+        text-align: center;
+    }
+
+    .container h3, .container p {
+        margin: 5px 0;
+    }
+
+    .container h3 {
+        font-size: 1.8em;
+        font-weight: bold;
+    }
+
+    .container p {
+        font-size: 1.2em;
+    }
+
+    .large-button {
+        display: inline-block;
+        background: #1c7db1;
+        color: #fff;
+        padding: 15px 30px;
+        font-size: 1em;
+        font-weight: 500;
+        border: none;
+        border-radius: 10px;
+        cursor: pointer;
+        box-shadow: 0 5px 15px rgba(92, 17, 17, 0.2);
+    }
+
+    .large-button:hover {
+        background: #1c7db1;
+        box-shadow: 0 8px 20px rgba(222, 222, 222, 0.21);
+    }
+</style>
+
+<body>
+    <header class="welcome-banner">
+        <!-- Contenedor del nombre del consultorio -->
+        <div class="container">
+            <h3>Consultorio Odontológico</h3>
+            <p>Dra. Diana Barreto</p>
+            <p>ig: dra.dianabarreto02</p>
+        </div>
+        
+        <!-- Contenedor de días y horario -->
+        <div class="container">
+            <h3>Horario de Atención</h3>
+            <p><strong>Lunes a Viernes:</strong> 14:00 a 19:00</p>
+            <p><strong>Sábados:</strong> 08:00 a 12:00 y 14:00 a 16:00</p>
+        </div>
+        
+        <!-- Contenedor del botón (en una fila nueva) -->
+        <div class="container horarios">
+            <a class="large-button" href="{{ url_for('agendmedica.agendaIndex') }}">Agendamiento</a>
+        </div>
+    </header>
+</body>
+
+{% endblock %}

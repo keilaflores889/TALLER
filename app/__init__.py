@@ -26,7 +26,7 @@ from app.rutas.referenciales.turno.turno_routes import turmod  #turno
 from app.rutas.Agendamiento.RegistCita.RegistrarC_routes import registrocmod
 from app.rutas.Agendamiento.vistaAGENDAR.vistaAGENDAR_routes import vistagendamod
 from app.rutas.Agendamiento.agendmedica.agenda_routes import agendmod
-from app.rutas.Agendamiento.RegisPaciente.RegistroP_routes import registropmod
+from app.rutas.Agendamiento.regispersona.registrop_routes import registropmod
 from app.rutas.Agendamiento.medico.medico_routes import medicomod
 # registrar referenciales
 modulo0 = '/referenciales' 
@@ -54,7 +54,7 @@ modulo0 = '/agendamientos'
 app.register_blueprint(registrocmod, url_prefix=f'{modulo0}/RegistCita')  # cita
 app.register_blueprint(vistagendamod, url_prefix=f'{modulo0}/cita')  # cita
 app.register_blueprint(agendmod, url_prefix=f'{modulo0}/agendmedica')  # cita
-app.register_blueprint(registropmod, url_prefix=f'{modulo0}/RegisPaciente')
+app.register_blueprint(registropmod, url_prefix=f'{modulo0}/regispaciente')
 app.register_blueprint(medicomod, url_prefix=f'{modulo0}/medico')
 #ciudad
 from app.rutas.referenciales.ciudad.ciudad_api import ciuapi
@@ -104,7 +104,7 @@ from app.rutas.referenciales.turno.turno_api import turnoapi
 
 from app.rutas.Agendamiento.RegistCita.RegistrarC_api import regiscitaapi
 from app.rutas.Agendamiento.agendmedica.agenda_api import agendaapi
-from app.rutas.Agendamiento.RegisPaciente.RegistrarP_api import registropapi
+from app.rutas.Agendamiento.regispersona.registrarp_api import registropapi
 from app.rutas.Agendamiento.medico.medico_api import medicoapi
 
 # APIS v1

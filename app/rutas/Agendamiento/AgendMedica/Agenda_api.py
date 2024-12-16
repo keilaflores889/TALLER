@@ -55,16 +55,16 @@ def addAgenda():
     # Validar campos requeridos
     campos_requeridos = ['id_medico', 'id_dia', 'id_turno',]
     for campo in campos_requeridos:
-        if not data.get(campo) or not isinstance(data[campo], str) or not data[campo].strip():
+        if not data.get(campo) or not isinstance(data[campo], str) or not data[campo]:
             return jsonify({
                 'success': False,
                 'error': f'El campo {campo} es obligatorio y debe ser una cadena no vacía.'
             }), 400
 
     try:
-        id_medico = data['id_medico'].strip()
-        id_dia = data['id_dia'].strip()
-        id_turno = data['id_turno'].strip()
+        id_medico = data['id_medico']
+        id_dia = data['id_dia']
+        id_turno = data['id_turno']
 
         agenda_medica_id = agendadao.guardarAgenda(id_medico, id_dia, id_turno)
         if agenda_medica_id:
@@ -100,9 +100,9 @@ def updateAgenda(agenda_medica_id):
             }), 400
 
     try:
-        id_medico = data['id_medico'].strip()
-        id_dia = data['id_dia'].strip()
-        id_turno = data['id_turno'].strip()
+        id_medico = data['id_medico']
+        id_dia = data['id_dia']
+        id_turno = data['id_turno']
 
         if agendadao.updateAgenda(agenda_medica_id, id_medico, id_dia, id_turno):
             app.logger.info(f"Agenda médica con ID {agenda_medica_id} actualizada exitosamente.")

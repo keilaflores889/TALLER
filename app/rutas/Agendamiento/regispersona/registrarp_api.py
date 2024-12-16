@@ -1,10 +1,10 @@
 from flask import Blueprint, request, jsonify, current_app as app
-from app.dao.RegisPaciente.RegistroPDao import RegistroPDao
+from app.dao.RegisPersona.RegistroPDao import RegistroPDao
 
 registropapi = Blueprint('registropapi', __name__)
 
 # Obtener todas los registros
-@registropapi.route('/RegistroP', methods=['GET'])
+@registropapi.route('/registrop', methods=['GET'])
 def getRegistrosP():
     registropdao = RegistroPDao()
     try:
@@ -23,7 +23,7 @@ def getRegistrosP():
 
 
 # Obtener un registro específica por ID
-@registropapi.route('/RegistroP/<int:persona_id>', methods=['GET'])
+@registropapi.route('/registrop/<int:persona_id>', methods=['GET'])
 def getRegistroP(persona_id):
     registropdao = RegistroPDao()
     try:
@@ -48,7 +48,7 @@ def getRegistroP(persona_id):
 
 
 # Agregar un nuevo registro
-@registropapi.route('/RegistroP', methods=['POST'])
+@registropapi.route('/registrop', methods=['POST'])
 def addRegistroP():
     data = request.get_json()
     registropdao = RegistroPDao()
@@ -56,15 +56,15 @@ def addRegistroP():
     # Validar campos requeridos
     campos_requeridos = ['nombre', 'apellido', 'cedula_identidad', 'fecha_nacimiento', 'fecha_registro', 'telefono', 'id_ciudad', 'id_barrio']
     for campo in campos_requeridos:
-        if not data.get(campo) or not isinstance(data[campo], str) or not data[campo].strip():
+        if not data.get(campo) or not isinstance(data[campo], str) or not data[campo]:
             return jsonify({
                 'success': False,
                 'error': f'El campo {campo} es obligatorio y debe ser una cadena no vacía.'
             }), 400
 
     try:
-        nombre = data['nombre'].upper()
-        apellido = data['apellido'].upper()
+        nombre = data['nombre']
+        apellido = data['apellido']
         cedula_identidad = data['cedula_identidad']
         fecha_nacimiento = data['fecha_nacimiento']
         fecha_registro = data['fecha_registro']
@@ -76,7 +76,7 @@ def addRegistroP():
         if persona_id is not None:
             return jsonify({
                 'success': True,
-                'data': {'id': persona_id, 'nombre': nombre, 'apellido': apellido, 'cedula_identidad': cedula_identidad, 'fecha_nacimiento': fecha_nacimiento, 'fecha_registro': fecha_registro, 'telefono':telefono, 'id_ciudad': id_ciudad, 'id_barrio': id_barrio,},
+                'data': {'id_persona': persona_id, 'nombre': nombre, 'apellido': apellido, 'cedula_identidad': cedula_identidad, 'fecha_nacimiento': fecha_nacimiento, 'fecha_registro': fecha_registro, 'telefono':telefono, 'id_ciudad': id_ciudad, 'id_barrio': id_barrio,},
                 'error': None
             }), 201
         else:
@@ -90,7 +90,7 @@ def addRegistroP():
 
 
 # Actualizar el registro existente
-@registropapi.route('/RegistroP/<int:persona_id>', methods=['PUT'])
+@registropapi.route('/registrop/<int:persona_id>', methods=['PUT'])
 def updateRegistroP(persona_id):
     data = request.get_json()
     registropdao = RegistroPDao()
@@ -105,8 +105,8 @@ def updateRegistroP(persona_id):
             }), 400
 
     try:
-        nombre = data['nombre'].strip().upper()
-        apellido = data['apellido'].strip().upper()
+        nombre = data['nombre']
+        apellido = data['apellido']
         cedula_identidad = data['cedula_identidad']
         fecha_nacimiento = data['fecha_nacimiento']
         fecha_registro = data['fecha_registro']
@@ -115,11 +115,11 @@ def updateRegistroP(persona_id):
         id_barrio = data['id_barrio']
 
 
-        if registropdao.updateRegistroP(persona_id, nombre.strip().upper(), apellido.strip().upper(), cedula_identidad, fecha_nacimiento, fecha_registro, telefono, id_ciudad, id_barrio):
+        if registropdao.updateRegistroP(persona_id, nombre, apellido, cedula_identidad, fecha_nacimiento, fecha_registro, telefono, id_ciudad, id_barrio):
             app.logger.info(f"Registro de persona con ID {persona_id} actualizada exitosamente.")
             return jsonify({
                 'success': True,
-                'data': {'id': persona_id, 'nombre': nombre, 'apellido': apellido, 'cedula_identidad': cedula_identidad, 'fecha_nacimiento': fecha_nacimiento, 'fecha_registro': fecha_registro, 'telefono':telefono, 'id_ciudad':id_ciudad, 'id_barrio': id_barrio},
+                'data': {'id_persona': persona_id, 'nombre': nombre, 'apellido': apellido, 'cedula_identidad': cedula_identidad, 'fecha_nacimiento': fecha_nacimiento, 'fecha_registro': fecha_registro, 'telefono':telefono, 'id_ciudad':id_ciudad, 'id_barrio': id_barrio},
                 'error': None
             }), 200
         else:
@@ -136,7 +136,7 @@ def updateRegistroP(persona_id):
 
 
 # Eliminar una registro
-@registropapi.route('/RegistroP/<int:persona_id>', methods=['DELETE'])
+@registropapi.route('/registrop/<int:persona_id>', methods=['DELETE'])
 def deleteRegistroP(persona_id):
     registropdao = RegistroPDao()
     try:

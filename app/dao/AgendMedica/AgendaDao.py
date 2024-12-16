@@ -101,7 +101,7 @@ class AgendaDao:
         con = conexion.getConexion()
         cur = con.cursor()
         try:
-            cur.execute(updateAgendaSQL, (id_medico, id_dia, id_turno, id_agenda_medica))
+            cur.execute(updateAgendaSQL, (id_medico, id_dia, id_turno, id_agenda_medica,))
             filas_afectadas = cur.rowcount
             con.commit()
             return filas_afectadas > 0

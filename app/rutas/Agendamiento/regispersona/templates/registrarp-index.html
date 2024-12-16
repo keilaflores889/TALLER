@@ -1,0 +1,313 @@
+{% extends 'base.html' %}
+
+{% block titulo %}
+Registrar Paciente
+{% endblock %}
+
+{% block contenido %}
+<div class="container mt-4">
+  <h3>Datos de la Persona</h3>
+
+  <!-- Tarjeta -->
+  <div class="card">
+    <div class="card-header">
+      <button type="button" class="btn btn-outline-info" id="btnAgregar">Agregar Paciente</button>
+    </div>
+    <div class="card-body">
+      <table class="table table-striped" id="tbl">
+        <thead>
+          <tr>
+            <th>Nombre</th>
+            <th>Apellido</th>
+            <th>N° Cedula</th>
+            <th>Fecha de Nacimiento</th>
+            <th>Teléfono</th>
+            <th>Fecha de Registro</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+  <!-- /Tarjeta -->
+
+  <!-- Modal -->
+  <div class="modal" id="modalFormulario">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+      <div class="modal-content">
+        <!-- Header -->
+        <div class="modal-header">
+          <h4 class="modal-title" id="modalTitle">Registrar Persona</h4>
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+        </div>
+        <!-- Cuerpo -->
+        <div class="modal-body">
+          <div class="row">
+            <!-- Columna izquierda -->
+            <div class="col-md-6">
+              <!-- Campo Nombre -->
+              <div class="form-group">
+                <label for="nombre">Nombre:</label>
+                <input type="text" id="nombre" class="form-control" placeholder="Ingrese el nombre">
+              </div>
+              <!-- Campo Apellido -->
+              <div class="form-group">
+                <label for="apellido">Apellido:</label>
+                <input type="text" id="apellido" class="form-control" placeholder="Ingrese el apellido">
+              </div>
+              <!-- Campo Documento -->
+              <div class="form-group">
+                <label for="documento">Documento de Identidad:</label>
+                <input type="text" id="documento" class="form-control" placeholder="Ingrese el documento">
+              </div>
+              <!-- Campo Fecha de Nacimiento -->
+              <div class="form-group">
+                <label for="fechaNacimiento">Fecha de Nacimiento:</label>
+                <input type="date" id="fechaNacimiento" class="form-control">
+              </div>
+            </div>
+            <!-- Columna derecha -->
+            <div class="col-md-6">
+              <!-- Campo Teléfono -->
+              <div class="form-group">
+                <label for="telefono">Teléfono:</label>
+                <input type="text" id="telefono" class="form-control" placeholder="Ingrese el teléfono">
+              </div>
+              <!-- Campo Fecha de Registro -->
+              <div class="form-group">
+                <label for="fechaRegistro">Fecha de Registro:</label>
+                <input type="date" id="fechaRegistro" class="form-control">
+              </div>
+              <!-- Campo Ciudad -->
+              <div class="form-group">
+                <label for="ciudad">Ciudad:</label>
+                <input type="text" id="ciudad" class="form-control" placeholder="Ingrese la ciudad">
+              </div>
+              <!-- Campo Barrio -->
+              <div class="form-group">
+                <label for="barrio">Barrio:</label>
+                <input type="text" id="barrio" class="form-control" placeholder="Ingrese el barrio">
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Footer -->
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary" id="btnGuardar">Guardar</button>
+          <button type="button" class="btn btn-danger" data-dismiss="modal">Cerrar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+</div>
+<!-- Librerías necesarias -->
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+{% endblock %}
+
+
+{% block js %}
+<script>
+  const initDatatable = () => {
+    $('#tbl').DataTable({
+      language: {
+        url: "{{ url_for('static', filename='vendor/datatables/es-ES.json') }}",
+      },
+      ajax: '/api/v1/registrop',
+      columns: [
+        { data: 'nombre' },
+        { data: 'apellido' },
+        { data: 'documento' },
+        { data: 'fechaNacimiento' },
+        { data: 'telefono' },
+        { data: 'fechaRegistro' },
+        { data: 'ciudad' },
+        { data: 'barrio' },
+        {
+          data: function(row) {
+            return `
+              <button type="button" name="btn_editar" class="btn btn-info" data-id_persona="${row.id_persona}">Editar</button>
+              <button type="button" name="btn_eliminar" class="btn btn-warning" data-id_persona="${row.id_persona}">Eliminar</button>`;
+          }
+        }
+      ]
+    });
+  };
+
+  const agregar = () => {
+    $('#btnAgregar').on('click', function() {
+      $('#modalTitle').text("Agregar Persona");
+      $('#nombre').val("");
+      $('#apellido').val("");
+      $('#documento').val("");
+      $('#fechaNacimiento').val("");
+      $('#telefono').val("");
+      $('#ciudad').val("");
+      $('#barrio').val("");
+      $('#modalFormulario').modal();
+    });
+  };
+
+  const guardar = () => {
+    $('#btnGuardar').on('click', function() {
+      const idPersona = $('#txtIdPersona').val();
+      const nombre = $('#nombre').val();
+      const apellido = $('#apellido').val();
+      const documento = $('#documento').val();
+      const fechaNacimiento = $('#fechaNacimiento').val();
+      const telefono = $('#telefono').val();
+      const fechaRegistro = $('#fechaRegistro').val();
+      const ciudad = $('#ciudad').val();
+      const barrio = $('#barrio').val();
+      const tabla = $('#tbl').DataTable();
+
+      if (idPersona) {
+        fetch(`/api/v1/registrop/${idPersona}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({  nombre: nombre, documento: documento, fechaNacimiento: fechaNacimiento, telefono: telefono, fechaRegistro: fechaRegistro, ciudad: ciudad, barrio: barrio })
+        })
+        .then(resp => resp.json())
+        .then(data => {
+          if (data && !data.error && data.success) {
+            tabla.ajax.reload();
+            Swal.fire("Actualizado", "La persona ha sido registrado correctamente.", "success");
+          } else {
+            Swal.fire(data.error);
+          }
+        })
+        .catch(err => {
+          console.error(err);
+          Swal.fire("Error", "Ocurrió un error al actualizar la persona.", "error");
+        });
+      } else {
+        fetch(`/api/v1/registrop`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ nombre: nombre, documento: documento, fechaNacimiento: fechaNacimiento, telefono: telefono, fechaRegistro: fechaRegistro, ciudad: ciudad, barrio: barrio })
+        })
+        .then(resp => resp.json())
+        .then(data => {
+          if (data && !data.error && data.success) {
+            tabla.ajax.reload();
+            Swal.fire("Registrado", "La persona ha sido registrada correctamente.", "success");
+          } else {
+            Swal.fire(data.error);
+          }
+        })
+        .catch(err => {
+          console.error(err);
+          Swal.fire("Error", "Ocurrió un error al guardar la persona.", "error");
+        });
+      }
+
+      $('#modalFormulario').modal("hide");
+    });
+  };
+
+  const editar = () => {
+    $('#tbl').on('click', 'button[name="btn_editar"]', function() {
+      Swal.fire({
+        title: "¿Deseas editar este registro?",
+        showCancelButton: true,
+        confirmButtonText: "Si",
+        cancelButtonText: "No"
+      }).then((result) => {
+        if (result.isConfirmed) {
+          $('#modalTitle').text("Editar Persona");
+          const idPersona = $(this).data('id_persona');
+          $('#txtIdPersona').val(idPersona);
+
+          fetch(`/api/v1/registrop/${idPersona}`, {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json'
+            }
+          })
+          .then(resp => resp.json())
+          .then(data => {
+            $('#nombre').val(data.data.nombre);
+            $('#apellido').val(data.data.apellido);
+            $('#documento').val(data.data.documento);
+            $('#fechaNacimiento').val(data.data.fechaNacimiento);
+            $('#telefono').val(data.data.telefono);
+            $('#fechaRegistro').val(data.data.fechaRegistro);
+            $('#ciudad').val(data.data.ciudad);
+            $('#barrio').val(data.data.barrio);
+            $('#modalFormulario').modal();
+          });
+        }
+      });
+    });
+  };
+
+  const eliminar = () => {
+    $('#tbl').on('click', 'button[name="btn_eliminar"]', function() {
+      const idPersona = $(this).data('id_persona');
+      Swal.fire({
+        title: "¿Deseas eliminar este registro?",
+        showCancelButton: true,
+        confirmButtonText: "Si",
+        cancelButtonText: "No"
+      }).then((result) => {
+        if (result.isConfirmed) {
+          fetch(`/api/v1/registrop/${idPersona}`, {
+            method: 'DELETE',
+            headers: {
+              'Content-Type': 'application/json'
+            }
+          })
+          .then(resp => resp.json())
+          .then(data => {
+            if (data && !data.error && data.success) {
+              const fila = $(this).closest('tr');
+              const tabla = $('#tbl').DataTable();
+              tabla.row(fila).remove().draw();
+              Swal.fire("Eliminado", "", data.success);
+            } else {
+              Swal.fire(data.error);
+            }
+          })
+          .catch(err => {
+            Swal.fire("Error", "Ocurrió un error al eliminar la persona.", "error");
+          });
+        }
+      });
+    });
+  };
+
+  // Validación del campo de telefono para que solo acepte números
+$('#telefono').on('input', function() {
+  this.value = this.value.replace(/[^0-9]/g, '');  // Solo permite números
+});
+
+// Validación del campo de cédula para que solo acepte números
+$('#documento').on('input', function() {
+  this.value = this.value.replace(/[^0-9]/g, '');  // Solo permite números
+});
+
+  const addEvents = () => {
+    agregar();
+    guardar();
+    editar();
+    eliminar();
+  };
+
+  $(function() {
+    initDatatable();
+    addEvents();
+  });
+</script>
+
+{% endblock %}
+
+
