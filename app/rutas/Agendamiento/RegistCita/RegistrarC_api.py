@@ -5,7 +5,7 @@ from app.dao.RegisCita.RegistroCDao import RegistroCDao
 regiscitaapi = Blueprint('regiscitaapi', __name__)
 
 # Obtener todas los registros
-@regiscitaapi.route('/RegistroC', methods=['GET'])
+@regiscitaapi.route('/registroc', methods=['GET'])
 def RegistrosC():
     registrocdao = RegistroCDao()
     try:
@@ -24,7 +24,7 @@ def RegistrosC():
 
 
 # Obtener un registro específica por ID
-@regiscitaapi.route('/RegistroC/<int:cita_id>', methods=['GET'])
+@regiscitaapi.route('/registroc/<int:cita_id>', methods=['GET'])
 def getRegistroC(cita_id):
     registrocdao = RegistroCDao()
     try:
@@ -49,7 +49,7 @@ def getRegistroC(cita_id):
 
 
 # Agregar un nuevo registro
-@regiscitaapi.route('/RegistroC', methods=['POST'])
+@regiscitaapi.route('/registroc', methods=['POST'])
 def addRegistroC():
     data = request.get_json()
     registrocdao = RegistroCDao()
@@ -91,7 +91,7 @@ def addRegistroC():
 
 
 # Actualizar el registro existente
-@regiscitaapi.route('/RegistroC/<int:cita_id>', methods=['PUT'])
+@regiscitaapi.route('/registroc/<int:cita_id>', methods=['PUT'])
 def updateRegistroC(cita_id):
     data = request.get_json()
     registrocdao = RegistroCDao()
@@ -136,7 +136,7 @@ def updateRegistroC(cita_id):
 
 
 # Eliminar una registro
-@regiscitaapi.route('/RegistroC/<int:cita_id>', methods=['DELETE'])
+@regiscitaapi.route('/registroc/<int:cita_id>', methods=['DELETE'])
 def deleteRegistroC(cita_id):
     registrocdao = RegistroCDao()
     try:

@@ -47,12 +47,6 @@ Registrar Cita
               <!-- Columna izquierda -->
               <div class="col-md-6">
 
-                <!-- Campo para ingresar la cédula del paciente -->
-              <div class="form-group">
-              <label for="cedula">Cédula del Paciente:</label>
-              <input type="text" id="cedula" class="form-control" placeholder="Ingrese la cédula del paciente">
-              </div>
-
                 <!-- Campo Paciente -->
                 <div class="form-group">
                   <label for="paciente">Paciente:</label>
@@ -132,152 +126,186 @@ Registrar Cita
 
 {% block js %}
 <script>
-  $(document).ready(function () {
-    const PACIENTES_STORAGE_KEY = 'pacientes';
-    const STORAGE_KEY = 'citas';
-    const pacientes = [
-      { cedula: '1234567890', nombre: 'Juan Pérez' },
-      { cedula: '5456948', nombre: 'Keila Flores' },
-      { cedula: '3823996', nombre: 'Fredy Aguilera' }
-    ];
-  
-    
-    let citas = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
-  
-    // Inicializar DataTable
-    const tabla = $('#tblCitas').DataTable({
+  const initDatatable = () => {
+    $('#tbl').DataTable({
       language: {
-        url: "https://cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json"
+        url: "{{ url_for('static', filename='vendor/datatables/es-ES.json') }}",
       },
+      ajax: '/api/v1/registroc',
       columns: [
-        { title: 'Paciente' },
-        { title: 'Médico' },
-        { title: 'Especialidad' },
-        { title: 'Fecha' },
-        { title: 'Hora' },
-        { title: 'Estado' },
-        { title: 'Motivo' },
-        { title: 'Acciones', orderable: false }
-      ],
+        { data: 'paciente' },
+        { data: 'medico' },
+        { data: 'especialidad' },
+        { data: 'fecha' },
+        { data: 'hora' },
+        { data: 'estado' },
+        {
+          data: function(row) {
+            return `
+              <button type="button" name="btn_editar" class="btn btn-info" data-id_cita="${row.id_cita}">Editar</button>
+              <button type="button" name="btn_eliminar" class="btn btn-warning" data-id_cita="${row.id_cita}">Eliminar</button>`;
+          }
+        }
+      ]
     });
-  
-    // Función para cargar datos en la tabla
-    const cargarTabla = () => {
-      tabla.clear();
-      citas.forEach((item, index) => {
-        tabla.row.add([
-          item.paciente,
-          item.medico,
-          item.especialidad,
-          item.fecha,
-          item.hora,
-          item.estado,
-          item.motivo,
-          `<button class="btn btn-info btnEditar" data-index="${index}" title="Editar">
-            <i class="fas fa-pencil-alt"></i>
-          </button>
-          <button class="btn btn-danger btnEliminar" data-index="${index}" title="Eliminar">
-            <i class="fas fa-trash"></i>
-          </button>`
-        ]);
-      });
-      tabla.draw();
-    };
-  
-    const guardarLocalStorage = () => {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(citas));
-    };
-  
-    cargarTabla();
-  
-    // Buscar paciente por cédula
-    const buscarPacientePorCedula = (cedula) => {
-      return pacientes.find(paciente => paciente.cedula === cedula);
-    };
-  
-    // Evento para buscar paciente al cambiar la cédula
-    $('#cedula').on('change', function () {
-      const cedula = $(this).val();
-      const paciente = buscarPacientePorCedula(cedula);
-  
-      if (paciente) {
-        $('#paciente').val(paciente.nombre); // Rellena el nombre si se encuentra
-      } else {
-        $('#paciente').val(''); // Limpia el campo si no se encuentra
-        Swal.fire('Atención', 'Paciente no encontrado. Regístrelo primero.', 'warning');
-      }
+  };
+
+  const agregarCita = () => {
+    $('#btnAgregarCita').on('click', function() {
+      $('#modalTitle').text("Registrar Cita");
+      $('#paciente').val("");
+      $('#medico').val("");
+      $('#especialidad').val("");
+      $('#fecha').val("");
+      $('#hora').val("");
+      $('#estado').val("");
+      $('#motivo').val("");
+      $('#modalFormularioCita').modal();
     });
-  
-    // Abrir modal para agregar cita
-    $('#btnAgregarCita').on('click', function () {
-      $('#modalFormularioCita').data('index', null).modal('show');
-      $('#cedula, #paciente, #especialidad, #fecha, #hora, #estado, #motivo').val('');
-      $('#medico').val(''); // Restablecer el combo de médicos
-    });
-  
-    // Guardar cita
-    $('#btnGuardarCita').on('click', function () {
-      const cedula = $('#cedula').val();
+  };
+
+  const guardarCita = () => {
+    $('#btnGuardarCita').on('click', function() {
+      const idCita = $('#txtIdCita').val();
       const paciente = $('#paciente').val();
-      const medico = $('#medico option:selected').text();
+      const medico = $('#medico').val();
       const especialidad = $('#especialidad').val();
       const fecha = $('#fecha').val();
       const hora = $('#hora').val();
       const estado = $('#estado').val();
       const motivo = $('#motivo').val();
-      const index = $('#modalFormularioCita').data('index');
-  
-      if (!cedula || !paciente || !medico || !especialidad || !fecha || !hora || !estado || !motivo) {
-        Swal.fire('Error', 'Por favor complete todos los campos obligatorios.', 'error');
-        return;
-      }
-  
-      const nuevaCita = { cedula, paciente, medico, especialidad, fecha, hora, estado, motivo };
-  
-      if (index !== null) {
-        citas[index] = nuevaCita;
+      const tabla = $('#tblCitas').DataTable();
+
+      if (idCita) {
+        fetch(`/api/v1/registroc/${idCita}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ cedula, paciente, medico, especialidad, fecha, hora, estado, motivo })
+        })
+        .then(resp => resp.json())
+        .then(data => {
+          if (data && !data.error && data.success) {
+            tabla.ajax.reload();
+            Swal.fire("Actualizado", "La cita ha sido actualizada correctamente.", "success");
+          } else {
+            Swal.fire(data.error);
+          }
+        })
+        .catch(err => {
+          console.error(err);
+          Swal.fire("Error", "Ocurrió un error al actualizar la cita.", "error");
+        });
       } else {
-        citas.push(nuevaCita);
+        fetch(`/api/v1/registroc`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ cedula, paciente, medico, especialidad, fecha, hora, estado, motivo })
+        })
+        .then(resp => resp.json())
+        .then(data => {
+          if (data && !data.error && data.success) {
+            tabla.ajax.reload();
+            Swal.fire("Registrado", "La cita ha sido registrada correctamente.", "success");
+          } else {
+            Swal.fire(data.error);
+          }
+        })
+        .catch(err => {
+          console.error(err);
+          Swal.fire("Error", "Ocurrió un error al guardar la cita.", "error");
+        });
       }
-  
-      guardarLocalStorage();
-      $('#modalFormularioCita').modal('hide');
-      cargarTabla();
+
+      $('#modalFormularioCita').modal("hide");
     });
-  
-    // Editar cita
-    $('#tblCitas').on('click', '.btnEditar', function () {
-      const index = $(this).data('index');
-      const cita = citas[index];
-      $('#modalFormularioCita').data('index', index).modal('show');
-      $('#cedula').val(cita.cedula);
-      $('#paciente').val(cita.paciente);
-      $('#medico').val(cita.medico); // Selecciona el médico guardado
-      $('#especialidad').val(cita.especialidad);
-      $('#fecha').val(cita.fecha);
-      $('#hora').val(cita.hora);
-      $('#estado').val(cita.estado);
-      $('#motivo').val(cita.motivo);
-    });
-  
-    // Eliminar cita
-    $('#tblCitas').on('click', '.btnEliminar', function () {
-      const index = $(this).data('index');
+  };
+
+  const editarCita = () => {
+    $('#tbl').on('click', 'button[name="btn_editar"]', function() {
       Swal.fire({
-        title: '¿Está seguro de eliminar esta cita?',
+        title: "¿Deseas editar esta cita?",
         showCancelButton: true,
-        confirmButtonText: 'Sí',
-        cancelButtonText: 'No',
+        confirmButtonText: "Sí",
+        cancelButtonText: "No"
       }).then((result) => {
         if (result.isConfirmed) {
-          citas.splice(index, 1);
-          guardarLocalStorage();
-          cargarTabla();
-          Swal.fire('Eliminado', 'La cita ha sido eliminada.', 'success');
+          $('#modalTitle').text("Editar Cita");
+          const idCita = $(this).data('id_cita');
+          $('#txtIdCita').val(idCita);
+
+          fetch(`/api/v1/registroc/${idCita}`, {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json'
+            }
+          })
+          .then(resp => resp.json())
+          .then(data => {
+            $('#paciente').val(data.data.paciente);
+            $('#medico').val(data.data.medico);
+            $('#especialidad').val(data.data.especialidad);
+            $('#fecha').val(data.data.fecha);
+            $('#hora').val(data.data.hora);
+            $('#estado').val(data.data.estado);
+            $('#motivo').val(data.data.motivo);
+            $('#modalFormularioCita').modal();
+          });
         }
       });
     });
+  };
+
+  const eliminarCita = () => {
+    $('#tbl').on('click', 'button[name="btn_eliminar"]', function() {
+      const idCita = $(this).data('id_cita');
+      Swal.fire({
+        title: "¿Deseas eliminar esta cita?",
+        showCancelButton: true,
+        confirmButtonText: "Sí",
+        cancelButtonText: "No"
+      }).then((result) => {
+        if (result.isConfirmed) {
+          fetch(`/api/v1/registroc/${idCita}`, {
+            method: 'DELETE',
+            headers: {
+              'Content-Type': 'application/json'
+            }
+          })
+          .then(resp => resp.json())
+          .then(data => {
+            if (data && !data.error && data.success) {
+              const fila = $(this).closest('tr');
+              const tabla = $('#tbl').DataTable();
+              tabla.row(fila).remove().draw();
+              Swal.fire("Eliminado", "La cita ha sido eliminada correctamente.", "success");
+            } else {
+              Swal.fire(data.error);
+            }
+          })
+          .catch(err => {
+            Swal.fire("Error", "Ocurrió un error al eliminar la cita.", "error");
+          });
+        }
+      });
+    });
+  };
+
+
+  const addEvents = () => {
+    agregarCita();
+    guardarCita();
+    editarCita();
+    eliminarCita();
+  };
+
+  $(function() {
+    initDatatable();
+    addEvents();
   });
-  </script>
+</script>
 
   {% endblock %}

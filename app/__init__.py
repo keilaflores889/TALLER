@@ -21,7 +21,7 @@ from app.rutas.referenciales.turno.turno_routes import turmod  #turno
 
 
 #importacion de cita
-from app.rutas.Agendamiento.RegistCita.RegistrarC_routes import registrocmod
+from app.rutas.Agendamiento.registcita.registrarc_routes import registrocmod
 from app.rutas.Agendamiento.vistaAGENDAR.vistaAGENDAR_routes import vistagendamod
 from app.rutas.Agendamiento.agendmedica.agenda_routes import agendmod
 from app.rutas.Agendamiento.regispersona.registrop_routes import registropmod
@@ -50,10 +50,10 @@ app.register_blueprint(turmod, url_prefix=f'{modulo0}/turno') #turno
 
 # registrar agendamientos
 modulo0 = '/agendamientos'
-app.register_blueprint(registrocmod, url_prefix=f'{modulo0}/RegistCita')  # cita
+app.register_blueprint(registrocmod, url_prefix=f'{modulo0}/registcita')  # cita
 app.register_blueprint(vistagendamod, url_prefix=f'{modulo0}/cita')  # cita
 app.register_blueprint(agendmod, url_prefix=f'{modulo0}/agendmedica')  # cita
-app.register_blueprint(registropmod, url_prefix=f'{modulo0}/regispaciente')
+app.register_blueprint(registropmod, url_prefix=f'{modulo0}/registrop')
 app.register_blueprint(medicomod, url_prefix=f'{modulo0}/medico')
 
 
@@ -89,7 +89,7 @@ from app.rutas.referenciales.turno.turno_api import turnoapi
 
 
 #agendamiento
-from app.rutas.Agendamiento.RegistCita.RegistrarC_api import regiscitaapi
+from app.rutas.Agendamiento.registcita.registrarc_api import regiscitaapi
 from app.rutas.Agendamiento.agendmedica.agenda_api import agendaapi
 from app.rutas.Agendamiento.regispersona.registrarp_api import registropapi
 from app.rutas.Agendamiento.medico.medico_api import medicoapi
@@ -164,6 +164,11 @@ app.register_blueprint(registropapi, url_prefix=version1)
 version1 = '/api/v1'
 app.register_blueprint(medicoapi, url_prefix=version1)
 
+
+
+@app.route('/login')
+def login():
+    return render_template('login-index.html')
 
 @app.route('/vista')
 def vista():
