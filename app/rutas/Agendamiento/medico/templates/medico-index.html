@@ -19,6 +19,7 @@ Medico
           <tr>
             <th>Médico</th>
             <th>Especialidad</th>
+            <th>N° de Registro</th>
             <th>Acciones</th>
           </tr>
         </thead>
@@ -57,6 +58,11 @@ Medico
               <option value="Cirugia Oral">Cirugia Oral</option>
             </select>
           </div>
+          <!-- Campo numero de registro -->
+          <div class="form-group">
+            <label for="registro">N° de Registro:</label>
+            <input type="text" id="registro" class="form-control" placeholder="Ingrese el numero del registro">
+          </div>
         </div>
         <!-- Footer -->
         <div class="modal-footer">
@@ -87,6 +93,7 @@ Medico
       columns: [
         { data: 'medico' },
         { data: 'especialidad' },
+        { data: 'num_registro' },
         {
           data: function(row) {
             return `
@@ -103,6 +110,7 @@ Medico
       $('#modalTitle').text("Agregar Medico");
       $('#doctor').val("");
       $('#especialidad').val("");
+      $('#registro').val("");
       $('#modalFormulario').modal();
     });
   };
@@ -112,6 +120,7 @@ Medico
       const idMedico = $('#txtIdMedico').val();
       const doctor = $('#doctor').val();
       const especialidad = $('#especialidad').val();
+      const registro = $('#registro').val();
       const tabla = $('#tbl').DataTable();
 
       if (idMedico) {
@@ -120,7 +129,7 @@ Medico
           headers: {
             'Content-Type': 'application/json'
           },
-          body: JSON.stringify({ id_medico: doctor, id_especialidad: especialidad })
+          body: JSON.stringify({ id_medico: doctor, id_especialidad: especialidad, num_registro: registro })
         })
         .then(resp => resp.json())
         .then(data => {
@@ -141,7 +150,7 @@ Medico
           headers: {
             'Content-Type': 'application/json'
           },
-          body: JSON.stringify({ id_medico: doctor, id_especialidad: especialidad })
+          body: JSON.stringify({ id_medico: doctor, id_especialidad: especialidad, num_registro: registro })
         })
         .then(resp => resp.json())
         .then(data => {
@@ -185,6 +194,7 @@ Medico
           .then(data => {
             $('#doctor').val(data.data.medico);
             $('#especialidad').val(data.data.especialidad);
+            $('#registro').val(data.data.registro);
             $('#modalFormulario').modal();
           });
         }
@@ -226,6 +236,11 @@ Medico
       });
     });
   };
+  
+ // Validación del campo de registro para que solo acepte números
+ $('#registro').on('input', function() {
+  this.value = this.value.replace(/[^0-9]/g, '');  // Solo permite números
+});
 
   const addEvents = () => {
     agregar();

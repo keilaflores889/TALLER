@@ -4,9 +4,8 @@ from flask import render_template
 app = Flask(__name__)
 
 # importar referenciales
-from app.rutas.vista.vista_routes import vistamod
+from app.rutas.vista.vista_routes import vistamod #vista principal
 from app.rutas.referenciales.ciudad.ciudad_routes import ciumod #ciudad
-from app.rutas.referenciales.Barrio.barrio_routes import barriomod
 from app.rutas.referenciales.paises.pais_routes import paimod   #pais
 from app.rutas.referenciales.nacionalidad.nacionalidad_routes import naciomod  #nacionalidad
 from app.rutas.referenciales.ocupacion.ocupacion_routes import ocupmod  #ocupacion
@@ -22,7 +21,6 @@ from app.rutas.referenciales.turno.turno_routes import turmod  #turno
 
 #importacion de cita
 from app.rutas.Agendamiento.registcita.registrarc_routes import registrocmod
-from app.rutas.Agendamiento.vistaAGENDAR.vistaAGENDAR_routes import vistagendamod
 from app.rutas.Agendamiento.agendmedica.agenda_routes import agendmod
 from app.rutas.Agendamiento.regispersona.registrop_routes import registropmod
 from app.rutas.Agendamiento.medico.medico_routes import medicomod
@@ -33,7 +31,6 @@ from app.rutas.Agendamiento.medico.medico_routes import medicomod
 modulo0 = '/referenciales' 
 app.register_blueprint(vistamod, url_prefix=f'{modulo0}/vista') 
 app.register_blueprint(ciumod, url_prefix=f'{modulo0}/ciudad') #ciudad
-app.register_blueprint(barriomod, url_prefix=f'{modulo0}/barrio')
 app.register_blueprint(paimod, url_prefix=f'{modulo0}/paises') #pais
 app.register_blueprint(naciomod, url_prefix=f'{modulo0}/nacionalidad')  #nacionalidad
 app.register_blueprint(ocupmod, url_prefix=f'{modulo0}/ocupacion')  #ocupacion
@@ -51,7 +48,6 @@ app.register_blueprint(turmod, url_prefix=f'{modulo0}/turno') #turno
 # registrar agendamientos
 modulo0 = '/agendamientos'
 app.register_blueprint(registrocmod, url_prefix=f'{modulo0}/registcita')  # cita
-app.register_blueprint(vistagendamod, url_prefix=f'{modulo0}/cita')  # cita
 app.register_blueprint(agendmod, url_prefix=f'{modulo0}/agendmedica')  # cita
 app.register_blueprint(registropmod, url_prefix=f'{modulo0}/registrop')
 app.register_blueprint(medicomod, url_prefix=f'{modulo0}/medico')
@@ -61,8 +57,6 @@ app.register_blueprint(medicomod, url_prefix=f'{modulo0}/medico')
 from app.rutas.referenciales.ciudad.ciudad_api import ciuapi
 #pais
 from app.rutas.referenciales.paises.pais_api import paisapi
-#barrio
-from app.rutas.referenciales.Barrio.barrio_api import barrioapi
 #nacionalidad
 from app.rutas.referenciales.nacionalidad.nacionalidad_api import nacioapi
 #nacionalidad
@@ -100,9 +94,6 @@ from app.rutas.Agendamiento.medico.medico_api import medicoapi
 #Ciudad
 version1 = '/api/v1'
 app.register_blueprint(ciuapi, url_prefix=version1)
-#barrio
-version1 = '/api/v1'
-app.register_blueprint(barrioapi, url_prefix=version1)
 
 #Pais
 version1 = '/api/v1'

@@ -11,7 +11,7 @@ Registrar Persona
   <!-- Tarjeta -->
   <div class="card">
     <div class="card-header">
-      <button type="button" class="btn btn-outline-info" id="btnAgregar">Agregar Paciente</button>
+      <button type="button" class="btn btn-outline-info" id="btnAgregar">Agregar Persona</button>
     </div>
     <div class="card-body">
       <table class="table table-striped" id="tbl">
@@ -84,11 +84,6 @@ Registrar Persona
                 <label for="ciudad">Ciudad:</label>
                 <input type="text" id="ciudad" class="form-control" placeholder="Ingrese la ciudad">
               </div>
-              <!-- Campo Barrio -->
-              <div class="form-group">
-                <label for="barrio">Barrio:</label>
-                <input type="text" id="barrio" class="form-control" placeholder="Ingrese el barrio">
-              </div>
             </div>
           </div>
         </div>
@@ -127,7 +122,6 @@ Registrar Persona
         { data: 'telefono' },
         { data: 'fechaRegistro' },
         { data: 'ciudad' },
-        { data: 'barrio' },
         {
           data: function(row) {
             return `
@@ -148,7 +142,6 @@ Registrar Persona
       $('#fechaNacimiento').val("");
       $('#telefono').val("");
       $('#ciudad').val("");
-      $('#barrio').val("");
       $('#modalFormulario').modal();
     });
   };
@@ -163,7 +156,6 @@ Registrar Persona
       const telefono = $('#telefono').val();
       const fechaRegistro = $('#fechaRegistro').val();
       const ciudad = $('#ciudad').val();
-      const barrio = $('#barrio').val();
       const tabla = $('#tbl').DataTable();
 
       if (idPersona) {
@@ -242,7 +234,6 @@ Registrar Persona
             $('#telefono').val(data.data.telefono);
             $('#fechaRegistro').val(data.data.fechaRegistro);
             $('#ciudad').val(data.data.ciudad);
-            $('#barrio').val(data.data.barrio);
             $('#modalFormulario').modal();
           });
         }

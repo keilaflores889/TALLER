@@ -6,7 +6,7 @@ class MedicoDao:
 
     def getMedicos(self):
         medicoSQL = """
-        SELECT id_medico, id_persona, id_especialidad
+        SELECT id_medico, id_persona, id_especialidad, num_registro
         FROM medico
         """
         conexion = Conexion()
@@ -22,6 +22,7 @@ class MedicoDao:
                     'id_medico': medico[0],
                     'id_persona': medico[1],
                     'id_especialidad': medico[2],
+                    'num_registro': medico[3],
                 }
                 for medico in medicos
             ]
@@ -37,7 +38,7 @@ class MedicoDao:
 
     def getMedicoById(self, id_medico):
         medicoSQL = """
-       SELECT id_medico, id_persona, id_especialidad
+       SELECT id_medico, id_persona, id_especialidad, num_registro
         FROM medico
         WHERE id_medico=%s
         """
@@ -52,6 +53,7 @@ class MedicoDao:
                    'id_medico': medico[0],
                     'id_persona': medico[1],
                     'id_especialidad': medico[2],
+                    'num_registro': medico[3],
                 }
             else:
                 return None
@@ -64,9 +66,9 @@ class MedicoDao:
             cur.close()
             con.close()
 
-    def guardarMedico(self, id_medico, id_persona, id_especialidad):
+    def guardarMedico(self, id_medico, id_persona, id_especialidad, num_registro):
         insertMedicoSQL = """
-        INSERT INTO medico (id_medico, id_persona, id_especialidad)
+        INSERT INTO medico (id_medico, id_persona, id_especialidad, num_registro)
         VALUES (%s, %s, %s)
         RETURNING id_medico
         """
@@ -74,7 +76,7 @@ class MedicoDao:
         con = conexion.getConexion()
         cur = con.cursor()
         try:
-            cur.execute(insertMedicoSQL, (id_medico, id_persona, id_especialidad))
+            cur.execute(insertMedicoSQL, (id_medico, id_persona, id_especialidad, num_registro))
             medico_id = cur.fetchone()[0]
             con.commit()
             return medico_id
@@ -89,17 +91,17 @@ class MedicoDao:
             cur.close()
             con.close()
 
-    def updateAgenda(self, id_medico, id_persona, id_especialidad):
+    def updateAgenda(self, id_medico, id_persona, id_especialidad, num_registro):
         updateMedicoSQL = """
         UPDATE medico
-        SET id_medico=%s, id_persona=%s, id_especialidada=%s
+        SET id_medico=%s, id_persona=%s, id_especialidada=%s, num_registro=%s
         WHERE id_medico=%s
         """
         conexion = Conexion()
         con = conexion.getConexion()
         cur = con.cursor()
         try:
-            cur.execute(updateMedicoSQL, (id_medico, id_persona, id_especialidad))
+            cur.execute(updateMedicoSQL, (id_medico, id_persona, id_especialidad, num_registro))
             filas_afectadas = cur.rowcount
             con.commit()
             return filas_afectadas > 0

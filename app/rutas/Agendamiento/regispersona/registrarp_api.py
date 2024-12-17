@@ -54,7 +54,7 @@ def addRegistroP():
     registropdao = RegistroPDao()
 
     # Validar campos requeridos
-    campos_requeridos = ['nombre', 'apellido', 'cedula_identidad', 'fecha_nacimiento', 'fecha_registro', 'telefono', 'id_ciudad', 'id_barrio']
+    campos_requeridos = ['nombre', 'apellido', 'cedula_identidad', 'fecha_nacimiento', 'fecha_registro', 'telefono', 'id_ciudad']
     for campo in campos_requeridos:
         if not data.get(campo) or not isinstance(data[campo], str) or not data[campo]:
             return jsonify({
@@ -70,13 +70,12 @@ def addRegistroP():
         fecha_registro = data['fecha_registro']
         telefono = data['telefono']
         id_ciudad = data['id_ciudad']
-        id_barrio = data['id_barrio']
 
-        persona_id = registropdao.guardarRegistroP(nombre, apellido, cedula_identidad, fecha_nacimiento, fecha_registro, telefono, id_ciudad, id_barrio)
+        persona_id = registropdao.guardarRegistroP(nombre, apellido, cedula_identidad, fecha_nacimiento, fecha_registro, telefono, id_ciudad,)
         if persona_id is not None:
             return jsonify({
                 'success': True,
-                'data': {'id_persona': persona_id, 'nombre': nombre, 'apellido': apellido, 'cedula_identidad': cedula_identidad, 'fecha_nacimiento': fecha_nacimiento, 'fecha_registro': fecha_registro, 'telefono':telefono, 'id_ciudad': id_ciudad, 'id_barrio': id_barrio,},
+                'data': {'id_persona': persona_id, 'nombre': nombre, 'apellido': apellido, 'cedula_identidad': cedula_identidad, 'fecha_nacimiento': fecha_nacimiento, 'fecha_registro': fecha_registro, 'telefono':telefono, 'id_ciudad': id_ciudad,},
                 'error': None
             }), 201
         else:
@@ -96,7 +95,7 @@ def updateRegistroP(persona_id):
     registropdao = RegistroPDao()
 
     # Validar campos requeridos
-    campos_requeridos = ['nombre', 'apellido', 'cedula_identidad', 'fecha_nacimiento', 'fecha_registro', 'telefono', 'id_ciudad', 'id_barrio']
+    campos_requeridos = ['nombre', 'apellido', 'cedula_identidad', 'fecha_nacimiento', 'fecha_registro', 'telefono', 'id_ciudad']
     for campo in campos_requeridos:
         if not data.get(campo) or not isinstance(data[campo], str) or not data[campo].strip():
             return jsonify({
@@ -112,14 +111,13 @@ def updateRegistroP(persona_id):
         fecha_registro = data['fecha_registro']
         telefono = data['telefono']
         id_ciudad = data['id_ciudad']
-        id_barrio = data['id_barrio']
 
 
-        if registropdao.updateRegistroP(persona_id, nombre, apellido, cedula_identidad, fecha_nacimiento, fecha_registro, telefono, id_ciudad, id_barrio):
+        if registropdao.updateRegistroP(persona_id, nombre, apellido, cedula_identidad, fecha_nacimiento, fecha_registro, telefono, id_ciudad):
             app.logger.info(f"Registro de persona con ID {persona_id} actualizada exitosamente.")
             return jsonify({
                 'success': True,
-                'data': {'id_persona': persona_id, 'nombre': nombre, 'apellido': apellido, 'cedula_identidad': cedula_identidad, 'fecha_nacimiento': fecha_nacimiento, 'fecha_registro': fecha_registro, 'telefono':telefono, 'id_ciudad':id_ciudad, 'id_barrio': id_barrio},
+                'data': {'id_persona': persona_id, 'nombre': nombre, 'apellido': apellido, 'cedula_identidad': cedula_identidad, 'fecha_nacimiento': fecha_nacimiento, 'fecha_registro': fecha_registro, 'telefono':telefono, 'id_ciudad':id_ciudad},
                 'error': None
             }), 200
         else:

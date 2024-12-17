@@ -54,25 +54,26 @@ def addMedico():
     medicodao = MedicoDao()
 
     # Validar campos requeridos
-    campos_requeridos = ['id_medico', 'id_persona', 'id_especialidad']
+    campos_requeridos = ['id_medico', 'id_persona', 'id_especialidad', 'num_registro']
     for campo in campos_requeridos:
-        if not data.get(campo) or not isinstance(data[campo], str) or not data[campo].strip():
+        if not data.get(campo) or not isinstance(data[campo], str) or not data[campo]:
             return jsonify({
                 'success': False,
                 'error': f'El campo {campo} es obligatorio y debe ser una cadena no vacía.'
             }), 400
 
     try:
-        id_medico = data['id_medico'].strip()
-        id_persona = data['id_persona'].strip()
-        id_especialidad = data['id_especialidad'].strip()
+        id_medico = data['id_medico']
+        id_persona = data['id_persona']
+        id_especialidad = data['id_especialidad']
+        num_registro = data['num_registro']
 
-        medico_id = medicodao.guardarMedico(id_medico, id_persona, id_especialidad)
+        medico_id = medicodao.guardarMedico(id_medico, id_persona, id_especialidad, num_registro)
         if medico_id:
             app.logger.info(f"Medico creada con ID {medico_id}.")
             return jsonify({
                 'success': True,
-                'data': {'id_medico': medico_id, 'id_medico': id_medico, 'id_persona': id_persona, 'id_especialidad': id_especialidad},
+                'data': {'id_medico': medico_id, 'id_medico': id_medico, 'id_persona': id_persona, 'id_especialidad': id_especialidad, 'num_registro': num_registro},
                 'error': None
             }), 201
         else:
@@ -92,24 +93,25 @@ def updateMedico(medico_id):
     medicodao = MedicoDao()
 
     # Validar campos requeridos
-    campos_requeridos = ['id_medico', 'id_persona', 'id_especialidad']
+    campos_requeridos = ['id_medico', 'id_persona', 'id_especialidad', 'num_registro']
     for campo in campos_requeridos:
-        if not data.get(campo) or not isinstance(data[campo], str) or not data[campo].strip():
+        if not data.get(campo) or not isinstance(data[campo], str) or not data[campo]:
             return jsonify({
                 'success': False,
                 'error': f'El campo {campo} es obligatorio y debe ser una cadena no vacía.'
             }), 400
 
     try:
-        id_medico = data['id_medico'].strip()
-        id_persona = data['id_persona'].strip()
-        id_especialidad = data['id_especialidad'].strip()
+        id_medico = data['id_medico']
+        id_persona = data['id_persona']
+        id_especialidad = data['id_especialidad']
+        num_registro = data['num_registro']
 
-        if medicodao.updateMedico(medico_id, id_medico, id_persona, id_especialidad):
+        if medicodao.updateMedico(medico_id, id_medico, id_persona, id_especialidad, num_registro):
             app.logger.info(f"medico con ID {medico_id} actualizada exitosamente.")
             return jsonify({
                 'success': True,
-                'data': {'id_medico': medico_id, 'id_medico': id_medico, 'id_persona': id_persona, 'id_especialidad': id_especialidad},
+                'data': {'id_medico': medico_id, 'id_medico': id_medico, 'id_persona': id_persona, 'id_especialidad': id_especialidad, 'num_registro': num_registro},
                 'error': None
             }), 200
         else:
