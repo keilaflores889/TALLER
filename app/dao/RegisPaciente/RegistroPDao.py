@@ -6,29 +6,29 @@ class RegistroPDao:
 
     def getRegistrosP(self):
         registropSQL = """
-        SELECT id_persona, nombre, apellido, cedula_identidad, fecha_nacimiento, fecha_registro, telefono, id_ciudad
-        FROM persona
+        SELECT id_paciente, nombre, apellido, cedula_identidad, fecha_nacimiento, fecha_registro, telefono, id_ciudad
+        FROM paciente
         """
         conexion = Conexion()
         con = conexion.getConexion()
         cur = con.cursor()
         try:
             cur.execute(registropSQL)
-            personas = cur.fetchall()  # Trae todos los datos del registro
+            pacientes = cur.fetchall()  # Trae todos los datos del registro
 
             # Transformar los datos en una lista de diccionarios
             return [
                 {
-                    'id_persona': persona[0]
-                    ,'nombre': persona[1]
-                    ,'apellido': persona[2]
-                    ,'cedula_identidad': persona[3]
-                    ,'fecha_nacimiento': persona[4]
-                    ,'fecha_registro': persona[5]
-                    ,'telefono': persona[6]
-                    ,'id_ciudad': persona[7]
+                    'id_paciente': paciente[0]
+                    ,'nombre': paciente[1]
+                    ,'apellido': paciente[2]
+                    ,'cedula_identidad': paciente[3]
+                    ,'fecha_nacimiento': paciente[4]
+                    ,'fecha_registro': paciente[5]
+                    ,'telefono': paciente[6]
+                    ,'id_ciudad': paciente[7]
                 }
-                for persona in personas
+                for paciente in pacientes
             ]
 
 
@@ -40,28 +40,28 @@ class RegistroPDao:
             cur.close()
             con.close()
 
-    def getRegistroPById(self, id_persona):
+    def getRegistroPById(self, id_paciente):
         registropSQL = """
-        SELECT id_persona, nombre, apellido, cedula_identidad, fecha_nacimiento, fecha_registro, telefono, id_ciudad
-        FROM persona 
-        WHERE id_persona=%s
+        SELECT id_paciente, nombre, apellido, cedula_identidad, fecha_nacimiento, fecha_registro, telefono, id_ciudad
+        FROM paciente
+        WHERE id_paciente=%s
         """
         conexion = Conexion()
         con = conexion.getConexion()
         cur = con.cursor()
         try:
-            cur.execute(registropSQL, (id_persona,))
-            personaEncontrada = cur.fetchone()  # Obtener una sola fila
-            if personaEncontrada:
+            cur.execute(registropSQL, (id_paciente,))
+            pacienteEncontrada = cur.fetchone()  # Obtener una sola fila
+            if pacienteEncontrada:
                 return {
-                    'id_persona': personaEncontrada[0],
-                    'nombre': personaEncontrada[1],
-                    'apellido': personaEncontrada[2],
-                    'cedula_identidad': personaEncontrada[3],
-                    'fecha_nacimiento': personaEncontrada[4],
-                    'fecha_registro': personaEncontrada[5],
-                    'telefono': personaEncontrada[6],
-                    'id_ciudad': personaEncontrada[7],
+                    'id_paciente': pacienteEncontrada[0],
+                    'nombre': pacienteEncontrada[1],
+                    'apellido': pacienteEncontrada[2],
+                    'cedula_identidad': pacienteEncontrada[3],
+                    'fecha_nacimiento': pacienteEncontrada[4],
+                    'fecha_registro': pacienteEncontrada[5],
+                    'telefono': pacienteEncontrada[6],
+                    'id_ciudad': pacienteEncontrada[7],
                 }
             else:
                 return None
@@ -76,9 +76,9 @@ class RegistroPDao:
 
     def guardarRegistroP(self, nombre, apellido, cedula_identidad, fecha_nacimiento, fecha_registro, telefono, id_ciudad):
         insertRegistropSQL = """
-        INSERT INTO persona (nombre, apellido, cedula_identidad, fecha_nacimiento, fecha_registro, telefono, id_ciudad)
+        INSERT INTO paciente (nombre, apellido, cedula_identidad, fecha_nacimiento, fecha_registro, telefono, id_ciudad)
         VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
-        RETURNING id_persona
+        RETURNING id_paciente
         """
         conexion = Conexion()
         con = conexion.getConexion()
@@ -99,17 +99,17 @@ class RegistroPDao:
             cur.close()
             con.close()
 
-    def updateRegistroP(self, nombre, apellido, cedula_identidad, fecha_nacimiento, fecha_registro, telefono, id_ciudad, id_persona):
+    def updateRegistroP(self, nombre, apellido, cedula_identidad, fecha_nacimiento, fecha_registro, telefono, id_ciudad, id_paciente):
         updateRegistropSQL = """
-        UPDATE persona
+        UPDATE paciente
         SET nombre=%s, apellido=%s, cedula_identidad=%s, fecha_nacimiento=%s, fecha_registro=%s, telefono=%s, id_ciudad=%s
-        WHERE id_persona=%s
+        WHERE id_paciente=%s
         """
         conexion = Conexion()
         con = conexion.getConexion()
         cur = con.cursor()
         try:
-            cur.execute(updateRegistropSQL, (nombre, apellido, cedula_identidad, fecha_nacimiento, fecha_registro, telefono, id_ciudad, id_persona))
+            cur.execute(updateRegistropSQL, (nombre, apellido, cedula_identidad, fecha_nacimiento, fecha_registro, telefono, id_ciudad, id_paciente))
             filas_afectadas = cur.rowcount
             con.commit()
             return filas_afectadas > 0
@@ -123,16 +123,16 @@ class RegistroPDao:
             cur.close()
             con.close()
 
-    def deleteRegistroP(self, id_persona):
+    def deleteRegistroP(self, id_paciente):
         deleteRegistropSQL = """
-        DELETE FROM persona
-        WHERE id_persona=%s
+        DELETE FROM paciente
+        WHERE id_paciente=%s
         """
         conexion = Conexion()
         con = conexion.getConexion()
         cur = con.cursor()
         try:
-            cur.execute(deleteRegistropSQL, (id_persona,))
+            cur.execute(deleteRegistropSQL, (id_paciente,))
             filas_afectadas = cur.rowcount
             con.commit()
             return filas_afectadas > 0

@@ -40,46 +40,76 @@ Agenda Médica
         </div>
         <!-- Cuerpo -->
         <div class="modal-body">
+          <!-- Campo Doctor/a -->
           <div class="form-group">
-            <label for="doctor">Doctor/a:</label>
-            <select id="doctor" class="form-control">
-              <option value="" data-especialidad="">Seleccione al Dr. o Dra.</option>
-              <option value="Dra. Diana Barreto" data-especialidad="Ortodoncia">Dra. Diana Barreto - Ortodoncia</option>
-              <option value="Dra. Nuri González" data-especialidad="Rehabilitación oral">Dra. Nuri González - Rehabilitación oral</option>
-              <option value="Dr. Alexander Ayala" data-especialidad="Cirugía oral">Dr. Alexander Ayala - Cirugía oral</option>
-            </select>
+            <label for="medico">Medico:</label>
+            <input type="text" id="medico" class="form-control" placeholder="Ingrese el medico">
           </div>
+          
+          <!-- Campo Día -->
           <div class="form-group">
             <label for="dia">Día:</label>
-            <select id="dia" class="form-control">
-              <option value="">Seleccione el día</option>
-              <option value="Lunes">Lunes</option>
-              <option value="Martes">Martes</option>
-              <option value="Miércoles">Miércoles</option>
-              <option value="Jueves">Jueves</option>
-              <option value="Viernes">Viernes</option>
-              <option value="Sábado">Sábado</option>
-              <option value="Lunes a Viernes">Lunes a Viernes</option>
-              <option value="Lunes a Sábado">Lunes a Sábado</option>
-            </select>
+            <input type="text" id="txtDia" class="form-control" placeholder="Click para seleccionar dia">
           </div>
+          
+          <!-- Campo Turno -->
           <div class="form-group">
             <label for="turno">Turno:</label>
-            <select id="turno" class="form-control">
-              <option value="">Seleccione el turno</option>
-              <option value="Mañana">Mañana</option>
-              <option value="Tarde">Tarde</option>
-              <option value="Noche">Noche</option>
-              <option value="Mañana, Tarde y Noche">Mañana, Tarde y Noche</option>
-              <option value="Mañana y Tarde">Mañana y Tarde</option>
-              <option value="Tarde y Noche">Tarde y Noche</option>
-            </select>
+            <input type="text" id="txtTurno" class="form-control" placeholder="Click para seleccionar turno">
           </div>
         </div>
         <!-- Footer -->
         <div class="modal-footer">
           <button type="button" class="btn btn-primary" id="btnGuardar">Guardar</button>
           <button type="button" class="btn btn-danger" data-dismiss="modal">Cerrar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="modalBuscarDia">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title" id="modalDiaTitle">Seleccionar Dia</h4>
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+      </div>
+      <div class="card-body">
+        <div class="table-responsive">
+          <table class="table table-striped" id="tblDia">
+            <thead>
+              <tr>
+                <th>Dia</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="modalBuscarTurno">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title" id="modalTurnoTitle">Seleccionar turno</h4>
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+      </div>
+      <div class="card-body">
+        <div class="table-responsive">
+          <table class="table table-striped" id="tblTurno">
+            <thead>
+              <tr>
+                <th>Turno</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
         </div>
       </div>
     </div>
@@ -117,12 +147,72 @@ Agenda Médica
     });
   };
 
+  const initDatatabled= () => {
+    $('#tblDia').DataTable({
+      language: {
+        url: "{{ url_for('static', filename='vendor/datatables/es-ES.json') }}",
+      },
+      ajax:'/api/v1/dias',
+      columns: [
+        { data: 'descripcion' },
+        { data: function(row) {
+            return `<button type="button" name="btn_seleccionar_dia" class="fa fa-check" data-id="${row.id_dia}" data-dia="${row.descripcion}">Seleccionar</button>`;
+          }
+        }
+      ]
+    });
+    $('#tblDia').on('click', 'button[name="btn_seleccionar_dia"]', function () {
+      const idDia = $(this).data('id');
+      const dia = $(this).data('dia');
+      $('#txtDia').val(dia);
+      $('#id_dia').val(idDia);
+      $('#modalBuscarDia').modal('hide');
+    });
+  }
+
+  const buscarDia = () => {
+    $('#txtDia').on('click', function () {
+      $('#modalDiaTitle').text("Seleccionar Dia");
+      $('#modalBuscarDia').modal();
+    });
+  }
+
+  const initDatatablet= () => {
+    $('#tblTurno').DataTable({
+      language: {
+        url: "{{ url_for('static', filename='vendor/datatables/es-ES.json') }}",
+      },
+      ajax:'/api/v1/turnos',
+      columns: [
+        { data: 'descripcion' },
+        { data: function(row) {
+            return `<button type="button" name="btn_seleccionar_Turno" class="fa fa-check" data-id="${row.id_turno}" data-turno="${row.descripcion}">Seleccionar</button>`;
+          }
+        }
+      ]
+    });
+    $('#tblTurno').on('click', 'button[name="btn_seleccionar_Turno"]', function () {
+      const idTurno = $(this).data('id');
+      const turno = $(this).data('turno');
+      $('#txtTurno').val(turno);
+      $('#id_turno').val(idTurno);
+      $('#modalBuscarTurno').modal('hide');
+    });
+  }
+
+  const buscarTurno = () => {
+    $('#txtTurno').on('click', function () {
+      $('#modalTurnoTitle').text("Seleccionar Turno");
+      $('#modalBuscarTurno').modal();
+    });
+  }
+
   const agregar = () => {
     $('#btnAgregar').on('click', function() {
       $('#modalTitle').text("Agregar Agenda");
-      $('#doctor').val("");
-      $('#dia').val("");
-      $('#turno').val("");
+      $('#medico').val("");
+      $('#txtDia').val("");
+      $('#txtTurno').val("");
       $('#modalFormulario').modal();
     });
   };
@@ -130,9 +220,9 @@ Agenda Médica
   const guardar = () => {
     $('#btnGuardar').on('click', function() {
       const idAgenda = $('#txtIdAgenda').val();
-      const doctor = $('#doctor').val();
-      const dia = $('#dia').val();
-      const turno = $('#turno').val();
+      const medico = $('#medico').val();
+      const dia = $('#txtDia').val();
+      const turno = $('#txtTurno').val();
       const tabla = $('#tbl').DataTable();
 
       if (idAgenda) {
@@ -141,7 +231,7 @@ Agenda Médica
           headers: {
             'Content-Type': 'application/json'
           },
-          body: JSON.stringify({ id_medico: doctor, id_dia: dia, id_turno: turno })
+          body: JSON.stringify({ id_medico: medico, id_dia: dia, id_turno: turno })
         })
         .then(resp => resp.json())
         .then(data => {
@@ -162,7 +252,7 @@ Agenda Médica
           headers: {
             'Content-Type': 'application/json'
           },
-          body: JSON.stringify({ id_medico: doctor, id_dia: dia, id_turno: turno })
+          body: JSON.stringify({ id_medico: medico, id_dia: dia, id_turno: turno })
         })
         .then(resp => resp.json())
         .then(data => {
@@ -204,9 +294,9 @@ Agenda Médica
           })
           .then(resp => resp.json())
           .then(data => {
-            $('#doctor').val(data.data.medico);
-            $('#dia').val(data.data.dia);
-            $('#turno').val(data.data.turno);
+            $('#medico').val(data.data.medico);
+            $('#txtDia').val(data.data.dia);
+            $('#txtTurno').val(data.data.turno);
             $('#modalFormulario').modal();
           });
         }
@@ -254,13 +344,16 @@ Agenda Médica
     guardar();
     editar();
     eliminar();
+    buscarDia();
+    buscarTurno();
   };
 
   $(function() {
     initDatatable();
+    initDatatabled();
+    initDatatablet();
     addEvents();
   });
 </script>
-
 
 {% endblock %}

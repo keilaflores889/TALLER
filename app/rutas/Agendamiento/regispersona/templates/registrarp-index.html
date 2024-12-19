@@ -1,17 +1,17 @@
 {% extends 'base.html' %}
 
 {% block titulo %}
-Registrar Persona
+Registrar Paciente
 {% endblock %}
 
 {% block contenido %}
 <div class="container mt-4">
-  <h3>Datos de la Persona</h3>
+  <h3>Datos del Paciente</h3>
 
   <!-- Tarjeta -->
   <div class="card">
     <div class="card-header">
-      <button type="button" class="btn btn-outline-info" id="btnAgregar">Agregar Persona</button>
+      <button type="button" class="btn btn-outline-info" id="btnAgregar">Agregar Paciente</button>
     </div>
     <div class="card-body">
       <table class="table table-striped" id="tbl">
@@ -38,7 +38,7 @@ Registrar Persona
       <div class="modal-content">
         <!-- Header -->
         <div class="modal-header">
-          <h4 class="modal-title" id="modalTitle">Registrar Persona</h4>
+          <h4 class="modal-title" id="modalTitle">Registrar Paciente</h4>
           <button type="button" class="close" data-dismiss="modal">&times;</button>
         </div>
         <!-- Cuerpo -->
@@ -125,8 +125,8 @@ Registrar Persona
         {
           data: function(row) {
             return `
-              <button type="button" name="btn_editar" class="btn btn-info" data-id_persona="${row.id_persona}">Editar</button>
-              <button type="button" name="btn_eliminar" class="btn btn-warning" data-id_persona="${row.id_persona}">Eliminar</button>`;
+              <button type="button" name="btn_editar" class="btn btn-info" data-id_paciente="${row.id_paciente}">Editar</button>
+              <button type="button" name="btn_eliminar" class="btn btn-warning" data-id_paciente="${row.id_paciente}">Eliminar</button>`;
           }
         }
       ]
@@ -135,7 +135,7 @@ Registrar Persona
 
   const agregar = () => {
     $('#btnAgregar').on('click', function() {
-      $('#modalTitle').text("Agregar Persona");
+      $('#modalTitle').text("Agregar Paciente");
       $('#nombre').val("");
       $('#apellido').val("");
       $('#documento').val("");
@@ -148,7 +148,7 @@ Registrar Persona
 
   const guardar = () => {
     $('#btnGuardar').on('click', function() {
-      const idPersona = $('#txtIdPersona').val();
+      const idPaciente = $('#txtIdPaciente').val();
       const nombre = $('#nombre').val();
       const apellido = $('#apellido').val();
       const documento = $('#documento').val();
@@ -158,8 +158,8 @@ Registrar Persona
       const ciudad = $('#ciudad').val();
       const tabla = $('#tbl').DataTable();
 
-      if (idPersona) {
-        fetch(`/api/v1/registrop/${idPersona}`, {
+      if (idPaciente) {
+        fetch(`/api/v1/registrop/${idPaciente}`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json'
@@ -170,14 +170,14 @@ Registrar Persona
         .then(data => {
           if (data && !data.error && data.success) {
             tabla.ajax.reload();
-            Swal.fire("Actualizado", "La persona ha sido registrado correctamente.", "success");
+            Swal.fire("Actualizado", "La paciente ha sido registrado correctamente.", "success");
           } else {
             Swal.fire(data.error);
           }
         })
         .catch(err => {
           console.error(err);
-          Swal.fire("Error", "Ocurrió un error al actualizar la persona.", "error");
+          Swal.fire("Error", "Ocurrió un error al actualizar la paciente.", "error");
         });
       } else {
         fetch(`/api/v1/registrop`, {
@@ -191,14 +191,14 @@ Registrar Persona
         .then(data => {
           if (data && !data.error && data.success) {
             tabla.ajax.reload();
-            Swal.fire("Registrado", "La persona ha sido registrada correctamente.", "success");
+            Swal.fire("Registrado", "La paciente ha sido registrada correctamente.", "success");
           } else {
             Swal.fire(data.error);
           }
         })
         .catch(err => {
           console.error(err);
-          Swal.fire("Error", "Ocurrió un error al guardar la persona.", "error");
+          Swal.fire("Error", "Ocurrió un error al guardar la paciente.", "error");
         });
       }
 
@@ -215,11 +215,11 @@ Registrar Persona
         cancelButtonText: "No"
       }).then((result) => {
         if (result.isConfirmed) {
-          $('#modalTitle').text("Editar Persona");
-          const idPersona = $(this).data('id_persona');
-          $('#txtIdPersona').val(idPersona);
+          $('#modalTitle').text("Editar Paciente");
+          const idPaciente = $(this).data('id_paciente');
+          $('#txtIdPaciente').val(idPaciente);
 
-          fetch(`/api/v1/registrop/${idPersona}`, {
+          fetch(`/api/v1/registrop/${idPaciente}`, {
             method: 'GET',
             headers: {
               'Content-Type': 'application/json'
@@ -243,7 +243,7 @@ Registrar Persona
 
   const eliminar = () => {
     $('#tbl').on('click', 'button[name="btn_eliminar"]', function() {
-      const idPersona = $(this).data('id_persona');
+      const idPaciente = $(this).data('id_paciente');
       Swal.fire({
         title: "¿Deseas eliminar este registro?",
         showCancelButton: true,
@@ -251,7 +251,7 @@ Registrar Persona
         cancelButtonText: "No"
       }).then((result) => {
         if (result.isConfirmed) {
-          fetch(`/api/v1/registrop/${idPersona}`, {
+          fetch(`/api/v1/registrop/${idPaciente}`, {
             method: 'DELETE',
             headers: {
               'Content-Type': 'application/json'
@@ -269,7 +269,7 @@ Registrar Persona
             }
           })
           .catch(err => {
-            Swal.fire("Error", "Ocurrió un error al eliminar la persona.", "error");
+            Swal.fire("Error", "Ocurrió un error al eliminar la paciente.", "error");
           });
         }
       });

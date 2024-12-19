@@ -86,7 +86,7 @@ def addEspecialidad():
         }), 500
 
 @especiapi.route('/especialidades/<int:especialidad_id>', methods=['PUT'])
-def updateEspecialidad(especialidad_id):
+def updateEspeccialidad(especialidad_id):
     data = request.get_json()
     especialidaddao = EspecialidadDao()
 
@@ -144,4 +144,3 @@ def deleteEspecialidad(especialidad_id):
             'success': False,
             'error': 'Ocurrió un error interno. Consulte con el administrador.'
         }), 500
-    

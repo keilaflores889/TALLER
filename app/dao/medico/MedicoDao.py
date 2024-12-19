@@ -6,8 +6,9 @@ class MedicoDao:
 
     def getMedicos(self):
         medicoSQL = """
-        SELECT id_medico, id_persona, id_especialidad, num_registro
-        FROM medico
+        SELECT m.id_medico, m.nombre, m.apellido, m.id_especialidad, m.num_registro, e.descripcion AS especialidad
+        FROM medico m
+        JOIN especialidad e ON m.id_especialidad = e.id_especialidad
         """
         conexion = Conexion()
         con = conexion.getConexion()
@@ -20,16 +21,17 @@ class MedicoDao:
             return [
                 {
                     'id_medico': medico[0],
-                    'id_persona': medico[1],
-                    'id_especialidad': medico[2],
-                    'num_registro': medico[3],
+                    'nombre': medico[1],
+                    'apellido': medico[2],
+                    'id_especialidad': medico[3],
+                    'num_registro': medico[4],
+                    'especialidad': medico[5],
                 }
                 for medico in medicos
             ]
 
-
         except Exception as e:
-            app.logger.error(f"Error al obtener todos los medicos: {str(e)}")
+            app.logger.error(f"Error al obtener todos los médicos: {str(e)}")
             return []
 
         finally:
@@ -38,9 +40,10 @@ class MedicoDao:
 
     def getMedicoById(self, id_medico):
         medicoSQL = """
-       SELECT id_medico, id_persona, id_especialidad, num_registro
-        FROM medico
-        WHERE id_medico=%s
+        SELECT m.id_medico, m.nombre, m.apellido, m.id_especialidad, m.num_registro, e.descripcion AS especialidad
+        FROM medico m
+        JOIN especialidad e ON m.id_especialidad = e.id_especialidad
+        WHERE m.id_medico = %s
         """
         conexion = Conexion()
         con = conexion.getConexion()
@@ -50,40 +53,41 @@ class MedicoDao:
             medico = cur.fetchone()  # Obtener una sola fila
             if medico:
                 return {
-                   'id_medico': medico[0],
-                    'id_persona': medico[1],
-                    'id_especialidad': medico[2],
-                    'num_registro': medico[3],
+                    'id_medico': medico[0],
+                    'nombre': medico[1],
+                    'apellido': medico[2],
+                    'id_especialidad': medico[3],
+                    'num_registro': medico[4],
+                    'especialidad': medico[5],
                 }
             else:
                 return None
 
         except Exception as e:
-            app.logger.error(f"Error al obtener medicos por ID: {str(e)}")
+            app.logger.error(f"Error al obtener médico por ID: {str(e)}")
             return None
 
         finally:
             cur.close()
             con.close()
 
-    def guardarMedico(self, id_medico, id_persona, id_especialidad, num_registro):
+    def guardarMedico(self, nombre, apellido, id_especialidad, num_registro):
         insertMedicoSQL = """
-        INSERT INTO medico (id_medico, id_persona, id_especialidad, num_registro)
-        VALUES (%s, %s, %s)
+        INSERT INTO medico (nombre, apellido, id_especialidad, num_registro)
+        VALUES (%s, %s, %s, %s)
         RETURNING id_medico
         """
         conexion = Conexion()
         con = conexion.getConexion()
         cur = con.cursor()
         try:
-            cur.execute(insertMedicoSQL, (id_medico, id_persona, id_especialidad, num_registro))
+            cur.execute(insertMedicoSQL, (nombre, apellido, id_especialidad, num_registro))
             medico_id = cur.fetchone()[0]
             con.commit()
             return medico_id
 
-
         except Exception as e:
-            app.logger.error(f"Error al insertar medico: {str(e)}")
+            app.logger.error(f"Error al insertar médico: {str(e)}")
             con.rollback()
             return False
 
@@ -91,23 +95,23 @@ class MedicoDao:
             cur.close()
             con.close()
 
-    def updateAgenda(self, id_medico, id_persona, id_especialidad, num_registro):
+    def updateMedico(self, id_medico, nombre, apellido, id_especialidad, num_registro):
         updateMedicoSQL = """
         UPDATE medico
-        SET id_medico=%s, id_persona=%s, id_especialidada=%s, num_registro=%s
+        SET nombre=%s, apellido=%s, id_especialidad=%s, num_registro=%s
         WHERE id_medico=%s
         """
         conexion = Conexion()
         con = conexion.getConexion()
         cur = con.cursor()
         try:
-            cur.execute(updateMedicoSQL, (id_medico, id_persona, id_especialidad, num_registro))
+            cur.execute(updateMedicoSQL, (nombre, apellido, id_especialidad, num_registro, id_medico))
             filas_afectadas = cur.rowcount
             con.commit()
             return filas_afectadas > 0
 
         except Exception as e:
-            app.logger.error(f"Error al actualizar medico: {str(e)}")
+            app.logger.error(f"Error al actualizar médico: {str(e)}")
             con.rollback()
             return False
 
@@ -130,7 +134,7 @@ class MedicoDao:
             return filas_afectadas > 0
 
         except Exception as e:
-            app.logger.error(f"Error al eliminar medico: {str(e)}")
+            app.logger.error(f"Error al eliminar médico: {str(e)}")
             con.rollback()
             return False
 

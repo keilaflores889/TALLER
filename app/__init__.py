@@ -1,7 +1,25 @@
 from flask import Flask
 from flask import render_template
+from datetime import timedelta
+from flask_wtf.csrf import CSRFProtect
+
 
 app = Flask(__name__)
+
+# creamos el token
+csrf = CSRFProtect()
+csrf.init_app(app)
+
+# inicializar el secret key
+app.secret_key = b'_5#y2L"F6Q7z\n\xec]/'
+
+# Establecer duración de la sesión, 15 minutos
+app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(minutes=15)
+
+# importar modulo de seguridad
+from app.rutas.seguridad.login_routes import logmod
+app.register_blueprint(logmod)
+
 
 # importar referenciales
 from app.rutas.vista.vista_routes import vistamod #vista principal
@@ -22,7 +40,7 @@ from app.rutas.referenciales.turno.turno_routes import turmod  #turno
 #importacion de cita
 from app.rutas.Agendamiento.registcita.registrarc_routes import registrocmod
 from app.rutas.Agendamiento.agendmedica.agenda_routes import agendmod
-from app.rutas.Agendamiento.regispersona.registrop_routes import registropmod
+from app.rutas.Agendamiento.regispaciente.registrop_routes import registropmod
 from app.rutas.Agendamiento.medico.medico_routes import medicomod
 
 
@@ -85,7 +103,7 @@ from app.rutas.referenciales.turno.turno_api import turnoapi
 #agendamiento
 from app.rutas.Agendamiento.registcita.registrarc_api import regiscitaapi
 from app.rutas.Agendamiento.agendmedica.agenda_api import agendaapi
-from app.rutas.Agendamiento.regispersona.registrarp_api import registropapi
+from app.rutas.Agendamiento.regispaciente.registrarp_api import registropapi
 from app.rutas.Agendamiento.medico.medico_api import medicoapi
 
 
