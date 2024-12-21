@@ -70,6 +70,7 @@ Turnos
 
 {% block js %}
 <script>
+  const CSRFToken = "{{ csrf_token() }}" || null;
 
   const initDatatable = () => {
     $('#tbl').DataTable({
@@ -109,7 +110,8 @@ Turnos
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json'
-          }, body: JSON.stringify({ descripcion: nuevaDescripcion})
+            , 'X-CSRFToken': CSRFToken
+          }, body: JSON.stringify({ descripcion: nuevaDescripcion, idTurno: idTurno})
         })
         .then(resp => resp.json())
         .then(data => {
@@ -129,7 +131,8 @@ Turnos
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
-          }, body: JSON.stringify({ descripcion: nuevaDescripcion})
+            , 'X-CSRFToken': CSRFToken
+          }, body: JSON.stringify({ descripcion: nuevaDescripcion, idTurno: idTurno})
         })
         .then(resp => resp.json())
         .then(data => {
@@ -167,10 +170,12 @@ Turnos
             method: 'GET',
             headers: {
               'Content-Type': 'application/json'
+              , 'X-CSRFToken': CSRFToken
             }
           })
           .then(resp => resp.json())
           .then(data => {
+            $('#txtIdTurno').val(data.data.id_turno);
             $('#txtDescripcion').val(data.data.descripcion);
             $('#modalFormulario').modal();
           });
@@ -193,6 +198,7 @@ Turnos
             method: 'DELETE',
             headers: {
               'Content-Type': 'application/json'
+              , 'X-CSRFToken': CSRFToken
             }
           })
           .then(resp => resp.json())
