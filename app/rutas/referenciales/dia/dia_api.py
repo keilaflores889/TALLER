@@ -3,7 +3,8 @@ from app.dao.referenciales.dia.DiaDao import DiaDao
 
 diaapi = Blueprint('diaapi', __name__)
 
-
+# Lista de dias validos
+DIAS_VALIDOS = ['LUNES', 'MARTES', 'MIÉRCOLES', 'JUEVES', 'VIERNES', 'SÁBADO', 'DOMINGO', 'LUNES A VIERNES', 'LUNES A SÁBADO']
 
 
 # Trae todos los dias
@@ -69,12 +70,18 @@ def addDia():
                             'success': False,
                             'error': f'El campo {campo} es obligatorio y no puede estar vacío.'
                             }), 400
-        
-
 
     try:
         descripcion = data['descripcion'].upper()
-        
+ 
+        # Validar si el DIA está en la lista de DIAS válidos
+        if descripcion not in DIAS_VALIDOS:
+            return jsonify({
+                'success': False,
+                'error': 'Día inválido. Solo se permiten días de la semana: "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo", "Lunes a Viernes", "Lunes a Sábados".'
+            }), 400
+
+
         dia_id = diadao.guardarDia(descripcion)
         if dia_id is not None:
             return jsonify({
@@ -108,7 +115,12 @@ def updateDia(dia_id):
                             }), 400
     descripcion = data['descripcion']
 
-
+    # Validar si el DIA está en la lista de DIAS válidos
+    if descripcion not in DIAS_VALIDOS:
+            return jsonify({
+                'success': False,
+                'error': 'Día inválido. Solo se permiten días de la semana: "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo", "Lunes a Viernes", "Lunes a Sábados".'
+            }), 400
 
     try:
         if diadao.updateDia(dia_id, descripcion.upper()):
@@ -138,7 +150,7 @@ def deleteDia(dia_id):
         if diadao.deleteDia(dia_id):
             return jsonify({
                 'success': True,
-                'mensaje': f'Dia con ID {dia_id} eliminada correctamente.',
+                'mensaje': f'Día con ID {dia_id} eliminado correctamente.',
                 'error': None
             }), 200
         else:

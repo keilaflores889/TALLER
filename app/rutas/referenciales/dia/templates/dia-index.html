@@ -1,12 +1,12 @@
 {% extends 'base.html' %}
 
 {% block titulo %}
-Dia de la Cita
+Días
 {% endblock %}
 
 {% block contenido %}
 <div class="container mt-4">
-    <h3>Listar Dia de la Cita</h3>
+    <h3>Listar Días</h3>
 
     <!-- tarjeta -->
     <div class="card">
@@ -17,7 +17,7 @@ Dia de la Cita
         <table class="table table-striped" id="tbl">
           <thead>
             <tr>
-              <th>Dias</th>
+              <th>Días</th>
               <th>Acciones</th>
             </tr>
           </thead>
@@ -38,23 +38,15 @@ Dia de la Cita
             <button type="button" class="close" data-dismiss="modal">&times;</button>
           </div>
 
-          <input type="hidden" id="txtIdDia" />
-          <!-- Combo dia-->
-          <div class="form-group">
-            <label for="cbo_dia">Día:</label>
-            <select id="cbo_dia" class="custom-select">
-             
-              <option value="1">Domingo</option>
-              <option value="2">Lunes</option>
-              <option value="3">Martes</option>
-              <option value="4">Miércoles</option>
-              <option value="5">Jueves</option>
-              <option value="6">Viernes</option>
-              <option value="7">Sábado</option>
-              <option value="8">Lunes a Viernes</option>
-              <option value="9">Lunes a Sábado</option>
-            </select>
+          <!-- Modal body -->
+          <div class="modal-body">
+            <div class="form-group">
+              <input type="hidden" id="txtIdDia">
+              <label for="txtDescripcion">Día:</label>
+              <input type="text" class="form-control" placeholder="Ingrese el día" id="txtDescripcion">
+            </div>
           </div>
+
           <!-- Modal footer -->
           <div class="modal-footer">
             <button type="button" class="btn btn-primary" id="btnGuardar">Guardar</button>
@@ -78,106 +70,98 @@ Dia de la Cita
 
 {% block js %}
 <script>
+  const CSRFToken = "{{ csrf_token() }}" || null;
+
   const initDatatable = () => {
     $('#tbl').DataTable({
       language: {
         url: "{{ url_for('static', filename='vendor/datatables/es-ES.json') }}",
       },
-      ajax: '/api/v1/dias',
+      ajax:'/api/v1/dias',
       columns: [
         { data: 'descripcion' },
         { data: function(row) {
             return `<button type="button" name="btn_editar" class="btn btn-info" data-id_dia="${row.id_dia}">Editar</button>
-                    <button type="button" name="btn_eliminar" class="btn btn-warning" data-id_dia="${row.id_dia}">Eliminar</button>`;
+                    <button type="button" name="btn_eliminar" class="btn btn-warning" data-id_dia="${row.id_dia}">Eliminar</button>`
           }
         }
       ]
     });
-  };
+  }
 
   const agregar = () => {
-    $('#btnAgregar').on('click', function() {
-      $('#modalTitle').text("Agregar Dia");
+    $('#btnAgregar').on('click', function(){
+      $('#modalTitle').text("Agregar Día");
       $('#txtIdDia').val("");
-      $('#cbo_dia').val("Seleccione el dia");
+      $('#txtDescripcion').val("");
       $('#modalFormulario').modal();
     });
-  };
+  }
 
   const guardar = () => {
     $('#btnGuardar').on('click', function() {
       const idDia = $('#txtIdDia').val();
-      const diaSeleccionado = $('#cbo_dia option:selected').text(); // Obtenemos el texto seleccionado
+      const nuevaDescripcion = $('#txtDescripcion').val();
       const tabla = $('#tbl').DataTable();
 
-      if (diaSeleccionado === "Seleccione el dia") {
-        Swal.fire("Error", "Debe seleccionar el dia.", "warning");
-        return;
-      }
-
-      const data = {
-        descripcion: diaSeleccionado
-      };
-
-      if (idDia) {
-        // Actualizar
+      if(idDia) {
+        // update
         fetch(`/api/v1/dias/${idDia}`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(data)
+            , 'X-CSRFToken': CSRFToken
+          }, body: JSON.stringify({ descripcion: nuevaDescripcion, idDia: idDia})
         })
         .then(resp => resp.json())
         .then(data => {
-          if (data && !data.error && data.success) {
+          if(data && !data.error && data.success) {
             tabla.ajax.reload();
-            Swal.fire("Actualizado", "El dia ha sido actualizado correctamente.", "success");
+            Swal.fire("Actualizado", "El día ha sido actualizado correctamente.", "success");
           } else {
             Swal.fire(data.error);
           }
         }).catch(err => {
           console.error(err);
-          Swal.fire("Error", "Ocurrió un error al actualizar el dia.", "error");
+          Swal.fire("Error", "Ocurrió un error al actualizar el día.", "error");
         });
       } else {
-        // Insertar
+        // insert
         fetch(`/api/v1/dias`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(data)
+            , 'X-CSRFToken': CSRFToken
+          }, body: JSON.stringify({ descripcion: nuevaDescripcion, idDia: idDia})
         })
         .then(resp => resp.json())
         .then(data => {
-          if (data && !data.error && data.success) {
+          if(data && !data.error && data.success) {
             tabla.ajax.reload();
-            Swal.fire("Agregado", "El dia ha sido agregado correctamente.", "success");
+            Swal.fire("Agregado", "El día ha sido agregado correctamente.", "success");
           } else {
             Swal.fire(data.error);
           }
         }).catch(err => {
           console.error(err);
-          Swal.fire("Error", "Ocurrió un error al guardar el dia.", "error");
+          Swal.fire("Error", "Ocurrió un error al guardar el día.", "error");
         });
       }
-
-      $('#cbo_dia').val("Seleccione el dia");
+      $('#txtDescripcion').val("");
       $('#modalFormulario').modal("hide");
     });
-  };
+  }
 
   const editar = () => {
-    $('#tbl').on('click', 'button[name="btn_editar"]', function() {
+    $('#tbl').on('click', 'button[name="btn_editar"]',function(){
       Swal.fire({
         title: "¿Deseas editar este registro?",
         showCancelButton: true,
-        confirmButtonText: "Sí",
-        cancelButtonText: "No"
+        confirmButtonText: "Si",
+        cancelButtonText: `No`
       }).then((result) => {
         if (result.isConfirmed) {
-          $('#modalTitle').text("Editar dia");
+          $('#modalTitle').text("Editar Día");
 
           const idDia = $(this).data('id_dia');
           $('#txtIdDia').val(idDia);
@@ -186,41 +170,41 @@ Dia de la Cita
             method: 'GET',
             headers: {
               'Content-Type': 'application/json'
+              , 'X-CSRFToken': CSRFToken
             }
           })
           .then(resp => resp.json())
           .then(data => {
-            $('#cbo_dia').val(data.data.descripcion); // Asumiendo que la descripción es el valor que necesitas
+            $('#txtIdDia').val(data.data.id_dia);
+            $('#txtDescripcion').val(data.data.descripcion);
             $('#modalFormulario').modal();
-          }).catch(err => {
-            console.error(err);
-            Swal.fire("Error", "Ocurrió un error al obtener el dia.", "error");
           });
         }
       });
     });
-  };
+  }
 
   const eliminar = () => {
-    $('#tbl').on('click', 'button[name="btn_eliminar"]', function() {
+    $('#tbl').on('click', 'button[name="btn_eliminar"]',function(){
       const idDia = $(this).data('id_dia');
       Swal.fire({
         title: "¿Deseas eliminar este registro?",
         showCancelButton: true,
-        confirmButtonText: "Sí",
-        cancelButtonText: "No"
+        confirmButtonText: "Si",
+        cancelButtonText: `No`
       }).then((result) => {
         if (result.isConfirmed) {
           fetch(`/api/v1/dias/${idDia}`, {
             method: 'DELETE',
             headers: {
               'Content-Type': 'application/json'
+              , 'X-CSRFToken': CSRFToken
             }
           })
           .then(resp => resp.json())
           .then(data => {
-            if (data && !data.error && data.success) {
-              const fila = $(this).closest('tr');
+            if(data && !data.error && data.success) {
+              const fila =$(this).closest('tr');
               const tabla = $('#tbl').DataTable();
               tabla.row(fila).remove().draw();
               Swal.fire("Eliminado", "", data.success);
@@ -228,19 +212,20 @@ Dia de la Cita
               Swal.fire(data.error);
             }
           }).catch(err => {
-            Swal.fire("Error", "Ocurrió un error al eliminar el dia.", "error");
+            Swal.fire("Error", "Ocurrió un error al eliminar el día.", "error");
           });
         }
       });
+
     });
-  };
+  }
 
   const addEvents = () => {
     agregar();
     guardar();
     editar();
     eliminar();
-  };
+  }
 
   $(function() {
     initDatatable();
