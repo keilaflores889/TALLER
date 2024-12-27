@@ -6,10 +6,10 @@ class MedicoDao:
 
     def getMedicos(self):
         medicoSQL = """
-        SELECT m.id_medico, m.nombre, m.apellido, m.id_especialidad, m.num_registro, e.descripcion AS especialidad
-        FROM medico m
-        JOIN especialidad e ON m.id_especialidad = e.id_especialidad
-        """
+       SELECT m.id_medico, m.nombre, m.apellido, m.id_especialidad, m.num_registro, e.descripcion AS especialidad
+       FROM medico m
+       JOIN especialidad e ON m.id_especialidad = e.id_especialidad
+       """
         conexion = Conexion()
         con = conexion.getConexion()
         cur = con.cursor()
@@ -81,7 +81,7 @@ class MedicoDao:
         con = conexion.getConexion()
         cur = con.cursor()
         try:
-            cur.execute(insertMedicoSQL, (nombre, apellido, id_especialidad, num_registro))
+            cur.execute(insertMedicoSQL, (nombre, apellido, id_especialidad, num_registro,))
             medico_id = cur.fetchone()[0]
             con.commit()
             return medico_id
@@ -105,7 +105,7 @@ class MedicoDao:
         con = conexion.getConexion()
         cur = con.cursor()
         try:
-            cur.execute(updateMedicoSQL, (nombre, apellido, id_especialidad, num_registro, id_medico))
+            cur.execute(updateMedicoSQL, (nombre, apellido, id_especialidad, num_registro, id_medico,))
             filas_afectadas = cur.rowcount
             con.commit()
             return filas_afectadas > 0

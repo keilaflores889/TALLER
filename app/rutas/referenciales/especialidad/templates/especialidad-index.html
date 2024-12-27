@@ -72,6 +72,8 @@ Especialidad
 {% block js %}
 <script>
 
+  const CSRFToken = "{{ csrf_token() }}" || null;
+
   const initDatatable = () => {
     $('#tbl').DataTable({
       language: {
@@ -81,8 +83,8 @@ Especialidad
       columns: [
         { data: 'descripcion' },
         { data: function(row) {
-            return `<button type="button" name="btn_editar" class="btn btn-info" data-id="${row.id}">Editar</button>
-                    <button type="button" name="btn_eliminar" class="btn btn-warning" data-id="${row.id}">Eliminar</button>`
+            return `<button type="button" name="btn_editar" class="btn btn-info" data-id_especialidad="${row.id_especialidad}">Editar</button>
+                    <button type="button" name="btn_eliminar" class="btn btn-warning" data-id_especialidad="${row.id_especialidad}">Eliminar</button>`
           }
         }
       ]
@@ -112,6 +114,7 @@ Especialidad
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json'
+            , 'X-CSRFToken': CSRFToken
           }, body: JSON.stringify({ descripcion: nuevaDescripcion})
         })
         .then(resp => resp.json())
@@ -132,6 +135,7 @@ Especialidad
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
+            , 'X-CSRFToken': CSRFToken
           }, body: JSON.stringify({ descripcion: nuevaDescripcion})
         })
         .then(resp => resp.json())
@@ -165,7 +169,7 @@ Especialidad
           //Swal.fire("Saved!", "", "success");
           $('#modalTitle').text("Editar Especialidad");
 
-          const idEspecialidad = $(this).data('id');
+          const idEspecialidad = $(this).data('id_especialidad');
           $('#txtIdEspecialidad').val(idEspecialidad);
 
           // Necesitamos obtener la descripción del backend
@@ -187,7 +191,7 @@ Especialidad
 
   const eliminar = () => {
     $('#tbl').on('click', 'button[name="btn_eliminar"]',function(){
-      const idEspecialidad = $(this).data('id');
+      const idEspecialidad = $(this).data('id_especialidad');
       // Mostrar mensaje de confirmación usando sweetalert
       Swal.fire({
         title: "¿Deseas eliminar este registro?",
@@ -200,6 +204,7 @@ Especialidad
             method: 'DELETE',
             headers: {
               'Content-Type': 'application/json'
+              , 'X-CSRFToken': CSRFToken
             }
           })
           .then(resp => resp.json())

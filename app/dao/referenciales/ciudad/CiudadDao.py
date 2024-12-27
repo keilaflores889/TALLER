@@ -29,7 +29,7 @@ class CiudadDao:
             cur.close()
             con.close()
 
-    def getCiudadById(self, id_ciudad):
+    def getCiudadById(self, id):
 
         ciudadSQL = """
         SELECT id_ciudad, descripcion
@@ -40,7 +40,7 @@ class CiudadDao:
         con = conexion.getConexion()
         cur = con.cursor()
         try:
-            cur.execute(ciudadSQL, (id_ciudad,))
+            cur.execute(ciudadSQL, (id,))
             ciudadEncontrada = cur.fetchone() # Obtener una sola fila
             if ciudadEncontrada:
                 return {
@@ -85,7 +85,7 @@ class CiudadDao:
             cur.close()
             con.close()
 
-    def updateCiudad(self, id_ciudad, descripcion):
+    def updateCiudad(self, id, descripcion):
 
         updateCiudadSQL = """
         UPDATE ciudad
@@ -98,7 +98,7 @@ class CiudadDao:
         cur = con.cursor()
 
         try:
-            cur.execute(updateCiudadSQL, (descripcion, id_ciudad,))
+            cur.execute(updateCiudadSQL, (descripcion, id,))
             filas_afectadas = cur.rowcount # Obtener el número de filas afectadas
             con.commit()
 
@@ -113,7 +113,7 @@ class CiudadDao:
             cur.close()
             con.close()
 
-    def deleteCiudad(self, id_ciudad):
+    def deleteCiudad(self, id):
 
         updateCiudadSQL = """
         DELETE FROM ciudad
@@ -125,7 +125,7 @@ class CiudadDao:
         cur = con.cursor()
 
         try:
-            cur.execute(updateCiudadSQL, (id_ciudad,))
+            cur.execute(updateCiudadSQL, (id,))
             rows_affected = cur.rowcount
             con.commit()
 

@@ -43,7 +43,7 @@ Agenda Médica
           <!-- Campo Doctor/a -->
           <div class="form-group">
             <label for="medico">Medico:</label>
-            <input type="text" id="medico" class="form-control" placeholder="Ingrese el medico">
+            <input type="text" id="txtmedico" class="form-control" placeholder="Click para seleccionar Médico">
           </div>
           
           <!-- Campo Día -->
@@ -62,6 +62,32 @@ Agenda Médica
         <div class="modal-footer">
           <button type="button" class="btn btn-primary" id="btnGuardar">Guardar</button>
           <button type="button" class="btn btn-danger" data-dismiss="modal">Cerrar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<div class="modal" id="modalBuscarMedico">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title" id="modalMedicoTitle">Seleccionar Medico</h4>
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+      </div>
+      <div class="card-body">
+        <div class="table-responsive">
+          <table class="table table-striped" id="tblMedico">
+            <thead>
+              <tr>
+                <th>Nombre</th>
+                <th>Apellido</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
         </div>
       </div>
     </div>
@@ -126,6 +152,8 @@ Agenda Médica
 
 {% block js %}
 <script>
+  const CSRFToken = "{{ csrf_token() }}" || null;
+
   const initDatatable = () => {
     $('#tbl').DataTable({
       language: {
@@ -144,6 +172,38 @@ Agenda Médica
           }
         }
       ]
+    });
+  };
+
+  const initDatatablem= () => {
+    $('#tblMedico').DataTable({
+      language: {
+        url: "{{ url_for('static', filename='vendor/datatables/es-ES.json') }}",
+      },
+      ajax:'/api/v1/medico',
+      columns: [
+        { data: 'nombre' },
+        { data: 'apellido'},
+        { data: function(row) {
+          return `<button type="button" name="btn_seleccionar_Medico" class="fa fa-check" data-id="${row.id_medico}" data-nombre="${row.nombre}" data-apellido="${row.apellido}">Seleccionar</button>`;
+          }
+        }
+      ]
+    });
+    $('#tblMedico').on('click', 'button[name="btn_seleccionar_Medico"]', function () {
+      const idMedico = $(this).data('id');
+      const nombreMedico = $(this).data('nombre');
+      const apellidoMedico = $(this).data('apellido');
+      $('#txtmedico').val(`${nombreMedico} ${apellidoMedico}`);
+      $('#id_medico').val(idMedico);
+      $('#modalBuscarMedico').modal('hide');
+    });
+  }
+
+  const buscarMedico = () => {
+    $('#txtmedico').on('click', function () {
+      $('#modalMedicoTitle').text("Seleccionar Medico");
+      $('#modalBuscarMedico').modal(); 
     });
   };
 
@@ -207,12 +267,16 @@ Agenda Médica
     });
   }
 
+  
   const agregar = () => {
     $('#btnAgregar').on('click', function() {
       $('#modalTitle').text("Agregar Agenda");
-      $('#medico').val("");
+      $('#txtmedico').val("");
+      $('#id_medico').val("");
       $('#txtDia').val("");
+      $('#id_dia').val("");
       $('#txtTurno').val("");
+      $('#id_turno').val("");
       $('#modalFormulario').modal();
     });
   };
@@ -220,9 +284,12 @@ Agenda Médica
   const guardar = () => {
     $('#btnGuardar').on('click', function() {
       const idAgenda = $('#txtIdAgenda').val();
-      const medico = $('#medico').val();
+      const medico = $('#txtmedico').val();
+      const id_medico = $('#txtmedico').val();
       const dia = $('#txtDia').val();
+      const id_dia = $('#txtDia').val();
       const turno = $('#txtTurno').val();
+      const id_turno = $('#txtTurno').val();
       const tabla = $('#tbl').DataTable();
 
       if (idAgenda) {
@@ -230,8 +297,9 @@ Agenda Médica
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json'
+            , 'X-CSRFToken': CSRFToken
           },
-          body: JSON.stringify({ id_medico: medico, id_dia: dia, id_turno: turno })
+          body: JSON.stringify({ id_medico: id_medico, dia: dia, turno: turno, id_dia: id_dia, id_turno: id_turno})
         })
         .then(resp => resp.json())
         .then(data => {
@@ -251,8 +319,9 @@ Agenda Médica
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
+            , 'X-CSRFToken': CSRFToken
           },
-          body: JSON.stringify({ id_medico: medico, id_dia: dia, id_turno: turno })
+          body: JSON.stringify({id_medico: id_medico, dia: dia, turno: turno, id_dia: id_dia, id_turno: id_turno})
         })
         .then(resp => resp.json())
         .then(data => {
@@ -285,7 +354,7 @@ Agenda Médica
           $('#modalTitle').text("Editar Agenda");
           const idAgenda = $(this).data('id_agenda_medica');
           $('#txtIdAgenda').val(idAgenda);
-
+  
           fetch(`/api/v1/agenda/${idAgenda}`, {
             method: 'GET',
             headers: {
@@ -294,15 +363,18 @@ Agenda Médica
           })
           .then(resp => resp.json())
           .then(data => {
-            $('#medico').val(data.data.medico);
-            $('#txtDia').val(data.data.dia);
+            $('#txtmedico').val(data.data.nombre + ' ' + data.data.apellido);
+            $('#txtDia').val(data.data.dia); 
+            $('#id_dia').val(data.data.id_dia);
             $('#txtTurno').val(data.data.turno);
+            $('#id_turno').val(data.data.id_turno);
             $('#modalFormulario').modal();
           });
         }
       });
     });
   };
+  
 
   const eliminar = () => {
     $('#tbl').on('click', 'button[name="btn_eliminar"]', function() {
@@ -318,6 +390,7 @@ Agenda Médica
             method: 'DELETE',
             headers: {
               'Content-Type': 'application/json'
+              , 'X-CSRFToken': CSRFToken
             }
           })
           .then(resp => resp.json())
@@ -344,12 +417,14 @@ Agenda Médica
     guardar();
     editar();
     eliminar();
+    buscarMedico();
     buscarDia();
     buscarTurno();
   };
 
   $(function() {
     initDatatable();
+    initDatatablem();
     initDatatabled();
     initDatatablet();
     addEvents();

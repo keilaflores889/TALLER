@@ -41,8 +41,8 @@ Medico
         </div>
         <!-- Cuerpo -->
         <div class="modal-body">
-           <!-- Campo Nombre -->
-           <div class="form-group">
+          <!-- Campo Nombre -->
+          <div class="form-group">
             <label for="nombre">Nombre:</label>
             <input type="text" id="nombre" class="form-control" placeholder="Ingrese el nombre">
           </div>
@@ -55,15 +55,15 @@ Medico
 
           <!-- Campo Especialidad -->
           <div class="form-group">
-            <label for="especialidad">Especialidad:</label>
-            <input type="text" id="txtEspecialidad" class="form-control"  placeholder="Click para seleccionar especialidad">
+            <label for="txtEspecialidad">Especialidad:</label>
+            <input type="text" id="txtEspecialidad" class="form-control" placeholder="Click para seleccionar especialidad">
             <input type="hidden" id="id_especialidad">
           </div>
 
           <!-- Campo numero de registro -->
           <div class="form-group">
-            <label for="registro">N° de Registro:</label>
-            <input type="text" id="registro" class="form-control" placeholder="Ingrese el numero del registro">
+            <label for="txtregistro">N° de Registro:</label>
+            <input type="text" id="txtregistro" class="form-control" placeholder="Ingrese el numero del registro">
           </div>
         </div>
         <!-- Footer -->
@@ -75,8 +75,7 @@ Medico
     </div>
   </div>
 
-
-  <!-- Modal de selección de especialidad -->
+   <!-- Modal de selección de especialidad -->
   <div class="modal" id="modalBuscarEspecialidad">
     <div class="modal-dialog modal-dialog-centered modal-lg">
       <div class="modal-content">
@@ -101,7 +100,6 @@ Medico
     </div>
   </div>
 </div>
-
 <!-- Librerías necesarias -->
 <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -112,6 +110,8 @@ Medico
 
 {% block js %}
 <script>
+  const CSRFToken = "{{ csrf_token() }}" || null;
+
   const initDatatable = () => {
     $('#tbl').DataTable({
       language: {
@@ -122,7 +122,7 @@ Medico
         { data: 'nombre' },
         { data: 'apellido' },
         { data: 'especialidad' },
-        { data: 'registro' },
+        { data: 'num_registro' },
         {
           data: function(row) {
             return `
@@ -139,15 +139,18 @@ Medico
       language: {
         url: "{{ url_for('static', filename='vendor/datatables/es-ES.json') }}",
       },
-      ajax:'/api/v1/especialidades',
+      ajax: '/api/v1/especialidades',
       columns: [
         { data: 'descripcion' },
-        { data: function(row) {
+        {
+          data: function(row) {
             return `<button type="button" name="btn_seleccionar_especialidad" class="fa fa-check" data-id="${row.id_especialidad}" data-especialidad="${row.descripcion}"> Seleccionar</button>`;
           }
         }
-      ]
+      ],
+      destroy: true // Permite reinicializar el DataTable
     });
+
     $('#tblEspecialidad').on('click', 'button[name="btn_seleccionar_especialidad"]', function () {
       const idEspecialidad = $(this).data('id');
       const especialidad = $(this).data('especialidad');
@@ -161,17 +164,19 @@ Medico
     $('#txtEspecialidad').on('click', function () {
       $('#modalEspecialidadTitle').text("Seleccionar Especialidad");
       $('#modalBuscarEspecialidad').modal();
-      
+      initDatatablee(); // Llama a la inicialización de la tabla de especialidades
     });
   };
 
   const agregar = () => {
     $('#btnAgregar').on('click', function() {
-      $('#modalTitle').text("Agregar Medico");
+      $('#modalTitle').text("Agregar Médico");
+      $('#txtIdMedico').val(""); // Se debe definir correctamente este campo
       $('#nombre').val("");
       $('#apellido').val("");
       $('#txtEspecialidad').val("");
-      $('#registro').val("");
+      $('#id_especialidad').val("");
+      $('#txtregistro').val("");
       $('#modalFormulario').modal();
     });
   };
@@ -181,53 +186,31 @@ Medico
       const idMedico = $('#txtIdMedico').val();
       const nombre = $('#nombre').val();
       const apellido = $('#apellido').val();
-      const especialidad = $('#txtEspecialidad').val();
-      const registro = $('#registro').val();
+      const id_especialidad = $('#id_especialidad').val();
+      const num_registro = $('#txtregistro').val();
       const tabla = $('#tbl').DataTable();
 
-      if (idMedico) {
-        fetch(`/api/v1/medico/${idMedico}`, {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({ nombre: nombre, apellido: apellido, especialidad: especialidad, registro: registro })
-        })
-        .then(resp => resp.json())
-        .then(data => {
-          if (data && !data.error && data.success) {
-            tabla.ajax.reload();
-            Swal.fire("Actualizado", "Medico ha sido registrado correctamente.", "success");
-          } else {
-            Swal.fire(data.error);
-          }
-        })
-        .catch(err => {
-          console.error(err);
-          Swal.fire("Error", "Ocurrió un error al actualizar medico.", "error");
-        });
-      } else {
-        fetch(`/api/v1/medico`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({ nombre: nombre, apellido: apellido, especialidad: especialidad, registro: registro })
-        })
-        .then(resp => resp.json())
-        .then(data => {
-          if (data && !data.error && data.success) {
-            tabla.ajax.reload();
-            Swal.fire("Registrado", "El medico ha sido registrada correctamente.", "success");
-          } else {
-            Swal.fire(data.error);
-          }
-        })
-        .catch(err => {
-          console.error(err);
-          Swal.fire("Error", "Ocurrió un error al guardar medico.", "error");
-        });
-      }
+      const metodo = idMedico ? 'PUT' : 'POST';
+      const url = idMedico ? `/api/v1/medico/${idMedico}` : `/api/v1/medico`;
+
+      fetch(url, {
+        method: metodo,
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': CSRFToken
+        },
+        body: JSON.stringify({ nombre, apellido, id_especialidad, num_registro })
+      })
+      .then(resp => resp.json())
+      .then(data => {
+        if (data.success) {
+          tabla.ajax.reload();
+          Swal.fire(idMedico ? "Actualizado" : "Registrado", `El médico ha sido ${idMedico ? 'actualizado' : 'registrado'} correctamente.`, "success");
+        } else {
+          Swal.fire("Error", data.error || "Ocurrió un error", "error");
+        }
+      })
+      .catch(err => Swal.fire("Error", "Ocurrió un error al guardar médico.", "error"));
 
       $('#modalFormulario').modal("hide");
     });
@@ -235,31 +218,32 @@ Medico
 
   const editar = () => {
     $('#tbl').on('click', 'button[name="btn_editar"]', function() {
+      const idMedico = $(this).data('id_medico');
       Swal.fire({
         title: "¿Deseas editar este registro?",
         showCancelButton: true,
-        confirmButtonText: "Si",
+        confirmButtonText: "Sí",
         cancelButtonText: "No"
       }).then((result) => {
         if (result.isConfirmed) {
-          $('#modalTitle').text("Editar Medico");
-          const idMedico = $(this).data('id_medico');
-          $('#txtIdMedico').val(idMedico);
+          $('#modalTitle').text("Editar Médico");
+          $('#txtIdMedico').val(idMedico); // Correcto
 
-          fetch(`/api/v1/medico/${idMedico}`, {
-            method: 'GET',
-            headers: {
-              'Content-Type': 'application/json'
-            }
-          })
+          fetch(`/api/v1/medico/${idMedico}`)
           .then(resp => resp.json())
           .then(data => {
-            $('#nombre').val(data.data.nombre);
-            $('#apellido').val(data.data.apellido);
-            $('#txtEspecialidad').val(data.data.especialidad);
-            $('#registro').val(data.data.registro);
-            $('#modalFormulario').modal();
-          });
+            if (data.data) {
+              $('#nombre').val(data.data.nombre);
+              $('#apellido').val(data.data.apellido);
+              $('#txtEspecialidad').val(data.data.especialidad);
+              $('#id_especialidad').val(data.data.id_especialidad);
+              $('#txtregistro').val(data.data.num_registro);
+              $('#modalFormulario').modal();
+            } else {
+              Swal.fire("Error", "No se encontraron datos del médico.", "error");
+            }
+          })
+          .catch(err => Swal.fire("Error", "Ocurrió un error al obtener los datos del médico.", "error"));
         }
       });
     });
@@ -267,44 +251,39 @@ Medico
 
   const eliminar = () => {
     $('#tbl').on('click', 'button[name="btn_eliminar"]', function() {
-      const idPersona = $(this).data('id_medico');
+      const idMedico = $(this).data('id_medico');
       Swal.fire({
         title: "¿Deseas eliminar este registro?",
         showCancelButton: true,
-        confirmButtonText: "Si",
+        confirmButtonText: "Sí",
         cancelButtonText: "No"
       }).then((result) => {
         if (result.isConfirmed) {
-          fetch(`/api/v1/medico/${idPersona}`, {
+          fetch(`/api/v1/medico/${idMedico}`, {
             method: 'DELETE',
             headers: {
-              'Content-Type': 'application/json'
+              'Content-Type': 'application/json',
+              'X-CSRFToken': CSRFToken
             }
           })
           .then(resp => resp.json())
           .then(data => {
-            if (data && !data.error && data.success) {
+            if (data.success) {
               const fila = $(this).closest('tr');
               const tabla = $('#tbl').DataTable();
               tabla.row(fila).remove().draw();
-              Swal.fire("Eliminado", "", data.success);
+              Swal.fire("Eliminado", data.success, "success");
             } else {
-              Swal.fire(data.error);
+              Swal.fire("Error", data.error || "Ocurrió un error", "error");
             }
           })
-          .catch(err => {
-            Swal.fire("Error", "Ocurrió un error al eliminar medico.", "error");
-          });
+          .catch(err => Swal.fire("Error", "Ocurrió un error al eliminar médico.", "error"));
         }
       });
     });
   };
 
-  // Validación del campo de cédula para que solo acepte números
-  $('#registro').on('input', function() {
-    this.value = this.value.replace(/[^0-9]/g, '');  // Solo permite números
-  });
-
+  // Agregar eventos
   const addEvents = () => {
     agregar();
     guardar();
@@ -315,7 +294,6 @@ Medico
 
   $(function() {
     initDatatable();
-    initDatatablee();
     addEvents();
   });
 </script>

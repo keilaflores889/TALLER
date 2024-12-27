@@ -6,25 +6,35 @@ class AgendaDao:
 
     def getAgendas(self):
         agendaSQL = """
-        SELECT id_agenda_medica, id_medico, id_dia, id_turno
-        FROM agenda_medica
+        SELECT am.id_agenda_medica, am.id_medico, am.id_dia, am.id_turno,
+               m.nombre AS medico_nombre, m.apellido AS medico_apellido,
+               d.descripcion AS dia, t.descripcion AS turno
+        FROM agenda_medica am
+        JOIN medico m ON am.id_medico = m.id_medico
+        JOIN dia d ON am.id_dia = d.id_dia
+        JOIN turno t ON am.id_turno = t.id_turno
         """
         conexion = Conexion()
         con = conexion.getConexion()
         cur = con.cursor()
         try:
             cur.execute(agendaSQL)
-            resultados = cur.fetchall()  # Trae todos los datos de la consulta
+            agendas = cur.fetchall()  # Trae todos los datos de la consulta
 
             # Transformar los datos en una lista de diccionarios
             return [
                 {
-                    'id_agenda_medica': fila[0],
-                    'id_medico': fila[1],
-                    'id_dia': fila[2],
-                    'id_turno': fila[3],
+                    'id_agenda_medica': agendas[0],
+                    'id_medico': agendas[1],
+                    'id_dia': agendas[2],
+                    'id_turno': agendas[3],
+                    'medico_nombre': agendas[4],
+                    'medico_apellido': agendas[5],
+                    'dia': agendas[6],
+                    'turno': agendas[7],
+                    
                 }
-                for fila in resultados
+                for fila in agendas
             ]
 
 
@@ -38,22 +48,31 @@ class AgendaDao:
 
     def getAgendaById(self, id_agenda_medica):
         agendaSQL = """
-       SELECT id_agenda_medica, id_medico, id_dia, id_turno
-        FROM agenda_medica 
-        WHERE id_agenda_medica=%s
+       SELECT am.id_agenda_medica, am.id_medico, am.id_dia, am.id_turno,
+               m.nombre AS medico_nombre, m.apellido AS medico_apellido,
+               d.descripcion AS dia, t.descripcion AS turno
+        FROM agenda_medica am
+        JOIN medico m ON am.id_medico = m.id_medico
+        JOIN dia d ON am.id_dia = d.id_dia
+        JOIN turno t ON am.id_turno = t.id_turno
+        WHERE am.id_agenda_medica = %s
         """
         conexion = Conexion()
         con = conexion.getConexion()
         cur = con.cursor()
         try:
             cur.execute(agendaSQL, (id_agenda_medica,))
-            fila = cur.fetchone()  # Obtener una sola fila
-            if fila:
+            agenda = cur.fetchone()  # Obtener una sola fila
+            if agenda:
                 return {
-                    "id_agenda_medica": fila[0],
-                    "id_medico": fila[1],
-                    "id_dia": fila[2],
-                    "id_turno": fila[3],
+                    'id_agenda_medica': agenda[0],
+                    'id_medico': agenda[1],
+                    'id_dia': agenda[2],
+                    'id_turno': agenda[3],
+                    'medico_nombre': agenda[4],
+                    'medico_apellido': agenda[5],
+                    'dia': agenda[6],
+                    'turno': agenda[7],
                 }
             else:
                 return None

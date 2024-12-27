@@ -43,8 +43,8 @@ Ciudades
           <div class="modal-body">
             <div class="form-group">
               <input type="hidden" id="txtIdCiudad">
-              <label for="txtCiudad">Ciudad:</label>
-              <input type="text" class="form-control" placeholder="Ingrese alguna ciudad" id="txtCiudad">
+              <label for="txtDescripcion">Ciudad:</label>
+              <input type="text" class="form-control" placeholder="Ingrese alguna ciudad" id="txtDescripcion">
             </div>
           </div>
 
@@ -95,20 +95,20 @@ Ciudades
       $('#modalTitle').text("Agregar una Ciudad");
       // inicia ventana modal
       $('#txtIdCiudad').val("");
-      $('#txtCiudad').val("");
+      $('#txtDescripcion').val("");
       $('#modalFormulario').modal();
     });
   }
 
   const guardar = () => {
     $('#btnGuardar').on('click', function() {
-      const idCiudad = $('#txtIdCiudad').val();
-      const nuevaDescripcion = $('#txtCiudad').val();
+      const id_ciudad = $('#txtIdCiudad').val();
+      const nuevaDescripcion = $('#txtDescripcion').val();
       const tabla = $('#tbl').DataTable();
 
-      if(idCiudad) {
+      if(id_ciudad) {
         // update
-        fetch(`/api/v1/ciudades/${idCiudad}`, {
+        fetch(`/api/v1/ciudades/${id_ciudad}`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json'
@@ -132,13 +132,13 @@ Ciudades
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
-          }, body: JSON.stringify({ descripcion: nuevaDescripcion})
+          }, body: JSON.stringify({descripcion: nuevaDescripcion})
         })
         .then(resp => resp.json())
         .then(data => {
           if(data && !data.error && data.success) {
             tabla.ajax.reload();
-            Swal.fire("Registrado", "La ciudad ha sido agregada correctamente.", "success");
+            Swal.fire("Actualizado", "La ciudad ha sido agregada correctamente.", "success");
           } else {
             Swal.fire(data.error);
           }
@@ -147,47 +147,46 @@ Ciudades
           Swal.fire("Error", "Ocurrió un error al guardar la ciudad.", "error");
         });
       }
-      $('#txtCiudad').val("");
+      $('#txtDescripcion').val("");
       $('#modalFormulario').modal("hide");
     });
   }
 
   const editar = () => {
-    $('#tbl').on('click', 'button[name="btn_editar"]',function(){
-      // Mostrar mensaje de confirmación usando sweetalert
-      Swal.fire({
-        title: "¿Deseas editar este registro?",
-        showCancelButton: true,
-        confirmButtonText: "Si",
-        cancelButtonText: `No`
-      }).then((result) => {
-        if (result.isConfirmed) {
-          //Swal.fire("Saved!", "", "success");
-          $('#modalTitle').text("Editar una Ciudad");
+    $('#tbl').on('click', 'button[name="btn_editar"]', function() {
+        // Mostrar mensaje de confirmación usando sweetalert
+        Swal.fire({
+            title: "¿Deseas editar este registro?",
+            showCancelButton: true,
+            confirmButtonText: "Si",
+            cancelButtonText: `No`
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $('#modalTitle').text("Editar una Ciudad");
 
-          const idCiudad = $(this).data('id_ciudad');
-          $('#txtIdCiudad').val(idCiudad);
+                const id_ciudad = $(this).data('id_ciudad');
+                $('#txtIdCiudad').val(id_ciudad);
 
-          // Necesitamos obtener la descripción del backend
-          fetch(`/api/v1/ciudades/${idCiudad}`, {
-            method: 'GET',
-            headers: {
-              'Content-Type': 'application/json'
+                // Necesitamos obtener la descripción del backend
+                fetch(`/api/v1/ciudades/${id_ciudad}`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                })
+                .then(resp => resp.json())
+                .then(data => {
+                    $('#txtDescripcion').val(data.data.descripcion); // Asegúrate que aquí accedes a la propiedad correcta
+                    $('#modalFormulario').modal();
+                });
             }
-          })
-          .then(resp => resp.json())
-          .then(data => {
-            $('#txtCiudad').val(data.data.descripcion);
-            $('#modalFormulario').modal();
-          });
-        }
-      });
+        });
     });
-  }
+  };
 
   const eliminar = () => {
     $('#tbl').on('click', 'button[name="btn_eliminar"]',function(){
-      const idCiudad = $(this).data('id_ciudad');
+      const id_ciudad = $(this).data('id_ciudad');
       // Mostrar mensaje de confirmación usando sweetalert
       Swal.fire({
         title: "¿Deseas eliminar este registro?",
@@ -196,7 +195,7 @@ Ciudades
         cancelButtonText: `No`
       }).then((result) => {
         if (result.isConfirmed) {
-          fetch(`/api/v1/ciudades/${idCiudad}`, {
+          fetch(`/api/v1/ciudades/${id_ciudad}`, {
             method: 'DELETE',
             headers: {
               'Content-Type': 'application/json'
@@ -206,7 +205,7 @@ Ciudades
           .then(data => {
             if(data && !data.error && data.success) {
               // Para borrar la fila del datatable(cliente)
-              const fila =$(this).closest('tr');
+              const fila = $(this).closest('tr');
               const tabla = $('#tbl').DataTable();
               tabla.row(fila).remove().draw();
               Swal.fire("Eliminado", "", data.success);
@@ -218,7 +217,6 @@ Ciudades
           });
         }
       });
-
     });
   }
 

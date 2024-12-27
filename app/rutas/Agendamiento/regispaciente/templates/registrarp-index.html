@@ -23,6 +23,7 @@ Registrar Paciente
             <th>Fecha de Nacimiento</th>
             <th>Teléfono</th>
             <th>Fecha de Registro</th>
+            <th>Ciudad</th>
             <th>Acciones</th>
           </tr>
         </thead>
@@ -46,22 +47,18 @@ Registrar Paciente
           <div class="row">
             <!-- Columna izquierda -->
             <div class="col-md-6">
-              <!-- Campo Nombre -->
               <div class="form-group">
                 <label for="nombre">Nombre:</label>
                 <input type="text" id="nombre" class="form-control" placeholder="Ingrese el nombre">
               </div>
-              <!-- Campo Apellido -->
               <div class="form-group">
                 <label for="apellido">Apellido:</label>
                 <input type="text" id="apellido" class="form-control" placeholder="Ingrese el apellido">
               </div>
-              <!-- Campo Documento -->
               <div class="form-group">
                 <label for="documento">Documento de Identidad:</label>
                 <input type="text" id="documento" class="form-control" placeholder="Ingrese el documento">
               </div>
-              <!-- Campo Fecha de Nacimiento -->
               <div class="form-group">
                 <label for="fechaNacimiento">Fecha de Nacimiento:</label>
                 <input type="date" id="fechaNacimiento" class="form-control">
@@ -69,17 +66,14 @@ Registrar Paciente
             </div>
             <!-- Columna derecha -->
             <div class="col-md-6">
-              <!-- Campo Teléfono -->
               <div class="form-group">
                 <label for="telefono">Teléfono:</label>
                 <input type="text" id="telefono" class="form-control" placeholder="Ingrese el teléfono">
               </div>
-              <!-- Campo Fecha de Registro -->
               <div class="form-group">
                 <label for="fechaRegistro">Fecha de Registro:</label>
                 <input type="date" id="fechaRegistro" class="form-control">
               </div>
-              <!-- Campo Ciudad -->
               <div class="form-group">
                 <label for="ciudad">Ciudad:</label>
                 <input type="text" id="ciudad" class="form-control" placeholder="Ingrese la ciudad">
@@ -95,8 +89,8 @@ Registrar Paciente
       </div>
     </div>
   </div>
-  
 </div>
+
 <!-- Librerías necesarias -->
 <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -104,7 +98,6 @@ Registrar Paciente
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 {% endblock %}
-
 
 {% block js %}
 <script>
@@ -164,13 +157,13 @@ Registrar Paciente
           headers: {
             'Content-Type': 'application/json'
           },
-          body: JSON.stringify({  nombre: nombre, documento: documento, fechaNacimiento: fechaNacimiento, telefono: telefono, fechaRegistro: fechaRegistro, ciudad: ciudad, barrio: barrio })
+          body: JSON.stringify({ nombre, documento, fechaNacimiento, telefono, fechaRegistro, ciudad })
         })
         .then(resp => resp.json())
         .then(data => {
           if (data && !data.error && data.success) {
             tabla.ajax.reload();
-            Swal.fire("Actualizado", "La paciente ha sido registrado correctamente.", "success");
+            Swal.fire("Actualizado", "La paciente ha sido registrada correctamente.", "success");
           } else {
             Swal.fire(data.error);
           }
@@ -185,7 +178,7 @@ Registrar Paciente
           headers: {
             'Content-Type': 'application/json'
           },
-          body: JSON.stringify({ nombre: nombre, documento: documento, fechaNacimiento: fechaNacimiento, telefono: telefono, fechaRegistro: fechaRegistro, ciudad: ciudad, barrio: barrio })
+          body: JSON.stringify({ nombre, documento, fechaNacimiento, telefono, fechaRegistro, ciudad })
         })
         .then(resp => resp.json())
         .then(data => {
@@ -277,14 +270,14 @@ Registrar Paciente
   };
 
   // Validación del campo de telefono para que solo acepte números
-$('#telefono').on('input', function() {
-  this.value = this.value.replace(/[^0-9]/g, '');  // Solo permite números
-});
+  $('#telefono').on('input', function() {
+    this.value = this.value.replace(/[^0-9]/g, '');  // Solo permite números
+  });
 
-// Validación del campo de cédula para que solo acepte números
-$('#documento').on('input', function() {
-  this.value = this.value.replace(/[^0-9]/g, '');  // Solo permite números
-});
+  // Validación del campo de cédula para que solo acepte números
+  $('#documento').on('input', function() {
+    this.value = this.value.replace(/[^0-9]/g, '');  // Solo permite números
+  });
 
   const addEvents = () => {
     agregar();
@@ -300,5 +293,3 @@ $('#documento').on('input', function() {
 </script>
 
 {% endblock %}
-
-

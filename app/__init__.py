@@ -114,47 +114,45 @@ version1 = '/api/v1'
 app.register_blueprint(ciuapi, url_prefix=version1)
 
 #Pais
-version1 = '/api/v1'
+
 app.register_blueprint(paisapi, url_prefix=version1)
 
 #nacionalidad
-version1 = '/api/v1'
+
 app.register_blueprint(nacioapi, url_prefix=version1)
 
 #ocupacion
-version1 = '/api/v1'
+
 app.register_blueprint(ocupapi, url_prefix=version1)
 
 #Estado civil
-version1 = '/api/v1'
+
 app.register_blueprint(estacivapi, url_prefix=version1)
 
 #sexo
-version1 = '/api/v1'
+
 app.register_blueprint(sexapi, url_prefix=version1)
 
 #Estado de la cita
-version1 = '/api/v1'
+
 app.register_blueprint(estacitapi, url_prefix=version1)
 
 #persona
-version1 = '/api/v1'
+
 app.register_blueprint(persapi, url_prefix=version1)
 
 #especialidad
-version1 = '/api/v1'
+
 app.register_blueprint(especiapi, url_prefix=version1)
 
 #dia
-version1 = '/api/v1'
+
 app.register_blueprint(diaapi, url_prefix=version1)
 
 #duracion de la consulta
-version1 = '/api/v1'
 app.register_blueprint(duraconsuapi, url_prefix=version1)
 
 #turno
-version1 = '/api/v1'
 app.register_blueprint(turnoapi, url_prefix=version1)
 
 
