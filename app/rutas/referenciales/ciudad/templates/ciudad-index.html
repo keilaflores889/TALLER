@@ -71,6 +71,7 @@ Ciudades
 
 {% block js %}
 <script>
+  const CSRFToken = "{{ csrf_token() }}" || null;
 
   const initDatatable = () => {
     $('#tbl').DataTable({
@@ -112,6 +113,7 @@ Ciudades
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json'
+            , 'X-CSRFToken': CSRFToken
           }, body: JSON.stringify({ descripcion: nuevaDescripcion})
         })
         .then(resp => resp.json())
@@ -132,6 +134,7 @@ Ciudades
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
+            , 'X-CSRFToken': CSRFToken
           }, body: JSON.stringify({descripcion: nuevaDescripcion})
         })
         .then(resp => resp.json())
@@ -199,6 +202,7 @@ Ciudades
             method: 'DELETE',
             headers: {
               'Content-Type': 'application/json'
+              , 'X-CSRFToken': CSRFToken
             }
           })
           .then(resp => resp.json())

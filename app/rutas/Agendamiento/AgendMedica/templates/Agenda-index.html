@@ -42,18 +42,21 @@ Agenda Médica
         <div class="modal-body">
           <!-- Campo Doctor/a -->
           <div class="form-group">
+            <input type="hidden" id="txtIdAgenda">
             <label for="medico">Medico:</label>
             <input type="text" id="txtmedico" class="form-control" placeholder="Click para seleccionar Médico">
           </div>
           
           <!-- Campo Día -->
           <div class="form-group">
+            <input type="hidden" id="txtIdAgenda">
             <label for="dia">Día:</label>
             <input type="text" id="txtDia" class="form-control" placeholder="Click para seleccionar dia">
           </div>
           
           <!-- Campo Turno -->
           <div class="form-group">
+            <input type="hidden" id="txtIdAgenda">
             <label for="turno">Turno:</label>
             <input type="text" id="txtTurno" class="form-control" placeholder="Click para seleccionar turno">
           </div>
@@ -161,9 +164,9 @@ Agenda Médica
       },
       ajax: '/api/v1/agenda',
       columns: [
-        { data: 'medico' },
-        { data: 'dia' },
-        { data: 'turno' },
+        { data: 'id_medico' },
+        { data: 'id_dia' },
+        { data: 'id_turno' },
         {
           data: function(row) {
             return `

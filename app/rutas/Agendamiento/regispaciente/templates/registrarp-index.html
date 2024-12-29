@@ -21,8 +21,8 @@ Registrar Paciente
             <th>Apellido</th>
             <th>N° Cedula</th>
             <th>Fecha de Nacimiento</th>
-            <th>Teléfono</th>
             <th>Fecha de Registro</th>
+            <th>Teléfono</th>
             <th>Ciudad</th>
             <th>Acciones</th>
           </tr>
@@ -56,7 +56,7 @@ Registrar Paciente
                 <input type="text" id="apellido" class="form-control" placeholder="Ingrese el apellido">
               </div>
               <div class="form-group">
-                <label for="documento">Documento de Identidad:</label>
+                <label for="documento">N° de Cedula:</label>
                 <input type="text" id="documento" class="form-control" placeholder="Ingrese el documento">
               </div>
               <div class="form-group">
@@ -75,8 +75,10 @@ Registrar Paciente
                 <input type="date" id="fechaRegistro" class="form-control">
               </div>
               <div class="form-group">
+                <input type="hidden" id="txtIdPaciente">
                 <label for="ciudad">Ciudad:</label>
-                <input type="text" id="ciudad" class="form-control" placeholder="Ingrese la ciudad">
+                <input type="text" id="txtCiudad" class="form-control" placeholder="Click para seleccionar la ciudad">
+                <input type="hidden" id="id_ciudad">
               </div>
             </div>
           </div>
@@ -91,16 +93,63 @@ Registrar Paciente
   </div>
 </div>
 
+<div class="modal" id="modalBuscarCiudad">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title" id="modalCiudadTitle">Seleccionar Ciudad</h4>
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+      </div>
+      <div class="card-body">
+        <div class="table-responsive">
+          <table class="table table-striped" id="tblCiudad">
+            <thead>
+              <tr>
+                <th>Ciudad</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
 <!-- Librerías necesarias -->
 <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
+
+<script>
+  $(function() {
+    $("#fechaNacimiento").datepicker({
+      dateFormat: "yy-mm-dd",  // Formato de fecha (ejemplo: 2024-01-01)
+      changeMonth: true,       // Permite cambiar el mes
+      changeYear: true,        // Permite cambiar el año
+      yearRange: "1900:2024"   // Rango de años disponibles
+    });
+  });
+</script>
+<script>
+  $(function() {
+    $("#fechaRegistro").datepicker({
+      dateFormat: "yy-mm-dd",  // Formato de fecha (ejemplo: 2024-01-01)
+      changeMonth: true,       // Permite cambiar el mes
+      changeYear: true,        // Permite cambiar el año
+      yearRange: "1900:2024"   // Rango de años disponibles
+    });
+  });
+</script>
+
 {% endblock %}
 
 {% block js %}
 <script>
+  const CSRFToken = "{{ csrf_token() }}" || null;
+
   const initDatatable = () => {
     $('#tbl').DataTable({
       language: {
@@ -110,10 +159,36 @@ Registrar Paciente
       columns: [
         { data: 'nombre' },
         { data: 'apellido' },
-        { data: 'documento' },
-        { data: 'fechaNacimiento' },
+        { data: 'cedula_entidad' },
+        { 
+          data: function(row) {
+              // Validar que la fecha no sea nula
+              if (row.fecha_nacimiento) {
+                  const fecha = new Date(row.fecha_nacimiento); 
+                  const dia = fecha.getUTCDate().toString().padStart(2, '0');
+                  const mes = (fecha.getUTCMonth() + 1).toString().padStart(2, '0');
+                  const anio = fecha.getUTCFullYear();
+                  return `${dia}/${mes}/${anio}`;
+              } else {
+                  return "Fecha no disponible";
+              }
+          }
+      },
+      { 
+          data: function(row) {
+              // Validar que la fecha no sea nula
+              if (row.fecha_registro) {
+                  const fecha = new Date(row.fecha_registro); 
+                  const dia = fecha.getUTCDate().toString().padStart(2, '0');
+                  const mes = (fecha.getUTCMonth() + 1).toString().padStart(2, '0');
+                  const anio = fecha.getUTCFullYear();
+                  return `${dia}/${mes}/${anio}`;
+              } else {
+                  return "Fecha no disponible";
+              }
+          }
+      },
         { data: 'telefono' },
-        { data: 'fechaRegistro' },
         { data: 'ciudad' },
         {
           data: function(row) {
@@ -126,6 +201,38 @@ Registrar Paciente
     });
   };
 
+  const initDatatablec= () => {
+    $('#tblCiudad').DataTable({
+      language: {
+        url: "{{ url_for('static', filename='vendor/datatables/es-ES.json') }}",
+      },
+      ajax:'/api/v1/ciudades',
+      columns: [
+        { data: 'descripcion' },
+        { data: function(row) {
+          return `<button type="button" name="btn_seleccionar_ciudad" class="fa fa-check" data-id="${row.id_ciudad}" data-ciudad="${row.descripcion}">Seleccionar</button>`;
+          }
+        }
+      ]
+    });
+  
+    $('#tblCiudad').on('click', 'button[name="btn_seleccionar_ciudad"]', function () {
+      const idCiudad = $(this).data('id');
+      const ciudad = $(this).data('ciudad'); 
+      $('#txtCiudad').val(ciudad);  
+      $('#id_ciudad').val(idCiudad); 
+      $('#modalBuscarCiudad').modal('hide');
+    });
+  };
+
+  const buscarCiudad = () => {
+    $('#txtCiudad').on('click', function () {
+      $('#modalCiudadTitle').text("Seleccionar Ciudad");
+      $('#modalBuscarCiudad').modal();
+    });
+  }
+
+  
   const agregar = () => {
     $('#btnAgregar').on('click', function() {
       $('#modalTitle').text("Agregar Paciente");
@@ -133,8 +240,10 @@ Registrar Paciente
       $('#apellido').val("");
       $('#documento').val("");
       $('#fechaNacimiento').val("");
+      $('#fechaRegistro').val("");
       $('#telefono').val("");
-      $('#ciudad').val("");
+      $('#tblCiudad').val("");
+      $('#id_ciudad').val("");
       $('#modalFormulario').modal();
     });
   };
@@ -144,11 +253,11 @@ Registrar Paciente
       const idPaciente = $('#txtIdPaciente').val();
       const nombre = $('#nombre').val();
       const apellido = $('#apellido').val();
-      const documento = $('#documento').val();
-      const fechaNacimiento = $('#fechaNacimiento').val();
+      const cedula_entidad = $('#documento').val();
+      const fecha_nacimiento = $('#fechaNacimiento').val();
       const telefono = $('#telefono').val();
-      const fechaRegistro = $('#fechaRegistro').val();
-      const ciudad = $('#ciudad').val();
+      const fecha_registro = $('#fechaRegistro').val();
+      const id_ciudad = $('#id_ciudad').val();
       const tabla = $('#tbl').DataTable();
 
       if (idPaciente) {
@@ -156,8 +265,9 @@ Registrar Paciente
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json'
+            , 'X-CSRFToken': CSRFToken
           },
-          body: JSON.stringify({ nombre, documento, fechaNacimiento, telefono, fechaRegistro, ciudad })
+          body: JSON.stringify({ nombre: nombre, apellido: apellido, cedula_entidad: cedula_entidad, fecha_nacimiento: fecha_nacimiento, telefono: telefono, fecha_registro: fecha_registro, id_ciudad: id_ciudad })
         })
         .then(resp => resp.json())
         .then(data => {
@@ -177,8 +287,9 @@ Registrar Paciente
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
+            , 'X-CSRFToken': CSRFToken
           },
-          body: JSON.stringify({ nombre, documento, fechaNacimiento, telefono, fechaRegistro, ciudad })
+          body: JSON.stringify({ nombre: nombre, apellido: apellido, cedula_entidad: cedula_entidad, fecha_nacimiento: fecha_nacimiento, telefono: telefono, fecha_registro: fecha_registro, id_ciudad: id_ciudad  })
         })
         .then(resp => resp.json())
         .then(data => {
@@ -222,13 +333,25 @@ Registrar Paciente
           .then(data => {
             $('#nombre').val(data.data.nombre);
             $('#apellido').val(data.data.apellido);
-            $('#documento').val(data.data.documento);
-            $('#fechaNacimiento').val(data.data.fechaNacimiento);
+            $('#documento').val(data.data.cedula_entidad);
             $('#telefono').val(data.data.telefono);
-            $('#fechaRegistro').val(data.data.fechaRegistro);
-            $('#ciudad').val(data.data.ciudad);
-            $('#modalFormulario').modal();
-          });
+            $('#txtCiudad').val(data.data.ciudad);
+            $('#id_ciudad').val(data.data.id_ciudad);
+            // Asegurarse de que las fechas estén en formato YYYY-MM-DD
+          const formatDate = (date) => {
+            if (!date) return ''; // Si no hay fecha, devolver vacío
+            const d = new Date(date);
+            return d.toISOString().split('T')[0]; // Convertir a formato YYYY-MM-DD
+          };
+
+          const fechaNacimiento = formatDate(data.data.fecha_nacimiento);
+          $('#fechaNacimiento').val(fechaNacimiento);
+
+          const fechaRegistro = formatDate(data.data.fecha_registro);
+          $('#fechaRegistro').val(fechaRegistro);
+
+          $('#modalFormulario').modal();
+        })
         }
       });
     });
@@ -248,6 +371,7 @@ Registrar Paciente
             method: 'DELETE',
             headers: {
               'Content-Type': 'application/json'
+              , 'X-CSRFToken': CSRFToken
             }
           })
           .then(resp => resp.json())
@@ -284,10 +408,12 @@ Registrar Paciente
     guardar();
     editar();
     eliminar();
+    buscarCiudad();
   };
 
   $(function() {
     initDatatable();
+    initDatatablec();
     addEvents();
   });
 </script>

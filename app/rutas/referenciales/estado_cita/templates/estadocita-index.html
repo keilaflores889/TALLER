@@ -17,7 +17,7 @@ Estado de la Cita
         <table class="table table-striped" id="tbl">
           <thead>
             <tr>
-              <th>Descripción</th>
+              <th>Estado</th>
               <th>Acciones</th>
             </tr>
           </thead>
@@ -72,6 +72,7 @@ Estado de la Cita
 {% block js %}
 <script>
 
+  const CSRFToken = "{{ csrf_token() }}" || null;
   const initDatatable = () => {
     $('#tbl').DataTable({
       language: {
@@ -112,6 +113,7 @@ Estado de la Cita
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json'
+            , 'X-CSRFToken': CSRFToken
           }, body: JSON.stringify({ descripcion: nuevaDescripcion})
         })
         .then(resp => resp.json())
@@ -132,6 +134,7 @@ Estado de la Cita
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
+            , 'X-CSRFToken': CSRFToken
           }, body: JSON.stringify({ descripcion: nuevaDescripcion})
         })
         .then(resp => resp.json())
@@ -200,6 +203,7 @@ Estado de la Cita
             method: 'DELETE',
             headers: {
               'Content-Type': 'application/json'
+              , 'X-CSRFToken': CSRFToken
             }
           })
           .then(resp => resp.json())

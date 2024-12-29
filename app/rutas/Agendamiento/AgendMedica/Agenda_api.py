@@ -1,5 +1,6 @@
 from flask import Blueprint, request, jsonify, current_app as app
 from app.dao.agendmedica.AgendaDao import AgendaDao
+
 agendaapi = Blueprint('agendaapi', __name__)
 
 # Obtener todas las agendas médicas
