@@ -17,7 +17,8 @@ Agenda Médica
       <table class="table table-striped" id="tbl">
         <thead>
           <tr>
-            <th>Médico</th>
+            <th>Médico nombre</th>
+            <th>Médico apellido</th>
             <th>Día</th>
             <th>Turno</th>
             <th>Acciones</th>
@@ -41,22 +42,23 @@ Agenda Médica
         <!-- Cuerpo -->
         <div class="modal-body">
           <!-- Campo Doctor/a -->
+          <input type="hidden" id="txtIdAgenda">
           <div class="form-group">
-            <input type="hidden" id="txtIdAgenda">
+            <input type="hidden" id="id_medico">
             <label for="medico">Medico:</label>
             <input type="text" id="txtmedico" class="form-control" placeholder="Click para seleccionar Médico">
           </div>
           
           <!-- Campo Día -->
           <div class="form-group">
-            <input type="hidden" id="txtIdAgenda">
+            <input type="hidden" id="id_dia">
             <label for="dia">Día:</label>
             <input type="text" id="txtDia" class="form-control" placeholder="Click para seleccionar dia">
           </div>
           
           <!-- Campo Turno -->
           <div class="form-group">
-            <input type="hidden" id="txtIdAgenda">
+            <input type="hidden" id="id_turno">
             <label for="turno">Turno:</label>
             <input type="text" id="txtTurno" class="form-control" placeholder="Click para seleccionar turno">
           </div>
@@ -164,9 +166,10 @@ Agenda Médica
       },
       ajax: '/api/v1/agenda',
       columns: [
-        { data: 'id_medico' },
-        { data: 'id_dia' },
-        { data: 'id_turno' },
+        { data: 'medico_nombre' },
+        { data: 'medico_apellido' },
+        { data: 'dia' },
+        { data: 'turno' },
         {
           data: function(row) {
             return `
@@ -188,7 +191,7 @@ Agenda Médica
         { data: 'nombre' },
         { data: 'apellido'},
         { data: function(row) {
-          return `<button type="button" name="btn_seleccionar_Medico" class="fa fa-check" data-id="${row.id_medico}" data-nombre="${row.nombre}" data-apellido="${row.apellido}">Seleccionar</button>`;
+          return `<button type="button" name="btn_seleccionar_Medico" class="btn btn-primary" data-id="${row.id_medico}" data-nombre="${row.nombre}" data-apellido="${row.apellido}">Seleccionar</button>`;
           }
         }
       ]
@@ -219,7 +222,7 @@ Agenda Médica
       columns: [
         { data: 'descripcion' },
         { data: function(row) {
-            return `<button type="button" name="btn_seleccionar_dia" class="fa fa-check" data-id="${row.id_dia}" data-dia="${row.descripcion}">Seleccionar</button>`;
+            return `<button type="button" name="btn_seleccionar_dia" class="btn btn-primary" data-id="${row.id_dia}" data-dia="${row.descripcion}">Seleccionar</button>`;
           }
         }
       ]
@@ -249,7 +252,7 @@ Agenda Médica
       columns: [
         { data: 'descripcion' },
         { data: function(row) {
-            return `<button type="button" name="btn_seleccionar_Turno" class="fa fa-check" data-id="${row.id_turno}" data-turno="${row.descripcion}">Seleccionar</button>`;
+            return `<button type="button" name="btn_seleccionar_Turno" class="btn btn-primary" data-id="${row.id_turno}" data-turno="${row.descripcion}">Seleccionar</button>`;
           }
         }
       ]
@@ -274,12 +277,10 @@ Agenda Médica
   const agregar = () => {
     $('#btnAgregar').on('click', function() {
       $('#modalTitle').text("Agregar Agenda");
+      $('#txtIdAgenda').val("");
       $('#txtmedico').val("");
-      $('#id_medico').val("");
       $('#txtDia').val("");
-      $('#id_dia').val("");
       $('#txtTurno').val("");
-      $('#id_turno').val("");
       $('#modalFormulario').modal();
     });
   };
@@ -287,12 +288,9 @@ Agenda Médica
   const guardar = () => {
     $('#btnGuardar').on('click', function() {
       const idAgenda = $('#txtIdAgenda').val();
-      const medico = $('#txtmedico').val();
-      const id_medico = $('#txtmedico').val();
-      const dia = $('#txtDia').val();
-      const id_dia = $('#txtDia').val();
-      const turno = $('#txtTurno').val();
-      const id_turno = $('#txtTurno').val();
+      const id_medico = $('#id_medico').val();
+      const id_dia = $('#id_dia').val();
+      const id_turno = $('#id_turno').val();
       const tabla = $('#tbl').DataTable();
 
       if (idAgenda) {
@@ -302,7 +300,7 @@ Agenda Médica
             'Content-Type': 'application/json'
             , 'X-CSRFToken': CSRFToken
           },
-          body: JSON.stringify({ id_medico: id_medico, dia: dia, turno: turno, id_dia: id_dia, id_turno: id_turno})
+          body: JSON.stringify({ id_medico, id_dia, id_turno})
         })
         .then(resp => resp.json())
         .then(data => {
@@ -324,7 +322,7 @@ Agenda Médica
             'Content-Type': 'application/json'
             , 'X-CSRFToken': CSRFToken
           },
-          body: JSON.stringify({id_medico: id_medico, dia: dia, turno: turno, id_dia: id_dia, id_turno: id_turno})
+          body: JSON.stringify({ id_medico, id_dia, id_turno})
         })
         .then(resp => resp.json())
         .then(data => {
@@ -366,7 +364,8 @@ Agenda Médica
           })
           .then(resp => resp.json())
           .then(data => {
-            $('#txtmedico').val(data.data.nombre + ' ' + data.data.apellido);
+            $('#id_medico').val(data.data.id_medico); 
+            $('#txtmedico').val(data.data.medico_nombre + ' ' + data.data.medico_apellido);
             $('#txtDia').val(data.data.dia); 
             $('#id_dia').val(data.data.id_dia);
             $('#txtTurno').val(data.data.turno);

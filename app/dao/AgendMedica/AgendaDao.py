@@ -34,7 +34,7 @@ class AgendaDao:
                     'turno': agendas[7],
                     
                 }
-                for fila in agendas
+                for agendas in agendas
             ]
 
 

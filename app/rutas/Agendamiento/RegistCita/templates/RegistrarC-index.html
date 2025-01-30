@@ -11,18 +11,21 @@ Registrar Cita
     <!-- Tarjeta -->
     <div class="card">
       <div class="card-header">
-        <button type="button" class="btn btn-outline-info" id="btnAgregarCita">Agregar Cita</button>
+        <button type="button" class="btn btn-outline-info" id="btnAgregar">Agregar Cita</button>
       </div>
       <div class="card-body">
-        <table class="table table-striped" id="tblCitas">
+        <table class="table table-striped" id="tbl">
           <thead>
             <tr>
-              <th>Paciente</th>
-              <th>Médico</th>
+              <th>Paciente nombre</th>
+              <th>Paciente apellido</th>
+              <th>Médico nombre</th>
+              <th>Médico apellido</th>
               <th>Especialidad</th>
-              <th>Fecha</th>
-              <th>Hora</th>
-              <th>Estado</th>
+              <th>Fecha/Cita</th>
+              <th>Hora/Cita</th>
+              <th>Estado/Cita</th>
+              <th>Motivo</th>
               <th>Acciones</th>
             </tr>
           </thead>
@@ -33,41 +36,49 @@ Registrar Cita
     <!-- /Tarjeta -->
   
     <!-- Modal -->
-    <div class="modal" id="modalFormularioCita">
+    <div class="modal" id="modalFormulario">
       <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content">
           <!-- Header -->
           <div class="modal-header">
-            <h4 class="modal-title" id="modalTitle">Registrar Cita</h4>
+            <h4 class="modal-title" id="modalTitle">Nueva Cita</h4>
             <button type="button" class="close" data-dismiss="modal">&times;</button>
           </div>
           <!-- Cuerpo -->
           <div class="modal-body">
+            <input type="hidden" id="txtIdCita">
             <div class="row">
               <!-- Columna izquierda -->
               <div class="col-md-6">
 
                 <!-- Campo Paciente -->
                 <div class="form-group">
+                  <input type="hidden" id="id_paciente">
                   <label for="paciente">Paciente:</label>
                   <input type="text" id="txtpaciente" class="form-control" placeholder="Click para ingresar paciente">
                 </div>
-                <!-- Campo Médico (Cambio de select a input) -->
+
+                <!-- Campo Médico  -->
                 <div class="form-group">
-                  <label for="medico">Médico:</label>
-                  <input type="text" id="txtmedico" class="form-control" placeholder="Click para ingresar médico">
+                  <input type="hidden" id="id_medico">
+                  <label for="medico">Medico:</label>
+                  <input type="text" id="txtmedico" class="form-control" placeholder="Click para ingresar medico">
                 </div>
-                <!-- Campo Especialidad (Cambio de select a input) -->
+
+                <!-- Campo Especialidad-->
                 <div class="form-group">
+                  <input type="hidden" id="id_especialidad">
                   <label for="especialidad">Especialidad:</label>
                   <input type="text" id="txtespecialidad" class="form-control" placeholder="Click para ingresar especialidad">
                 </div>
+
                 <!-- Campo Fecha -->
                 <div class="form-group">
                   <label for="fecha">Fecha:</label>
                   <input type="date" id="fecha" class="form-control">
                 </div>
               </div>
+
               <!-- Columna derecha -->
               <div class="col-md-6">
                 <!-- Campo Hora -->
@@ -75,19 +86,25 @@ Registrar Cita
                   <label for="hora">Hora:</label>
                   <input type="time" id="hora" class="form-control">
                 </div>
-                <!-- Campo Estado (Cambio de select a input) -->
+
+                <!-- Campo Estado -->
                 <div class="form-group">
+                  <input type="hidden" id="id_estado">
                   <label for="estado">Estado:</label>
                   <input type="text" id="txtestado" class="form-control" placeholder="Click para ingresar estado de la cita">
                 </div>
+
                 <!-- Campo Motivo de Consulta -->
                 <div class="form-group">
+                  <input type="hidden" id="id_motivo">
                   <label for="motivo">Motivo de Consulta:</label>
                   <textarea id="txtmotivo" class="form-control" rows="4" placeholder="Describa el motivo de la consulta"></textarea>
                 </div>
               </div>
+
             </div>
           </div>
+
           <!-- Footer -->
           <div class="modal-footer">
             <button type="button" class="btn btn-primary" id="btnGuardarCita">Guardar</button>
@@ -98,7 +115,8 @@ Registrar Cita
     </div>
   </div>
 
-  <div class="modal" id="modalBuscarPaciente">
+   <!-- Modal de selección de Paciente -->
+  <div class="modal" id="modalBuscarPaciente" >
     <div class="modal-dialog modal-dialog-centered modal-lg">
       <div class="modal-content">
         <div class="modal-header">
@@ -121,21 +139,22 @@ Registrar Cita
         </div>
       </div>
     </div>
-
-    <div class="modal" id="modalBuscarMedico">
+  </div>
+    
+    <!-- Modal de selección de especialidad -->
+    <div class="modal" id="modalBuscarEspecialidad">
       <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content">
           <div class="modal-header">
-            <h4 class="modal-title" id="modalMedicoTitle">Seleccionar Medico</h4>
+            <h4 class="modal-title" id="modalEspecialidadTitle">Seleccionar Especialidad</h4>
             <button type="button" class="close" data-dismiss="modal">&times;</button>
           </div>
           <div class="card-body">
             <div class="table-responsive">
-              <table class="table table-striped" id="tblMedico">
+              <table class="table table-striped" id="tblEspecialidad">
                 <thead>
                   <tr>
-                    <th>Nombre</th>
-                    <th>Apellido</th>
+                    <th>Especialidad</th>
                     <th>Acciones</th>
                   </tr>
                 </thead>
@@ -145,21 +164,24 @@ Registrar Cita
           </div>
         </div>
       </div>
-
-    <!-- Modal de selección de especialidad -->
-  <div class="modal" id="modalBuscarEspecialidad">
+    </div>
+  </div>
+  
+  <!-- Modal de selección de Medico -->
+  <div class="modal" id="modalBuscarMedico">
     <div class="modal-dialog modal-dialog-centered modal-lg">
       <div class="modal-content">
         <div class="modal-header">
-          <h4 class="modal-title" id="modalEspecialidadTitle">Seleccionar Especialidad</h4>
+          <h4 class="modal-title" id="modalMedicoTitle">Seleccionar Medico</h4>
           <button type="button" class="close" data-dismiss="modal">&times;</button>
         </div>
         <div class="card-body">
           <div class="table-responsive">
-            <table class="table table-striped" id="tblEspecialidad">
+            <table class="table table-striped" id="tblMedico">
               <thead>
                 <tr>
-                  <th>Especialidad</th>
+                  <th>Nombre</th>
+                  <th>Apellido</th>
                   <th>Acciones</th>
                 </tr>
               </thead>
@@ -169,15 +191,14 @@ Registrar Cita
         </div>
       </div>
     </div>
-  </div>
-</div>
+ </div>
 
  <!-- Modal de selección de estado -->
  <div class="modal" id="modalBuscarEstado">
   <div class="modal-dialog modal-dialog-centered modal-lg">
     <div class="modal-content">
       <div class="modal-header">
-        <h4 class="modal-title" id="modalEstadoTitle">Seleccionar Estado</h4>
+        <h4 class="modal-title" id="modalEstadoCitaTitle">Seleccionar Estado</h4>
         <button type="button" class="close" data-dismiss="modal">&times;</button>
       </div>
       <div class="card-body">
@@ -195,20 +216,31 @@ Registrar Cita
       </div>
     </div>
   </div>
-</div>
-</div>
 
-  <!-- Librerías necesarias -->
-  <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
-  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-  <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+ <!-- Librerías necesarias -->
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 {% endblock %}
+
+
+<script>
+  $(function() {
+    $("#fecha").datepicker({
+      dateFormat: "yy-mm-dd",  // Formato de fecha (ejemplo: 2025-01-01)
+      changeMonth: true,       // Permite cambiar el mes
+      changeYear: true,        // Permite cambiar el año
+      yearRange: "1900:2025"   // Rango de años disponibles
+    });
+  });
+</script>
 
 {% block js %}
 <script>
   const CSRFToken = "{{ csrf_token() }}" || null;
+
   const initDatatable = () => {
     $('#tbl').DataTable({
       language: {
@@ -216,12 +248,28 @@ Registrar Cita
       },
       ajax: '/api/v1/registroc',
       columns: [
-        { data: 'paciente' },
-        { data: 'medico' },
+        { data: 'paciente_nombre' }, 
+        { data: 'paciente_apellido' },
+        { data: 'medico_nombre' },
+        { data: 'medico_apellido' },
         { data: 'especialidad' },
-        { data: 'fecha' },
+        { 
+          data: function(row) {
+          // Validar que la fecha no sea nula
+          if (row.fecha_cita) {
+              const fecha = new Date(row.fecha_cita); 
+              const dia = fecha.getUTCDate().toString().padStart(2, '0');
+              const mes = (fecha.getUTCMonth() + 1).toString().padStart(2, '0');
+              const anio = fecha.getUTCFullYear();
+              return `${dia}/${mes}/${anio}`;
+          } else {
+              return "Fecha no disponible";
+          }
+       }
+      },
         { data: 'hora' },
         { data: 'estado' },
+        { data: 'motivo_consulta' },
         {
           data: function(row) {
             return `
@@ -233,7 +281,7 @@ Registrar Cita
     });
   };
 
-  //persona
+  //paciente
   const initDatatablep= () => {
     $('#tblPaciente').DataTable({
       language: {
@@ -244,11 +292,12 @@ Registrar Cita
         { data: 'nombre' },
         { data: 'apellido'},
         { data: function(row) {
-          return `<button type="button" name="btn_seleccionar_Medico" class="fa fa-check" data-id="${row.id_paciente}" data-nombre="${row.nombre}" data-apellido="${row.apellido}">Seleccionar</button>`;
+          return `<button type="button" name="btn_seleccionar_Paciente" class="btn btn-primary" data-id="${row.id_paciente}" data-nombre="${row.nombre}" data-apellido="${row.apellido}">Seleccionar</button>`;
           }
         }
       ]
     });
+
     $('#tblPaciente').on('click', 'button[name="btn_seleccionar_Paciente"]', function () {
       const idPaciente = $(this).data('id');
       const nombrePaciente = $(this).data('nombre');
@@ -272,16 +321,17 @@ Registrar Cita
       language: {
         url: "{{ url_for('static', filename='vendor/datatables/es-ES.json') }}",
       },
-      ajax:'/api/v1/medico',
+      ajax: '/api/v1/medico',
       columns: [
         { data: 'nombre' },
         { data: 'apellido'},
         { data: function(row) {
-          return `<button type="button" name="btn_seleccionar_Medico" class="fa fa-check" data-id="${row.id_medico}" data-nombre="${row.nombre}" data-apellido="${row.apellido}">Seleccionar</button>`;
+          return `<button type="button" name="btn_seleccionar_Medico" class="btn btn-primary" data-id="${row.id_medico}" data-nombre="${row.nombre}" data-apellido="${row.apellido}">Seleccionar</button>`;
           }
         }
-      ]
+      ],
     });
+
     $('#tblMedico').on('click', 'button[name="btn_seleccionar_Medico"]', function () {
       const idMedico = $(this).data('id');
       const nombreMedico = $(this).data('nombre');
@@ -310,92 +360,88 @@ Registrar Cita
         { data: 'descripcion' },
         {
           data: function(row) {
-            return `<button type="button" name="btn_seleccionar_especialidad" class="fa fa-check" data-id="${row.id_especialidad}" data-especialidad="${row.descripcion}"> Seleccionar</button>`;
+            return `<button type="button" name="btn_seleccionar_Especialidad" class="btn btn-primary" data-id="${row.id_especialidad}" data-especialidad="${row.descripcion}"> Seleccionar</button>`;
           }
         }
-      ],
-      destroy: true // Permite reinicializar el DataTable
+      ]
     });
 
     $('#tblEspecialidad').on('click', 'button[name="btn_seleccionar_Especialidad"]', function () {
       const idEspecialidad = $(this).data('id');
       const especialidad = $(this).data('especialidad');
-      $('#txtEspecialidad').val(especialidad);
+      $('#txtespecialidad').val(especialidad);
       $('#id_especialidad').val(idEspecialidad);
       $('#modalBuscarEspecialidad').modal('hide');
     });
   };
 
   const buscarEspecialidad = () => {
-    $('#txtEspecialidad').on('click', function () {
+    $('#txtespecialidad').on('click', function () {
       $('#modalEspecialidadTitle').text("Seleccionar Especialidad");
       $('#modalBuscarEspecialidad').modal();
-      initDatatablee(); // Llama a la inicialización de la tabla de especialidades
     });
   };
 
   //estado
-
   const initDatatableestado= () => {
     $('#tblEstado').DataTable({
       language: {
         url: "{{ url_for('static', filename='vendor/datatables/es-ES.json') }}",
       },
-      ajax: '/api/v1/estadoscitas',
+      ajax: '/api/v1/estadocita',
       columns: [
         { data: 'descripcion' },
         {
           data: function(row) {
-            return `<button type="button" name="btn_seleccionar_estado" class="fa fa-check" data-id="${row.id_estado}" data-estado="${row.descripcion}"> Seleccionar</button>`;
+            return `<button type="button" name="btn_seleccionar_Estado" class="btn btn-primary" data-id="${row.id_estado}" data-estado="${row.descripcion}"> Seleccionar</button>`;
           }
         }
       ],
-      destroy: true // Permite reinicializar el DataTable
     });
 
     $('#tblEstado').on('click', 'button[name="btn_seleccionar_Estado"]', function () {
       const idEstadoCita = $(this).data('id');
       const estado = $(this).data('estado');
-      $('#txtEstado').val(estado);
-      $('#id_estado').val(idEstado);
+      $('#txtestado').val(estado);
+      $('#id_estado').val(idEstadoCita);
       $('#modalBuscarEstado').modal('hide');
     });
   };
 
   const buscarEstado = () => {
-    $('#txtEstado').on('click', function () {
-      $('#modalEstadoTitle').text("Seleccionar Estado");
+    $('#txtestado').on('click', function () {
+      $('#modalEstadoCitaTitle').text("Seleccionar Estado");
       $('#modalBuscarEstado').modal();
-      initDatatableestado(); // Llama a la inicialización de la tabla de especialidades
     });
   };
 
 
-  const agregarCita = () => {
-    $('#btnAgregarCita').on('click', function() {
+  const agregar = () => {
+    $('#btnAgregar').on('click', function () {
       $('#modalTitle').text("Registrar Cita");
-      $('#paciente').val("");
-      $('#medico').val("");
-      $('#especialidad').val("");
+      $('#txtIdCita').val("");
+      $('#txtpaciente').val("");
+      $('#txtmedico').val("");
+      $('#txtespecialidad').val("");
       $('#fecha').val("");
       $('#hora').val("");
-      $('#estado').val("");
-      $('#motivo').val("");
-      $('#modalFormularioCita').modal();
+      $('#txtestado').val("");
+      $('#txtmotivo').val("");
+      $('#modalFormulario').modal();
     });
   };
 
-  const guardarCita = () => {
-    $('#btnGuardarCita').on('click', function() {
+  const guardar = () => {
+    $('#btnGuardarCita').on('click', function () {
       const idCita = $('#txtIdCita').val();
-      const id_paciente = $('#paciente').val();
-      const id_medico = $('#medico').val();
-      const id_especialidad = $('#especialidad').val();
+      const id_paciente = $('#id_paciente').val();
+      const id_medico = $('#id_medico').val();
+      const id_especialidad = $('#id_especialidad').val();
       const fecha_cita = $('#fecha').val();
       const hora = $('#hora').val();
-      const id_estado = $('#estado').val();
-      const motivo = $('#motivo').val();
-      const tabla = $('#tblCitas').DataTable();
+      const id_estado = $('#id_estado').val();
+      const motivo_consulta = $('#txtmotivo').val();
+      const tabla = $('#tbl').DataTable();
 
       if (idCita) {
         fetch(`/api/v1/registroc/${idCita}`, {
@@ -404,7 +450,7 @@ Registrar Cita
             'Content-Type': 'application/json'
             , 'X-CSRFToken': CSRFToken
           },
-          body: JSON.stringify({ id_paciente: id_paciente, id_medico: id_medico, id_especialidad: id_especialidad, fecha_cita: fecha_cita, hora, id_estado: id_estado, motivo })
+          body: JSON.stringify({ id_paciente, id_medico, id_especialidad, fecha_cita, hora, id_estado, motivo_consulta})
         })
         .then(resp => resp.json())
         .then(data => {
@@ -426,7 +472,7 @@ Registrar Cita
             'Content-Type': 'application/json'
             , 'X-CSRFToken': CSRFToken
           },
-          body: JSON.stringify({ id_paciente: id_paciente, id_medico: id_medico, id_especialidad: id_especialidad, fecha_cita: fecha_cita, hora, id_estado: id_estado, motivo  })
+          body: JSON.stringify({id_paciente, id_medico, id_especialidad, fecha_cita, hora, id_estado, motivo_consulta })
         })
         .then(resp => resp.json())
         .then(data => {
@@ -443,12 +489,12 @@ Registrar Cita
         });
       }
 
-      $('#modalFormularioCita').modal("hide");
+      $('#modalFormulario').modal("hide");
     });
   };
 
-  const editarCita = () => {
-    $('#tbl').on('click', 'button[name="btn_editar"]', function() {
+  const editar = () => {
+    $('#tbl').on('click', 'button[name="btn_editar"]', function () {
       Swal.fire({
         title: "¿Deseas editar esta cita?",
         showCancelButton: true,
@@ -456,33 +502,58 @@ Registrar Cita
         cancelButtonText: "No"
       }).then((result) => {
         if (result.isConfirmed) {
-          $('#modalTitle').text("Editar Cita");
           const idCita = $(this).data('id_cita');
           $('#txtIdCita').val(idCita);
-
+  
           fetch(`/api/v1/registroc/${idCita}`, {
             method: 'GET',
             headers: {
               'Content-Type': 'application/json'
             }
           })
-          .then(resp => resp.json())
-          .then(data => {
-            $('#paciente').val(data.data.id_paciente);
-            $('#medico').val(data.data.id_medico);
-            $('#especialidad').val(data.data.id_especialidad);
-            $('#fecha').val(data.data.fecha_cita);
-            $('#hora').val(data.data.hora);
-            $('#estado').val(data.data.id_estado);
-            $('#motivo').val(data.data.motivo);
-            $('#modalFormularioCita').modal();
-          });
+            .then(resp => resp.json())
+            .then(data => {
+              if (data && data.success && data.data) {
+                const cita = data.data;
+  
+                // Llenar los campos del formulario
+                $('#modalTitle').text("Editar Cita");
+                $('#txtIdCita').val(idCita);
+                $('#id_paciente').val(cita.id_paciente);
+                $('#txtpaciente').val(`${cita.paciente_nombre} ${cita.paciente_apellido}`);
+                $('#id_medico').val(cita.id_medico);
+                $('#txtmedico').val(`${cita.medico_nombre} ${cita.medico_apellido}`);
+                $('#id_especialidad').val(cita.id_especialidad);
+                $('#txtespecialidad').val(cita.especialidad);
+                $('#fecha').val(formatDate(cita.fecha_cita));
+                $('#hora').val(cita.hora);
+                $('#id_estado').val(cita.id_estado);
+                $('#txtestado').val(cita.estado);
+                $('#txtmotivo').val(cita.motivo_consulta);
+  
+                // Mostrar el modal
+                $('#modalFormulario').modal();
+              } else {
+                Swal.fire("Error", data.error || "No se pudieron cargar los datos de la cita.", "error");
+              }
+            })
+            .catch(err => {
+              console.error("Error al obtener los datos de la cita:", err);
+              Swal.fire("Error", "Ocurrió un error al intentar obtener los datos de la cita.", "error");
+            });
         }
       });
     });
+  
+     //fechas
+    const formatDate = (date) => {
+      if (!date) return ''; // Si no hay fecha, devolver vacío
+      const d = new Date(date);
+      return d.toISOString().split('T')[0]; // Convertir a formato YYYY-MM-D
+    };
   };
-
-  const eliminarCita = () => {
+  
+  const eliminar = () => {
     $('#tbl').on('click', 'button[name="btn_eliminar"]', function() {
       const idCita = $(this).data('id_cita');
       Swal.fire({
@@ -520,10 +591,10 @@ Registrar Cita
 
 
   const addEvents = () => {
-    agregarCita();
-    guardarCita();
-    editarCita();
-    eliminarCita();
+    agregar();
+    guardar();
+    editar();
+    eliminar();
     buscarPaciente();
     buscarMedico();
     buscarEspecialidad();
@@ -540,5 +611,4 @@ Registrar Cita
     addEvents();
   });
 </script>
-
-  {% endblock %}
+ {% endblock %}

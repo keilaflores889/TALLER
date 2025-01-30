@@ -94,10 +94,10 @@ Registrar Paciente
 </div>
 
 <div class="modal" id="modalBuscarCiudad">
-  <div class="modal-dialog modal-dialog-centered modal-lg">
+  <div class="modal-dialog modal-dialog-centered modal-l">
     <div class="modal-content">
       <div class="modal-header">
-        <h4 class="modal-title" id="modalCiudadTitle">Seleccionar Ciudad</h4>
+        <h4 class="modal-title" >Seleccionar Ciudad</h4>
         <button type="button" class="close" data-dismiss="modal">&times;</button>
       </div>
       <div class="card-body">
@@ -173,7 +173,7 @@ Registrar Paciente
                   return "Fecha no disponible";
               }
           }
-      },
+       },
       { 
           data: function(row) {
               // Validar que la fecha no sea nula
@@ -209,8 +209,9 @@ Registrar Paciente
       ajax:'/api/v1/ciudades',
       columns: [
         { data: 'descripcion' },
-        { data: function(row) {
-          return `<button type="button" name="btn_seleccionar_ciudad" class="fa fa-check" data-id="${row.id_ciudad}" data-ciudad="${row.descripcion}">Seleccionar</button>`;
+        { 
+          data: function(row) {
+          return `<button type="button" name="btn_seleccionar_ciudad" class="btn btn-primary" data-id="${row.id_ciudad}" data-ciudad="${row.descripcion}">Seleccionar</button>`;
           }
         }
       ]
@@ -244,6 +245,7 @@ Registrar Paciente
       $('#telefono').val("");
       $('#tblCiudad').val("");
       $('#id_ciudad').val("");
+      $('#txtCiudad').val("");
       $('#modalFormulario').modal();
     });
   };
@@ -343,13 +345,10 @@ Registrar Paciente
             const d = new Date(date);
             return d.toISOString().split('T')[0]; // Convertir a formato YYYY-MM-DD
           };
-
           const fechaNacimiento = formatDate(data.data.fecha_nacimiento);
           $('#fechaNacimiento').val(fechaNacimiento);
-
           const fechaRegistro = formatDate(data.data.fecha_registro);
           $('#fechaRegistro').val(fechaRegistro);
-
           $('#modalFormulario').modal();
         })
         }

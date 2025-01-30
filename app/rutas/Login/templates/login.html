@@ -65,6 +65,12 @@
                                         <button type="submit" class="btn btn-info btn-user btn-block rounded-pill"> Iniciar Sesión</button>
                                         <hr>
                                     </form>
+
+                                     <!-- Footer -->
+                                     <div class="text-center">
+
+                                        <p class="small text-muted">© 2025 Consultorio Odontologico Dra. Diana Barreto. Todos los derechos reservados.</p>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -83,6 +89,19 @@
 
     <!-- Custom scripts for all pages-->
     <script src="{{ url_for('static', filename='js/sb-admin-2.min.js') }}"></script>
+
+    
+    <script>
+        setTimeout(() => {
+            const flashMessages = document.getElementById('flash-messages');
+            if (flashMessages) {
+                flashMessages.style.transition = "opacity 0.5s ease";
+                flashMessages.style.opacity = "0";
+                setTimeout(() => flashMessages.remove(), 500);
+            }
+        }, 3000);
+    </script>
+
 
 </body>
 

@@ -4,7 +4,6 @@ from app.conexion.Conexion import Conexion
 class RegistroCDao:
 
     def getRegistrosC(self):
-        # Consulta con JOINs para obtener detalles de paciente, médico, especialidad y estado
         registrocSQL = """
         SELECT 
             cita.id_cita,
@@ -20,12 +19,12 @@ class RegistroCDao:
             medico.nombre AS medico_nombre,
             medico.apellido AS medico_apellido,
             especialidad.descripcion AS especialidad_descripcion,
-            estado.descripcion AS estado_descripcion
+            estado_cita.descripcion AS estado_descripcion
         FROM cita
         JOIN paciente ON cita.id_paciente = paciente.id_paciente
         JOIN medico ON cita.id_medico = medico.id_medico
         JOIN especialidad ON cita.id_especialidad = especialidad.id_especialidad
-        JOIN estado ON cita.id_estado = estado.id_estado
+        JOIN estado_cita ON cita.id_estado = estado_cita.id_estado
         """
         conexion = Conexion()
         con = conexion.getConexion()
@@ -37,20 +36,20 @@ class RegistroCDao:
             # Transformar los datos en una lista de diccionarios
             return [
                 {
-                    'id_cita': cita[0],
-                    'id_paciente': cita[1],
-                    'id_medico': cita[2],
-                    'id_especialidad': cita[3],
-                    'fecha_cita': cita[4],
-                    'hora': cita[5],
-                    'id_estado': cita[6],
-                    'motivo_consulta': cita[7],
-                    'paciente_nombre': cita[8],
-                    'paciente_apellido': cita[9],
-                    'medico_nombre': cita[10],
-                    'medico_apellido': cita[11],
-                    'especialidad_descripcion': cita[12],
-                    'estado_descripcion': cita[13]
+                            'id_cita': cita[0],
+                            'id_paciente': cita[1],
+                            'id_medico': cita[2],
+                            'id_especialidad': cita[3],
+                            'fecha_cita': cita[4],
+                            'hora': cita[5],
+                            'id_estado': cita[6],
+                            'motivo_consulta': cita[7],
+                            'paciente_nombre': cita[8],
+                            'paciente_apellido': cita[9],
+                            'medico_nombre': cita[10],
+                            'medico_apellido': cita[11],
+                            'especialidad': cita[12],
+                            'estado': cita[13]
                 }
                 for cita in citas
             ]
@@ -80,12 +79,12 @@ class RegistroCDao:
             medico.nombre AS medico_nombre,
             medico.apellido AS medico_apellido,
             especialidad.descripcion AS especialidad_descripcion,
-            estado.descripcion AS estado_descripcion
+            estado_cita.descripcion AS estado_descripcion
         FROM cita
         JOIN paciente ON cita.id_paciente = paciente.id_paciente
         JOIN medico ON cita.id_medico = medico.id_medico
         JOIN especialidad ON cita.id_especialidad = especialidad.id_especialidad
-        JOIN estado ON cita.id_estado = estado.id_estado
+        JOIN estado_cita ON cita.id_estado = estado_cita.id_estado
         WHERE cita.id_cita = %s
         """
         conexion = Conexion()
@@ -96,21 +95,22 @@ class RegistroCDao:
             cita = cur.fetchone()  # Obtener una sola fila
             if cita:
                 return {
-                    'id_cita': cita[0],
-                    'id_paciente': cita[1],
-                    'id_medico': cita[2],
-                    'id_especialidad': cita[3],
-                    'fecha_cita': cita[4],
-                    'hora': cita[5],
-                    'id_estado': cita[6],
-                    'motivo_consulta': cita[7],
-                    'paciente_nombre': cita[8],
-                    'paciente_apellido': cita[9],
-                    'medico_nombre': cita[10],
-                    'medico_apellido': cita[11],
-                    'especialidad_descripcion': cita[12],
-                    'estado_descripcion': cita[13]
-                }
+                            'id_cita': cita[0],
+                            'id_paciente': cita[1],
+                            'id_medico': cita[2],
+                            'id_especialidad': cita[3],
+                            'fecha_cita': cita[4],
+                            'hora': cita[5],
+                            'id_estado': cita[6],
+                            'motivo_consulta': cita[7],
+                            'paciente_nombre': cita[8],
+                            'paciente_apellido': cita[9],
+                            'medico_nombre': cita[10],
+                            'medico_apellido': cita[11],
+                            'especialidad': cita[12],
+                            'estado': cita[13]
+                        }
+                
             else:
                 return None
 
