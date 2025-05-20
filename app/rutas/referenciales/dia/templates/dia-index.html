@@ -81,8 +81,8 @@ Días
       columns: [
         { data: 'descripcion' },
         { data: function(row) {
-            return `<button type="button" name="btn_editar" class="btn btn-info" data-id_dia="${row.id_dia}">Editar</button>
-                    <button type="button" name="btn_eliminar" class="btn btn-warning" data-id_dia="${row.id_dia}">Eliminar</button>`
+            return `<button type="button" name="btn_editar" class="btn btn-info" data-id_dia="${row.id_dia}"title="Editar"><i class="fas fa-edit"></i>
+                    <button type="button" name="btn_eliminar" class="btn btn-danger" data-id_dia="${row.id_dia}"title="Eliminar"><i class="fas fa-trash-alt"></i>`
           }
         }
       ]

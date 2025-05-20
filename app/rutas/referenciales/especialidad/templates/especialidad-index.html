@@ -83,8 +83,8 @@ Especialidad
       columns: [
         { data: 'descripcion' },
         { data: function(row) {
-            return `<button type="button" name="btn_editar" class="btn btn-info" data-id_especialidad="${row.id_especialidad}">Editar</button>
-                    <button type="button" name="btn_eliminar" class="btn btn-warning" data-id_especialidad="${row.id_especialidad}">Eliminar</button>`
+            return `<button type="button" name="btn_editar" class="btn btn-info" data-id_especialidad="${row.id_especialidad}"title="Editar"><i class="fas fa-edit"></i>
+                    <button type="button" name="btn_eliminar" class="btn btn-danger" data-id_especialidad="${row.id_especialidad}"title="Eliminar"><i class="fas fa-trash-alt"></i>`
           }
         }
       ]

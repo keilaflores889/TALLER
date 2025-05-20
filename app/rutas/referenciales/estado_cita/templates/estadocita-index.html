@@ -82,8 +82,8 @@ Estado de la Cita
       columns: [
         { data: 'descripcion' },
         { data: function(row) {
-            return `<button type="button" name="btn_editar" class="btn btn-info" data-id="${row.id_estado}">Editar</button>
-                    <button type="button" name="btn_eliminar" class="btn btn-warning" data-id="${row.id_estado}">Eliminar</button>`
+            return `<button type="button" name="btn_editar" class="btn btn-info" data-id="${row.id_estado}"title="Editar"><i class="fas fa-edit"></i>
+                    <button type="button" name="btn_eliminar" class="btn btn-danger" data-id="${row.id_estado}"title="Eliminar"><i class="fas fa-trash-alt"></i>`
           }
         }
       ]

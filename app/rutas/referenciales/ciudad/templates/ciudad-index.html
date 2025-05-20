@@ -82,8 +82,8 @@ Ciudades
       columns: [
         { data: 'descripcion' },
         { data: function(row) {
-            return `<button type="button" name="btn_editar" class="btn btn-info" data-id_ciudad="${row.id_ciudad}">Editar</button>
-                    <button type="button" name="btn_eliminar" class="btn btn-warning" data-id_ciudad="${row.id_ciudad}">Eliminar</button>`
+            return `<button type="button" name="btn_editar" class="btn btn-info" data-id_ciudad="${row.id_ciudad}" title="Editar"><i class="fas fa-edit"></i>
+                    <button type="button" name="btn_eliminar" class="btn btn-danger" data-id_ciudad="${row.id_ciudad}"title="Eliminar"><i class="fas fa-trash-alt"></i>`
           }
         }
       ]
