@@ -3,6 +3,10 @@ from app.dao.referenciales.estado_cita.EstadoCitaDao import EstadoCitaDao
 
 estacitapi = Blueprint('estacitapi', __name__)
 
+# Lista de estados de la cita validos
+ESTADOCITA_VALIDOS= ['RESERVADO', 'CONFIRMADO', 'REALIZADO', 'CANCELADO']
+
+
 # Trae todos los Estados de la Cita
 @estacitapi.route('/estadocita', methods=['GET'])
 def getEstadosCita():
@@ -69,6 +73,14 @@ def addEstadoCita():
 
     try:
         descripcion = data['descripcion'].upper()
+        
+        # Validar si el ESTADO está en la lista de TURNOS válidos
+        if descripcion not in ESTADOCITA_VALIDOS:
+            return jsonify({
+                'success': False,
+                'error': 'Estado de la cita inválido. Solo se permiten Estado de "Confirmado", "Reservado", "Cancelado", "Realizado".'
+            }), 400
+        
         estado_id = estacitdao.guardarEstadoCita(descripcion)
         if estado_id is not None:
             return jsonify({
@@ -101,6 +113,13 @@ def updateEstadoCita(estado_id):
                             'error': f'El campo {campo} es obligatorio y no puede estar vacío.'
                             }), 400
     descripcion = data['descripcion']
+    
+    # Validar si el ESTADO está en la lista de TURNOS válidos
+    if descripcion not in ESTADOCITA_VALIDOS:
+            return jsonify({
+                'success': False,
+                'error': 'Estado de la cita inválido. Solo se permiten Estado de "Confirmado", "Reservado", "Cancelado", "Realizado".'
+            }), 400
     try:
         if estacitdao.updateEstadoCita(estado_id, descripcion.upper()):
             return jsonify({

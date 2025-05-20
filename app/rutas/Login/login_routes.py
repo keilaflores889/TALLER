@@ -1,5 +1,4 @@
-from flask import Blueprint, render_template, session, \
-    request, redirect, url_for, flash, current_app as app
+from flask import Blueprint, render_template, session, request, redirect, url_for, flash, current_app as app
 from werkzeug.security import check_password_hash
 from app.dao.login.loginDao import LoginDao
 
@@ -24,9 +23,9 @@ def login():
                 session.permanent = True
                 session['idusuario'] = usuario_encontrado['idusuario']
                 session['usu_nombre'] = usuario_encontrado['usu_nombre']
-                #session['per_nombre'] = usuario_encontrado['per_nombre']
-                #session['idrol'] = usuario_encontrado['idrol']
-                return redirect(url_for('login.inicio'))
+                # session['per_nombre'] = usuario_encontrado['per_nombre']
+                # session['grupo'] = usuario_encontrado['grupo']
+                return redirect(url_for('login.vista'))
             else:
                 flash('Contraseña incorrecta.', 'warning')
         else:
@@ -43,9 +42,9 @@ def logout():
     flash('Sesion cerrada', 'warning')
     return redirect(url_for('login.login'))
 
-@logmod.route('/inicio')
-def inicio():
+@logmod.route('/vista')
+def vista():
     if 'usu_nombre' in session:
-        return render_template('inicio.html')
+        return render_template('vista-index.html')
     else:
         return redirect(url_for('login.login'))

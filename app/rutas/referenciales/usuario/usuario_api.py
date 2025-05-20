@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify, current_app as app
-from app.dao.referenciales.usuario.UsuarioDao import UsuarioDao
+from app.dao.usuario.usuarioDao import UsuarioDao
 
 usuarioapi = Blueprint('usuarioapi', __name__)
 

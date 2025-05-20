@@ -127,6 +127,7 @@ Usuarios
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json'
+            , 'X-CSRFToken': CSRFToken
           }, body: JSON.stringify({ nickname, clave, estado })
         })
         .then(resp => resp.json())
@@ -147,6 +148,7 @@ Usuarios
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
+            , 'X-CSRFToken': CSRFToken
           }, body: JSON.stringify({ nickname, clave, estado })
         })
         .then(resp => resp.json())
@@ -218,6 +220,7 @@ Usuarios
             method: 'DELETE',
             headers: {
               'Content-Type': 'application/json'
+              , 'X-CSRFToken': CSRFToken
             }
           })
           .then(resp => resp.json())

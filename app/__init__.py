@@ -17,7 +17,7 @@ app.secret_key = b'_5#y2L"F6Q7z\n\xec]/'
 app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(minutes=15)
 
 # importar modulo de seguridad
-from app.rutas.Login.login_routes import logmod
+from app.rutas.login.login_routes import logmod
 app.register_blueprint(logmod)
 
 
