@@ -273,10 +273,10 @@ Registrar Cita
         {
           data: function(row) {
   return `
-    <button type="button" name="btn_editar" class="btn btn-info btn-sm" data-id_agenda_medica="${row.id_agenda_medica}" title="Editar">
+    <button type="button" name="btn_editar" class="btn btn-info btn-sm" data-id_cita="${row.id_cita}" title="Editar">
       <i class="fas fa-edit"></i>
     </button>
-    <button type="button" name="btn_eliminar" class="btn btn-danger btn-sm" data-id_agenda_medica="${row.id_agenda_medica}" title="Eliminar">
+    <button type="button" name="btn_eliminar" class="btn btn-danger btn-sm" data-id_cita="${row.id_cita}" title="Eliminar">
       <i class="fas fa-trash-alt"></i>
     </button>`;
 }
