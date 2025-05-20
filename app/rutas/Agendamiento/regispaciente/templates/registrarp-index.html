@@ -192,10 +192,14 @@ Registrar Paciente
         { data: 'ciudad' },
         {
           data: function(row) {
-            return `
-              <button type="button" name="btn_editar" class="btn btn-info" data-id_paciente="${row.id_paciente}">Editar</button>
-              <button type="button" name="btn_eliminar" class="btn btn-warning" data-id_paciente="${row.id_paciente}">Eliminar</button>`;
-          }
+  return `
+    <button type="button" name="btn_editar" class="btn btn-info btn-sm" data-id_agenda_medica="${row.id_agenda_medica}" title="Editar">
+      <i class="fas fa-edit"></i>
+    </button>
+    <button type="button" name="btn_eliminar" class="btn btn-danger btn-sm" data-id_agenda_medica="${row.id_agenda_medica}" title="Eliminar">
+      <i class="fas fa-trash-alt"></i>
+    </button>`;
+}
         }
       ]
     });
