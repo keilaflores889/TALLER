@@ -55,21 +55,21 @@ Registrar Cita
                 <div class="form-group">
                   <input type="hidden" id="id_paciente">
                   <label for="paciente">Paciente:</label>
-                  <input type="text" id="txtpaciente" class="form-control" placeholder="Click para ingresar paciente">
+                  <input type="text" id="txtpaciente" class="form-control" placeholder="Click para ingresar paciente" readonly>
                 </div>
 
                 <!-- Campo Médico  -->
                 <div class="form-group">
                   <input type="hidden" id="id_medico">
                   <label for="medico">Medico:</label>
-                  <input type="text" id="txtmedico" class="form-control" placeholder="Click para ingresar medico">
+                  <input type="text" id="txtmedico" class="form-control" placeholder="Click para ingresar medico" readonly>
                 </div>
 
                 <!-- Campo Especialidad-->
                 <div class="form-group">
                   <input type="hidden" id="id_especialidad">
                   <label for="especialidad">Especialidad:</label>
-                  <input type="text" id="txtespecialidad" class="form-control" placeholder="Click para ingresar especialidad">
+                  <input type="text" id="txtespecialidad" class="form-control" placeholder="Click para ingresar especialidad" readonly>
                 </div>
 
                 <!-- Campo Fecha -->
@@ -91,7 +91,7 @@ Registrar Cita
                 <div class="form-group">
                   <input type="hidden" id="id_estado">
                   <label for="estado">Estado:</label>
-                  <input type="text" id="txtestado" class="form-control" placeholder="Click para ingresar estado de la cita">
+                  <input type="text" id="txtestado" class="form-control" placeholder="Click para ingresar estado de la cita" readonly>
                 </div>
 
                 <!-- Campo Motivo de Consulta -->
@@ -115,95 +115,94 @@ Registrar Cita
     </div>
   </div>
 
-   <!-- Modal de selección de Paciente -->
-  <div class="modal" id="modalBuscarPaciente" >
-    <div class="modal-dialog modal-dialog-centered modal-lg">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h4 class="modal-title" id="modalPacienteTitle">Seleccionar Paciente</h4>
-          <button type="button" class="close" data-dismiss="modal">&times;</button>
-        </div>
-        <div class="card-body">
-          <div class="table-responsive">
-            <table class="table table-striped" id="tblPaciente">
-              <thead>
-                <tr>
-                  <th>Nombre</th>
-                  <th>Apellido</th>
-                  <th>Acciones</th>
-                </tr>
-              </thead>
-              <tbody></tbody>
-            </table>
-          </div>
-        </div>
+<!-- Modal de selección de Paciente -->
+<div class="modal fade" id="modalBuscarPaciente" tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title" id="modalPacienteTitle">Seleccionar Paciente</h4>
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
       </div>
-    </div>
-  </div>
-    
-    <!-- Modal de selección de especialidad -->
-    <div class="modal" id="modalBuscarEspecialidad">
-      <div class="modal-dialog modal-dialog-centered modal-lg">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h4 class="modal-title" id="modalEspecialidadTitle">Seleccionar Especialidad</h4>
-            <button type="button" class="close" data-dismiss="modal">&times;</button>
-          </div>
-          <div class="card-body">
-            <div class="table-responsive">
-              <table class="table table-striped" id="tblEspecialidad">
-                <thead>
-                  <tr>
-                    <th>Especialidad</th>
-                    <th>Acciones</th>
-                  </tr>
-                </thead>
-                <tbody></tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-  
-  <!-- Modal de selección de Medico -->
-  <div class="modal" id="modalBuscarMedico">
-    <div class="modal-dialog modal-dialog-centered modal-lg">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h4 class="modal-title" id="modalMedicoTitle">Seleccionar Medico</h4>
-          <button type="button" class="close" data-dismiss="modal">&times;</button>
-        </div>
-        <div class="card-body">
-          <div class="table-responsive">
-            <table class="table table-striped" id="tblMedico">
-              <thead>
-                <tr>
-                  <th>Nombre</th>
-                  <th>Apellido</th>
-                  <th>Acciones</th>
-                </tr>
-              </thead>
-              <tbody></tbody>
-            </table>
-          </div>
+      <div class="modal-body">
+        <div class="table-responsive">
+          <table class="table table-striped table-bordered w-100" id="tblPaciente">
+            <thead>
+              <tr>
+                <th>Nombre</th>
+                <th>Apellido</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
         </div>
       </div>
     </div>
  </div>
+</div>
+    
+<!-- Modal de selección de especialidad -->
+<div class="modal fade" id="modalBuscarEspecialidad" tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title" id="modalEspecialidadTitle">Seleccionar Especialidad</h4>
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="table-responsive">
+          <table class="table table-striped table-bordered w-100" id="tblEspecialidad">
+            <thead>
+              <tr>
+                <th>Especialidad</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+  
+<!-- Modal de selección de Medico -->
+<div class="modal fade" id="modalBuscarMedico" tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title" id="modalMedicoTitle">Seleccionar Medico</h4>
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="table-responsive">
+          <table class="table table-striped table-bordered w-100" id="tblMedico">
+            <thead>
+              <tr>
+                <th>Nombre</th>
+                <th>Apellido</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 
- <!-- Modal de selección de estado -->
- <div class="modal" id="modalBuscarEstado">
-  <div class="modal-dialog modal-dialog-centered modal-lg">
+<!-- Modal de selección de estado -->
+ <div class="modal fade" id="modalBuscarEstado" tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
     <div class="modal-content">
       <div class="modal-header">
         <h4 class="modal-title" id="modalEstadoCitaTitle">Seleccionar Estado</h4>
         <button type="button" class="close" data-dismiss="modal">&times;</button>
       </div>
-      <div class="card-body">
+      <div class="modal-body">
         <div class="table-responsive">
-          <table class="table table-striped" id="tblEstado">
+          <table class="table table-striped table-bordered w-100" id="tblEstado">
             <thead>
               <tr>
                 <th>Estado</th>
@@ -216,12 +215,15 @@ Registrar Cita
       </div>
     </div>
   </div>
+</div>
 
- <!-- Librerías necesarias -->
+<!-- Librerías necesarias -->
 <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/1.10.21/css/dataTables.bootstrap4.min.css">
 
 {% endblock %}
 
