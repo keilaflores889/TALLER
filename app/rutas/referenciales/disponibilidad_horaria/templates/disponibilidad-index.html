@@ -1,0 +1,324 @@
+{% extends 'base.html' %}
+
+{% block titulo %}
+Disponibilidad Horaria
+{% endblock %}
+
+{% block contenido %}
+<div class="container mt-4">
+  <h3>Listar Disponibilidad Horaria</h3>
+
+  <!-- Tarjeta -->
+  <div class="card">
+    <div class="card-header">
+      <button type="button" class="btn btn-outline-info" id="btnAgregar">Agregar</button>
+    </div>
+    <div class="card-body">
+      <table class="table table-striped" id="tbl">
+        <thead>
+          <tr>
+            <th>Médico</th>
+            <th>Fecha</th>
+            <th>Hora Inicio</th>
+            <th>Hora Fin</th>
+            <th>Cupos</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+  <!-- /Tarjeta -->
+
+  <!-- Modal Formulario -->
+  <div class="modal" id="modalFormulario">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title" id="modalTitle">Nueva Disponibilidad</h4>
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+        </div>
+        <div class="modal-body">
+          <input type="hidden" id="txtIdDisponibilidad">
+          
+          <!-- Selección Médico -->
+          <div class="form-group">
+            <input type="hidden" id="id_medico">
+            <label for="medico">Médico:</label>
+            <input type="text" id="txtmedico" class="form-control" placeholder="Click para seleccionar Médico" readonly>
+          </div>
+
+          <!-- Fecha -->
+          <div class="form-group">
+            <label for="fecha">Fecha:</label>
+            <input type="date" id="txtFecha" name="disponibilidad_fecha" class="form-control">
+          </div>
+
+          <!-- Hora Inicio -->
+          <div class="form-group">
+            <label for="hora_inicio">Hora Inicio:</label>
+            <input type="time" id="txtHoraInicio" class="form-control">
+          </div>
+
+          <!-- Hora Fin -->
+          <div class="form-group">
+            <label for="hora_fin">Hora Fin:</label>
+            <input type="time" id="txtHoraFin" class="form-control">
+          </div>
+
+          <!-- Cupos -->
+          <div class="form-group">
+            <label for="cupos">Cupos:</label>
+            <input type="number" id="txtCupos" class="form-control" min="1">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary" id="btnGuardar">Guardar</button>
+          <button type="button" class="btn btn-danger" data-dismiss="modal">Cerrar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal para seleccionar médico -->
+  <div class="modal fade" id="modalBuscarMedico" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title">Seleccionar Médico</h4>
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div class="table-responsive">
+            <table class="table table-striped table-bordered w-100" id="tblMedico">
+              <thead>
+                <tr>
+                  <th>Nombre</th>
+                  <th>Apellido</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Librerías -->
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+{% endblock %}
+
+{% block js %}
+<script>
+const CSRFToken = "{{ csrf_token() }}" || null;
+
+const initDatatable = () => {
+  $('#tbl').DataTable({
+    language: { url: "{{ url_for('static', filename='vendor/datatables/es-ES.json') }}" },
+    ajax: '/api/v1/disponibilidades',
+    columns: [
+      { data: 'medico_nombre' },
+      { data: 'disponibilidad_fecha' },
+      { data: 'disponibilidad_hora_inicio' },
+      { data: 'disponibilidad_hora_fin' },
+      { data: 'disponibilidad_cupos' },
+      { data: function(row) {
+          return `
+            <button type="button" name="btn_editar" class="btn btn-info btn-sm" data-id_disponibilidad="${row.id_disponibilidad}">
+              <i class="fas fa-edit"></i>
+            </button>
+            <button type="button" name="btn_eliminar" class="btn btn-danger btn-sm" data-id_disponibilidad="${row.id_disponibilidad}">
+              <i class="fas fa-trash-alt"></i>
+            </button>`;
+        }
+      }
+    ]
+  });
+};
+
+const initDatatablem = () => {
+  $('#tblMedico').DataTable({
+    language: { url: "{{ url_for('static', filename='vendor/datatables/es-ES.json') }}" },
+    ajax:'/api/v1/medico',
+    columns: [
+      { data: 'nombre' },
+      { data: 'apellido'},
+      { data: function(row) {
+        return `<button type="button" name="btn_seleccionar_Medico" class="btn btn-primary" data-id="${row.id_medico}" data-nombre="${row.nombre}" data-apellido="${row.apellido}">Seleccionar</button>`;
+        }
+      }
+    ]
+  });
+
+  $('#tblMedico').on('click', 'button[name="btn_seleccionar_Medico"]', function () {
+    const idMedico = $(this).data('id');
+    const nombreMedico = $(this).data('nombre');
+    const apellidoMedico = $(this).data('apellido');
+    $('#txtmedico').val(`${nombreMedico} ${apellidoMedico}`);
+    $('#id_medico').val(idMedico);
+    $('#modalBuscarMedico').modal('hide');
+  });
+}
+
+    const buscarMedico = () => {
+    $('#txtmedico').on('click', function () {
+      $('#modalMedicoTitle').text("Seleccionar Medico");
+      $('#modalBuscarMedico').modal(); 
+    });
+  };
+
+const agregar = () => {
+  $('#btnAgregar').on('click', function() {
+    $('#modalTitle').text("Agregar Disponibilidad");
+    $('#txtIdDisponibilidad').val("");
+    $('#txtmedico').val("");
+    $('#txtFecha').val("");
+    $('#txtHoraInicio').val("");
+    $('#txtHoraFin').val("");
+    $('#txtCupos').val("");
+    $('#modalFormulario').modal();
+  });
+}
+
+const guardar = () => {
+  $('#btnGuardar').on('click', function() {
+    const idDisponibilidad = Number($('#txtIdDisponibilidad').val()) || 0;
+    const id_medico = $('#id_medico').val();
+    const disponibilidad_fecha = $('#txtFecha').val();
+    const disponibilidad_hora_inicio = $('#txtHoraInicio').val();
+    const disponibilidad_hora_fin = $('#txtHoraFin').val();
+    const disponibilidad_cupos = $('#txtCupos').val();
+    const tabla = $('#tbl').DataTable();
+
+    // Validación de campos obligatorios
+    if(!id_medico || !disponibilidad_fecha || !disponibilidad_hora_inicio || !disponibilidad_hora_fin || !disponibilidad_cupos) {
+      Swal.fire("Error", "Todos los campos son obligatorios.", "error");
+      return;
+    }
+
+    const data = {
+      id_medico,
+      disponibilidad_fecha,
+      disponibilidad_hora_inicio,
+      disponibilidad_hora_fin,
+      disponibilidad_cupos
+    };
+
+    if(idDisponibilidad > 0) {
+      // Editar
+      fetch(`/api/v1/disponibilidades/${idDisponibilidad}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', 'X-CSRFToken': CSRFToken },
+        body: JSON.stringify(data)
+      })
+      .then(resp => resp.json())
+      .then(result => {
+        if(result && !result.error && result.success) {
+          tabla.ajax.reload();
+          Swal.fire("Actualizado", "La disponibilidad ha sido actualizada correctamente.", "success")
+            .then(() => { $('#modalFormulario').modal("hide"); });
+        } else {
+          Swal.fire(result.error || "Error al actualizar.");
+        }
+      })
+      .catch(err => Swal.fire("Error", "Ocurrió un error al actualizar.", "error"));
+    } else {
+      // Agregar
+      fetch(`/api/v1/disponibilidades`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-CSRFToken': CSRFToken },
+        body: JSON.stringify(data)
+      })
+      .then(resp => resp.json())
+      .then(result => {
+        if(result && !result.error && result.success) {
+          tabla.ajax.reload();
+          Swal.fire("Registrado", "La disponibilidad ha sido registrada correctamente.", "success")
+            .then(() => { $('#modalFormulario').modal("hide"); });
+        } else {
+          Swal.fire(result.error || "Error al guardar.");
+        }
+      })
+      .catch(err => Swal.fire("Error", "Ocurrió un error al guardar.", "error"));
+    }
+  });
+};
+
+
+const editar = () => {
+  $('#tbl').on('click', 'button[name="btn_editar"]', function() {
+    const idDisponibilidad = $(this).data('id_disponibilidad');
+
+    fetch(`/api/v1/disponibilidades/${idDisponibilidad}`, { method: 'GET' })
+      .then(resp => resp.json())
+      .then(data => {
+        if(data && data.success) {
+          $('#txtIdDisponibilidad').val(data.data.id_disponibilidad);
+          $('#id_medico').val(data.data.id_medico);
+          $('#txtmedico').val(data.data.medico_nombre);
+          $('#txtFecha').val(data.data.disponibilidad_fecha);
+          $('#txtHoraInicio').val(data.data.disponibilidad_hora_inicio);
+          $('#txtHoraFin').val(data.data.disponibilidad_hora_fin);
+          $('#txtCupos').val(data.data.disponibilidad_cupos);
+          $('#modalFormulario').modal();
+        }
+      });
+  });
+};
+
+const eliminar = () => {
+  $('#tbl').on('click', 'button[name="btn_eliminar"]', function() {
+    const idDisponibilidad = $(this).data('id_disponibilidad');
+    const tabla = $('#tbl').DataTable();
+
+    Swal.fire({
+      title: "¿Deseas eliminar esta disponibilidad?",
+      showCancelButton: true,
+      confirmButtonText: "Sí",
+      cancelButtonText: "No"
+    }).then((result) => {
+      if(result.isConfirmed) {
+        fetch(`/api/v1/disponibilidades/${idDisponibilidad}`, {
+          method: 'DELETE',
+          headers: { 'Content-Type': 'application/json', 'X-CSRFToken': CSRFToken }
+        })
+        .then(resp => resp.json())
+        .then(result => {
+          if(result && !result.error && result.success) {
+            tabla.ajax.reload();
+            Swal.fire("Eliminado", "Disponibilidad eliminada correctamente.", "success");
+          } else {
+            Swal.fire(result.error || "Error al eliminar.");
+          }
+        }).catch(err => Swal.fire("Error", "Ocurrió un error al eliminar.", "error"));
+      }
+    });
+  });
+};
+
+// Inicializar eventos
+const addEvents = () => {
+  agregar();
+  guardar();
+  editar();
+  eliminar();
+  buscarMedico();
+};
+
+$(function() {
+  initDatatable();
+  initDatatablem();
+  addEvents();
+});
+
+</script>
+{% endblock %}

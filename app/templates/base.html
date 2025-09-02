@@ -74,8 +74,8 @@
                     
                     <a class="collapse-item" href="{{ url_for('agendmedica.agendaIndex') }}">Agenda Médica</a>
                     <a class="collapse-item" href="{{ url_for('regispersona.registrarpIndex') }}">Registrar Paciente</a>
-                    <a class="collapse-item" href="{{ url_for('medico.medicoIndex') }}">Medico</a> 
-                    <a class="collapse-item" href="{{ url_for('registcita.registrarcIndex') }}">Citas</a> 
+                    <a class="collapse-item" href="{{ url_for('medico.medicoIndex') }}">Registrar Medico</a> 
+                    <a class="collapse-item" href="{{ url_for('registcita.registrarcIndex') }}">Registrar Citas</a> 
                 </div>
                 </div>
            </li>
@@ -91,7 +91,7 @@
                 <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
                     <div class="bg-white py-2 collapse-inner rounded">
                         <a class="collapse-item" href="{{ url_for('ciudad.ciudadIndex') }}">Ciudad</a>
-                        <a class="collapse-item" href="{{ url_for('estadocita.estadocitaIndex') }}">Estado de la Cita</a> 
+                        <a class="collapse-item" href="{{ url_for('disponibilidad.disponibilidadIndex') }}">Disponibilidad horaria</a> 
                         <a class="collapse-item" href="{{ url_for('especialidad.especialidadIndex') }}">Especialidad</a>   
                         <a class="collapse-item" href="{{ url_for('dia.diaIndex') }}">Dia</a>
                         <a class="collapse-item" href="{{ url_for('turno.turnoIndex') }}">Turno</a>   
@@ -175,7 +175,39 @@
                                 </button>
                             </div>
                         </div>
+                        
                     </form> -->
+  <div class="d-flex align-items-center">
+  <form
+    class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search"
+  >
+  </form>
+
+  <div
+    id="fechaHora"
+    class="ml-3 text-muted"
+    style="white-space: nowrap; font-size: 0.9rem; min-width: 220px;"
+  >
+    <!-- Fecha y hora aparecerán aquí -->
+  <</div>
+</div>
+
+<script>
+  function actualizarFechaHora() {
+    const ahora = new Date();
+    const opciones = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+    let fecha = ahora.toLocaleDateString('es-ES', opciones);
+
+    // Capitalizar la primera letra del día (y mantener el resto igual)
+    fecha = fecha.charAt(0).toUpperCase() + fecha.slice(1);
+
+    const hora = ahora.toLocaleTimeString('es-ES');
+    document.getElementById('fechaHora').textContent = `${fecha} - ${hora}`;
+  }
+
+  actualizarFechaHora();
+  setInterval(actualizarFechaHora, 1000);
+</script>
 
                     <!-- Topbar Navbar -->
                     <!-- <ul class="navbar-nav ml-auto"> -->
@@ -427,7 +459,9 @@
 
      <!-- Libreria para mensajes emergentes -->
      <script src="{{ url_for('static', filename='vendor/sweetalert/sweetalert2@11.js') }}"></script>
-
+     
+|   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.21/css/dataTables.bootstrap4.min.css">
     {# Este bloque pertenece a nuestros scripts de js #}
     {% block js %}
     {% endblock %}
