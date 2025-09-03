@@ -1,158 +1,192 @@
-from flask import Blueprint, request, jsonify, current_app as app
-from app.dao.RegisPaciente.RegistroPDao import RegistroPDao
+from flask import Blueprint, jsonify, request, current_app as app
+from app.dao.RegisPaciente.RegistroPDao import PacienteDao
+pacienteapi = Blueprint('pacienteapi', __name__) 
 
-registropapi = Blueprint('registropapi', __name__)
 
-# Obtener todas los registros
-@registropapi.route('/registrop', methods=['GET'])
-def getRegistrosP():
-    registropdao = RegistroPDao()
+# ==============================
+#   Obtener todos los pacientes
+# ==============================
+@pacienteapi.route('/paciente', methods=['GET'])
+def getPacientes():
+    pacientedao = PacienteDao()
     try:
-        registrosp = registropdao.getRegistrosP()
-        return jsonify({
-            'success': True,
-            'data': registrosp,
-            'error': None
-        }), 200
+        pacientes = pacientedao.getPacientes()
+        return jsonify({'success': True, 'data': pacientes, 'error': None}), 200
     except Exception as e:
-        app.logger.error(f"Error al obtener todas los registros: {str(e)}")
+        app.logger.error(f"Error al obtener todos los pacientes: {str(e)}")
         return jsonify({
             'success': False,
-            'error': 'Ocurrió un error interno al consultar las agendas. Consulte con el administrador.'
+            'error': 'Ocurrió un error interno al consultar los pacientes. Consulte con el administrador.'
         }), 500
 
 
-# Obtener un registro específica por ID
-@registropapi.route('/registrop/<int:paciente_id>', methods=['GET'])
-def getRegistroP(paciente_id):
-    registropdao = RegistroPDao()
+# ==============================
+#   Obtener paciente por ID
+# ==============================
+@pacienteapi.route('/paciente/<int:paciente_id>', methods=['GET'])
+def getPaciente(paciente_id):
+    pacientedao = PacienteDao()
     try:
-        registrop = registropdao.getRegistroPById(paciente_id)
-        if registrop:
-            return jsonify({
-                'success': True,
-                'data': registrop,
-                'error': None
-            }), 200
-        else:
-            return jsonify({
-                'success': False,
-                'error': f'No se encontró el registro con el ID {paciente_id}.'
-            }), 404
-    except Exception as e:
-        app.logger.error(f"Error al obtener registro con ID {paciente_id}: {str(e)}")
+        paciente = pacientedao.getPacienteById(paciente_id)
+        if paciente:
+            return jsonify({'success': True, 'data': paciente, 'error': None}), 200
         return jsonify({
             'success': False,
-            'error': 'Ocurrió un error interno al consultar el registro. Consulte con el administrador.'
+            'error': f'No se encontró el paciente con el ID {paciente_id}.'
+        }), 404
+    except Exception as e:
+        app.logger.error(f"Error al obtener paciente con ID {paciente_id}: {str(e)}")
+        return jsonify({
+            'success': False,
+            'error': 'Ocurrió un error interno al consultar el paciente. Consulte con el administrador.'
         }), 500
 
 
-# Agregar un nuevo registro
-@registropapi.route('/registrop', methods=['POST'])
-def addRegistroP():
+# ==============================
+#   Agregar nuevo paciente
+# ==============================
+@pacienteapi.route('/paciente', methods=['POST'])
+def addPaciente():
     data = request.get_json()
-    registropdao = RegistroPDao()
+    pacientedao = PacienteDao()
 
     # Validar campos requeridos
-    campos_requeridos = ['nombre', 'apellido', 'cedula_entidad', 'fecha_nacimiento', 'fecha_registro', 'telefono', 'id_ciudad']
+    campos_requeridos = ['nombre', 'apellido', 'cedula_entidad',
+                         'fecha_nacimiento', 'fecha_registro', 'id_ciudad']
     for campo in campos_requeridos:
-        if not data.get(campo) or not isinstance(data[campo], str) or not data[campo]:
+        if not data.get(campo) or (isinstance(data[campo], str) and not data[campo].strip()):
             return jsonify({
                 'success': False,
-                'error': f'El campo {campo} es obligatorio y debe ser una cadena no vacía.'
+                'error': f'El campo {campo} es obligatorio.'
             }), 400
 
     try:
-        nombre = data['nombre']
-        apellido = data['apellido']
-        cedula_entidad = data['cedula_entidad']
-        fecha_nacimiento = data['fecha_nacimiento']
-        fecha_registro = data['fecha_registro']
-        telefono = data['telefono']
-        id_ciudad = data['id_ciudad']
+        paciente_id = pacientedao.guardarPaciente(
+            data['nombre'], data['apellido'], data['cedula_entidad'],
+            data['fecha_nacimiento'], data['fecha_registro'],
+            data.get('telefono'), data.get('direccion'),
+            data.get('correo'), data['id_ciudad']
+        )
 
-        paciente_id = registropdao.guardarRegistroP(nombre, apellido, cedula_entidad, fecha_nacimiento, fecha_registro, telefono, id_ciudad,)
-        if paciente_id is not None:
+        if paciente_id:
             return jsonify({
                 'success': True,
-                'data': {'id_paciete': paciente_id, 'nombre': nombre, 'apellido': apellido, 'cedula_entidad': cedula_entidad, 'fecha_nacimiento': fecha_nacimiento, 'fecha_registro': fecha_registro, 'telefono':telefono, 'id_ciudad': id_ciudad,},
+                'data': {**data, 'id_paciente': paciente_id},
                 'error': None
             }), 201
         else:
-            return jsonify({'success': False, 'error': 'No se pudo guardar el registro. Consulte con el administrador.'}), 500
+            return jsonify({
+                'success': False,
+                'error': 'Paciente ya está registrado.'
+            }), 500
     except Exception as e:
-        app.logger.error(f"Error al agregar el registro: {str(e)}")
+        app.logger.error(f"Error al agregar paciente: {str(e)}")
+        return jsonify({'success': False, 'error': 'Error interno.'}), 500
+
+    try:
+        # Validación de duplicados (cédula)
+        if pacientedao.existeDuplicado(data['cedula_entidad']):
+            return jsonify({
+                'success': False,
+                'error': 'El paciente ya está registrado con esa cédula.'
+            }), 409
+
+        paciente_id = pacientedao.guardarPaciente(
+            data['nombre'], data['apellido'], data['cedula_entidad'],
+            data['fecha_nacimiento'], data['fecha_registro'],
+            data['telefono'], data['direccion'], data['correo'], data['id_ciudad']
+        )
+
+        if paciente_id:
+            app.logger.info(f"Paciente creado con ID {paciente_id}.")
+            return jsonify({
+                'success': True,
+                'data': {**data, 'id_paciente': paciente_id},
+                'error': None
+            }), 201
+        else:
+            return jsonify({
+                'success': False,
+                'error': 'No se pudo guardar el paciente. Consulte con el administrador.'
+            }), 500
+
+    except Exception as e:
+        app.logger.error(f"Error al agregar paciente: {str(e)}")
         return jsonify({
             'success': False,
-            'error': 'Ocurrió un error interno al guardar el registro. Consulte con el administrador.'
+            'error': 'Ocurrió un error interno al guardar el paciente. Consulte con el administrador.'
         }), 500
 
 
-# Actualizar el registro existente
-@registropapi.route('/registrop/<int:paciente_id>', methods=['PUT'])
-def updateRegistroP(paciente_id):
+# ==============================
+#   Actualizar paciente existente
+# ==============================
+@pacienteapi.route('/paciente/<int:paciente_id>', methods=['PUT'])
+def updatePaciente(paciente_id):
     data = request.get_json()
-    registropdao = RegistroPDao()
+    pacientedao = PacienteDao()
 
     # Validar campos requeridos
-    campos_requeridos = ['nombre', 'apellido', 'cedula_entidad', 'fecha_nacimiento', 'fecha_registro', 'telefono', 'id_ciudad']
+    campos_requeridos = ['nombre', 'apellido', 'cedula_entidad', 
+                         'fecha_nacimiento', 'fecha_registro', 
+                         'telefono', 'direccion', 'correo', 'id_ciudad']
     for campo in campos_requeridos:
-        if not data.get(campo) or not isinstance(data[campo], str) or not data[campo].strip():
+        if not data.get(campo) or (isinstance(data[campo], str) and not data[campo].strip()):
             return jsonify({
                 'success': False,
-                'error': f'El campo {campo} es obligatorio y debe ser una cadena no vacía.'
+                'error': f'El campo {campo} es obligatorio y no puede estar vacío.'
             }), 400
 
     try:
-        nombre = data['nombre']
-        apellido = data['apellido']
-        cedula_entidad = data['cedula_entidad']
-        fecha_nacimiento = data['fecha_nacimiento']
-        fecha_registro = data['fecha_registro']
-        telefono = data['telefono']
-        id_ciudad = data['id_ciudad']
+        actualizado = pacientedao.updatePaciente(
+            paciente_id, data['nombre'], data['apellido'], data['cedula_entidad'],
+            data['fecha_nacimiento'], data['fecha_registro'],
+            data['telefono'], data['direccion'], data['correo'], data['id_ciudad']
+        )
 
-
-        if registropdao.updateRegistroP(paciente_id, nombre, apellido, cedula_entidad, fecha_nacimiento, fecha_registro, telefono, id_ciudad):
-            app.logger.info(f"Registro de paciente con ID {paciente_id} actualizada exitosamente.")
+        if actualizado:
+            app.logger.info(f"Paciente con ID {paciente_id} actualizado exitosamente.")
             return jsonify({
                 'success': True,
-                'data': {'id_paciente': paciente_id, 'nombre': nombre, 'apellido': apellido, 'cedula_identidad': cedula_entidad, 'fecha_nacimiento': fecha_nacimiento, 'fecha_registro': fecha_registro, 'telefono':telefono, 'id_ciudad':id_ciudad},
+                'data': {**data, 'id_paciente': paciente_id},
                 'error': None
             }), 200
         else:
             return jsonify({
                 'success': False,
-                'error': f'No se encontró el registro con el ID {paciente_id} o no se pudo actualizar.'
+                'error': f'No se encontró el paciente con el ID {paciente_id} o no se pudo actualizar.'
             }), 404
+
     except Exception as e:
-        app.logger.error(f"Error al actualizar registro con ID {paciente_id}: {str(e)}")
+        app.logger.error(f"Error al actualizar paciente con ID {paciente_id}: {str(e)}")
         return jsonify({
             'success': False,
-            'error': 'Ocurrió un error interno al actualizar el registro. Consulte con el administrador.'
+            'error': 'Ocurrió un error interno al actualizar el paciente. Consulte con el administrador.'
         }), 500
 
 
-# Eliminar una registro
-@registropapi.route('/registrop/<int:paciente_id>', methods=['DELETE'])
-def deleteRegistroP(paciente_id):
-    registropdao = RegistroPDao()
+# ==============================
+#   Eliminar paciente
+# ==============================
+@pacienteapi.route('/paciente/<int:paciente_id>', methods=['DELETE'])
+def deletePaciente(paciente_id):
+    pacientedao = PacienteDao()
     try:
-        if registropdao.deleteRegistroP(paciente_id):
-            app.logger.info(f"El registro de paciente con ID {paciente_id} eliminada.")
+        if pacientedao.deletePaciente(paciente_id):
+            app.logger.info(f"Paciente con ID {paciente_id} eliminado.")
             return jsonify({
                 'success': True,
-                'mensaje': f'Registro con ID {paciente_id} eliminada correctamente.',
+                'mensaje': f'Paciente con ID {paciente_id} eliminado correctamente.',
                 'error': None
             }), 200
         else:
             return jsonify({
                 'success': False,
-                'error': f'No se encontró el registro con el ID {paciente_id} o no se pudo eliminar.'
+                'error': f'No se encontró el paciente con el ID {paciente_id} o no se pudo eliminar.'
             }), 404
     except Exception as e:
-        app.logger.error(f"Error al eliminar registro con ID {paciente_id}: {str(e)}")
+        app.logger.error(f"Error al eliminar paciente con ID {paciente_id}: {str(e)}")
         return jsonify({
             'success': False,
-            'error': 'Ocurrió un error interno al eliminar el registro. Consulte con el administrador.'
+            'error': 'Ocurrió un error interno al eliminar el paciente. Consulte con el administrador.'
         }), 500
