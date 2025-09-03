@@ -24,7 +24,11 @@ app.register_blueprint(logmod)
 # importar referenciales
 from app.rutas.vista.vista_routes import vistamod #vista principal
 from app.rutas.referenciales.ciudad.ciudad_routes import ciumod #ciudad
+
+from app.rutas.referenciales.cargo.cargo_routes import cargomod #cargo
+from app.rutas.referenciales.consultorio.consultorio_routes import consulmod
 from app.rutas.referenciales.paises.pais_routes import paimod   #pais
+from app.rutas.referenciales.disponibilidad_horaria.disponibilidad_routes import disponibilidadmod
 from app.rutas.referenciales.nacionalidad.nacionalidad_routes import naciomod  #nacionalidad
 from app.rutas.referenciales.ocupacion.ocupacion_routes import ocupmod  #ocupacion
 from app.rutas.referenciales.estado_civil.estado_civil_routes import estacivmod  #estado civil
@@ -42,14 +46,17 @@ from app.rutas.Agendamiento.registcita.registrarc_routes import registrocmod
 from app.rutas.Agendamiento.agendmedica.agenda_routes import agendmod
 from app.rutas.Agendamiento.regispaciente.registrop_routes import registropmod
 from app.rutas.Agendamiento.medico.medico_routes import medicomod
-
+from app.rutas.Agendamiento.personal.personal_routes import personalmod
 
 
 # registrar referenciales
 modulo0 = '/referenciales' 
 app.register_blueprint(vistamod, url_prefix=f'{modulo0}/vista') 
 app.register_blueprint(ciumod, url_prefix=f'{modulo0}/ciudad') #ciudad
+app.register_blueprint(cargomod, url_prefix=f'{modulo0}/cargo') #cargo
+app.register_blueprint(consulmod, url_prefix=f'{modulo0}/consultorio')
 app.register_blueprint(paimod, url_prefix=f'{modulo0}/paises') #pais
+app.register_blueprint(disponibilidadmod, url_prefix=f'{modulo0}/disponibilidad')
 app.register_blueprint(naciomod, url_prefix=f'{modulo0}/nacionalidad')  #nacionalidad
 app.register_blueprint(ocupmod, url_prefix=f'{modulo0}/ocupacion')  #ocupacion
 app.register_blueprint(estacivmod, url_prefix=f'{modulo0}/estadocivil')  #estado civil
@@ -69,10 +76,16 @@ app.register_blueprint(registrocmod, url_prefix=f'{modulo0}/registcita')  # cita
 app.register_blueprint(agendmod, url_prefix=f'{modulo0}/agendmedica')  # cita
 app.register_blueprint(registropmod, url_prefix=f'{modulo0}/registrop')
 app.register_blueprint(medicomod, url_prefix=f'{modulo0}/medico')
+app.register_blueprint(personalmod, url_prefix=f'{modulo0}/medico')
 
-
+from app.rutas.referenciales.disponibilidad_horaria.disponibilidad_api import disponibilidadapi
 #ciudad
 from app.rutas.referenciales.ciudad.ciudad_api import ciuapi
+
+from app.rutas.referenciales.consultorio.consultorio_api import consultorioapi
+
+#cargo
+from app.rutas.referenciales.cargo.cargo_api import cargoapi
 #pais
 from app.rutas.referenciales.paises.pais_api import paisapi
 #nacionalidad
@@ -105,7 +118,7 @@ from app.rutas.Agendamiento.registcita.registrarc_api import regiscitaapi
 from app.rutas.Agendamiento.agendmedica.agenda_api import agendaapi
 from app.rutas.Agendamiento.regispaciente.registrarp_api import registropapi
 from app.rutas.Agendamiento.medico.medico_api import medicoapi
-
+from app.rutas.Agendamiento.personal.personal_api import personalapi
 
 
 # APIS v1
@@ -113,8 +126,19 @@ from app.rutas.Agendamiento.medico.medico_api import medicoapi
 version1 = '/api/v1'
 app.register_blueprint(ciuapi, url_prefix=version1)
 
-#Pais
+version1 = '/api/v1'
+app.register_blueprint(consultorioapi, url_prefix=version1)
 
+version1 = '/api/v1'
+app.register_blueprint(disponibilidadapi, url_prefix=version1)
+
+version1 = '/api/v1'
+app.register_blueprint(cargoapi, url_prefix=version1)
+
+version1 = '/api/v1'
+app.register_blueprint(personalapi, url_prefix=version1)
+
+#Pais
 app.register_blueprint(paisapi, url_prefix=version1)
 
 #nacionalidad
