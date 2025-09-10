@@ -77,6 +77,7 @@
                     <a class="collapse-item" href="{{ url_for('personal.personalIndex') }}">Registrar Personal</a>
                     <a class="collapse-item" href="{{ url_for('medico.medicoIndex') }}">Registrar Medico</a> 
                     <a class="collapse-item" href="{{ url_for('registcita.registrarcIndex') }}">Registrar Citas</a> 
+                    <a class="collapse-item" href="{{ url_for('avisosRecordatorios.AvisosRecordatoriosIndex') }}">Generar Avisos</a> 
                 </div>
                 </div>
            </li>
@@ -93,6 +94,7 @@
                     <div class="bg-white py-2 collapse-inner rounded">
                         <a class="collapse-item" href="{{ url_for('ciudad.ciudadIndex') }}">Ciudad</a>
                         <a class="collapse-item" href="{{ url_for('cargo.cargoIndex') }}">Cargo</a>
+                         <a class="collapse-item" href="{{ url_for('estadocita.estadocitaIndex') }}">Estado de la cita</a>
                          <a class="collapse-item" href="{{ url_for('consultorio.consultorioIndex') }}">Consultorio</a>
                         <a class="collapse-item" href="{{ url_for('disponibilidad.disponibilidadIndex') }}">Disponibilidad horaria</a> 
                         <a class="collapse-item" href="{{ url_for('especialidad.especialidadIndex') }}">Especialidad</a>   
@@ -139,26 +141,26 @@
                
 
             <!-- Divider -->
-            <hr class="sidebar-divider">
+            <hr class="sidebar-divider ">
 
 
             <!-- Sidebar Toggler (Sidebar) -->
-            <div class="text-center d-none d-md-inline">
+            <div class="text-center d-none d-md-inline ">
                 <button class="rounded-circle border-0" id="sidebarToggle"></button>
             </div>
 
         </ul>
         <!-- End of Sidebar -->
 
-        <!-- Content Wrapper -->
-        <div id="content-wrapper" class="d-flex flex-column">
+        <!-- Content Wrapper FONDO DETRAS DE LOS CONTAINER DE INFO-->
+        <div id="content-wrapper" class="d-flex flex-column ">
             
 
             <!-- Main Content -->
             <div id="content">
 
-                <!-- Topbar -->
-                <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
+                <!-- Topbar  barra DONDE APARECE LA HORA-->
+                <nav class="navbar navbar-expand navbar-light   topbar mb-4 static-top shadow">
 
                     <!-- Sidebar Toggle (Topbar) -->
                     <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
@@ -180,37 +182,50 @@
                         </div>
                         
                     </form> -->
-  <div class="d-flex align-items-center">
+  <div class="d-flex align-items-center ">
   <form
     class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search"
   >
   </form>
 
-  <div
-    id="fechaHora"
-    class="ml-3 text-muted"
-    style="white-space: nowrap; font-size: 0.9rem; min-width: 220px;"
-  >
-    <!-- Fecha y hora aparecerán aquí -->
-  <</div>
+<div id="fechaHora" 
+     class="ml-3 text-dark font-weight-bold px-3 d-flex align-items-center"
+     style="white-space: nowrap; font-size: 1rem; letter-spacing: 0.5px; width: 100%;">
 </div>
 
 <script>
   function actualizarFechaHora() {
     const ahora = new Date();
+
     const opciones = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
     let fecha = ahora.toLocaleDateString('es-ES', opciones);
-
-    // Capitalizar la primera letra del día (y mantener el resto igual)
     fecha = fecha.charAt(0).toUpperCase() + fecha.slice(1);
 
-    const hora = ahora.toLocaleTimeString('es-ES');
-    document.getElementById('fechaHora').textContent = `${fecha} - ${hora}`;
+    let horas = ahora.getHours();
+    const minutos = String(ahora.getMinutes()).padStart(2, '0');
+    const segundos = String(ahora.getSeconds()).padStart(2, '0');
+    const ampm = horas >= 12 ? "PM" : "AM";
+    const horaFinal = `${horas}:${minutos}:${segundos} ${ampm}`;
+
+    // Generar una línea larga de dientes 🦷
+    let dientes = "";
+    for (let i = 0; i < 8; i++) {  // ajusta el número de dientes aquí
+      dientes += "🦷 ";
+    }
+
+    document.getElementById('fechaHora').innerHTML = `
+      <span style="color:#17a2b8; margin-right:15px;">${dientes}</span>
+      <span style="color:#6c757d;">${fecha}</span> 
+      <span style="color:#17a2b8; margin-left:10px;">${horaFinal}</span>
+    `;
   }
 
   actualizarFechaHora();
   setInterval(actualizarFechaHora, 1000);
 </script>
+
+
+
 
                     <!-- Topbar Navbar -->
                     <!-- <ul class="navbar-nav ml-auto"> -->
@@ -395,7 +410,7 @@
                 </nav>
                 <!-- End of Topbar -->
 
-                <!-- Begin Page Content -->
+                <!-- Begin Page Content FONDO PRINCIPAL-->
                 <div class="container-fluid">
                     {% block contenido %}
                     {% endblock %}
