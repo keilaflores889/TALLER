@@ -5,137 +5,140 @@ from app.conexion.Conexion import Conexion
 class EstadoCitaDao:
 
     def getEstadosCitas(self):
-
         estadocitaSQL = """
         SELECT id_estado, descripcion
         FROM estado_cita
         """
-        # objeto conexion
         conexion = Conexion()
         con = conexion.getConexion()
         cur = con.cursor()
         try:
             cur.execute(estadocitaSQL)
-            estadoscitas = cur.fetchall() # trae datos de la bd
-
-            # Transformar los datos en una lista de diccionarios
-            return [{'id_estado': estadocita[0], 'descripcion': estadocita[1]} for estadocita in estadoscitas]
-
+            estadoscitas = cur.fetchall()
+            return [{'id_estado': e[0], 'descripcion': e[1]} for e in estadoscitas]
         except Exception as e:
             app.logger.error(f"Error al obtener todos los Estados de Cita: {str(e)}")
             return []
-
         finally:
             cur.close()
             con.close()
 
     def getEstadoCitaById(self, id_estado):
-
         estadocitaSQL = """
         SELECT id_estado, descripcion
         FROM estado_cita WHERE id_estado=%s
         """
-        # objeto conexion
         conexion = Conexion()
         con = conexion.getConexion()
         cur = con.cursor()
         try:
             cur.execute(estadocitaSQL, (id_estado,))
-            estadocitaEncontrada = cur.fetchone() # Obtener una sola fila
+            estadocitaEncontrada = cur.fetchone()
             if estadocitaEncontrada:
                 return {
-                        "id_estado": estadocitaEncontrada[0],
-                        "descripcion": estadocitaEncontrada[1]
-                    }  # Retornar los datos de los estados de cita
+                    "id_estado": estadocitaEncontrada[0],
+                    "descripcion": estadocitaEncontrada[1]
+                }
             else:
-                return None # Retornar None si no se encuentra los estados de citas
+                return None
         except Exception as e:
             app.logger.error(f"Error al obtener el estado de cita: {str(e)}")
             return None
-
         finally:
             cur.close()
             con.close()
 
     def guardarEstadoCita(self, descripcion):
-
         insertEstadoCitaSQL = """
         INSERT INTO estado_cita(descripcion) VALUES(%s) RETURNING id_estado
         """
-
         conexion = Conexion()
         con = conexion.getConexion()
         cur = con.cursor()
-
-        # Ejecucion exitosa
         try:
             cur.execute(insertEstadoCitaSQL, (descripcion,))
             estadocita_id = cur.fetchone()[0]
-            con.commit() # se confirma la insercion
+            con.commit()
             return estadocita_id
-
-        # Si algo fallo entra aqui
         except Exception as e:
             app.logger.error(f"Error al insertar estado de cita: {str(e)}")
-            con.rollback() # retroceder si hubo error
+            con.rollback()
             return False
-
-        # Siempre se va ejecutar
         finally:
             cur.close()
             con.close()
 
     def updateEstadoCita(self, id_estado, descripcion):
-
         updateEstadoCitaSQL = """
         UPDATE estado_cita
         SET descripcion=%s
         WHERE id_estado=%s
         """
-
         conexion = Conexion()
         con = conexion.getConexion()
         cur = con.cursor()
-
         try:
             cur.execute(updateEstadoCitaSQL, (descripcion, id_estado,))
-            filas_afectadas = cur.rowcount # Obtener el número de filas afectadas
+            filas_afectadas = cur.rowcount
             con.commit()
-
-            return filas_afectadas > 0 # Retornar True si se actualizó al menos una fila
-
+            return filas_afectadas > 0
         except Exception as e:
             app.logger.error(f"Error al actualizar Estado de Cita: {str(e)}")
             con.rollback()
             return False
-
         finally:
             cur.close()
             con.close()
 
     def deleteEstadoCita(self, id_estado):
-
-        updateEstadoCitaSQL = """
+        deleteEstadoCitaSQL = """
         DELETE FROM estado_cita
         WHERE id_estado=%s
         """
-
         conexion = Conexion()
         con = conexion.getConexion()
         cur = con.cursor()
-
         try:
-            cur.execute(updateEstadoCitaSQL, (id_estado,))
+            cur.execute(deleteEstadoCitaSQL, (id_estado,))
             rows_affected = cur.rowcount
             con.commit()
-
-            return rows_affected > 0  # Retornar True si se eliminó al menos una fila
-
+            return rows_affected > 0
         except Exception as e:
             app.logger.error(f"Error al eliminar Estado de Cita: {str(e)}")
             con.rollback()
             return False
+        finally:
+            cur.close()
+            con.close()
 
+    # Nuevo método: verifica si ya existe un estado con la misma descripción
+    def existeDescripcion(self, descripcion):
+        sql = "SELECT 1 FROM estado_cita WHERE descripcion = %s"
+        conexion = Conexion()
+        con = conexion.getConexion()
+        cur = con.cursor()
+        try:
+            cur.execute(sql, (descripcion,))
+            return cur.fetchone() is not None
+        except Exception as e:
+            app.logger.error(f"Error al verificar existencia de descripción: {str(e)}")
+            return False
+        finally:
+            cur.close()
+            con.close()
+
+    # Nuevo método: verifica si existe descripción igual para otro id distinto (para update)
+    def existeDescripcionExceptoId(self, descripcion, id_estado):
+        sql = "SELECT 1 FROM estado_cita WHERE descripcion = %s AND id_estado <> %s"
+        conexion = Conexion()
+        con = conexion.getConexion()
+        cur = con.cursor()
+        try:
+            cur.execute(sql, (descripcion, id_estado))
+            return cur.fetchone() is not None
+        except Exception as e:
+            app.logger.error(f"Error al verificar existencia de descripción (excepto id): {str(e)}")
+            return False
         finally:
             cur.close()
             con.close()

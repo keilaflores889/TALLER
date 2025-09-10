@@ -3,9 +3,8 @@ from app.dao.referenciales.estado_cita.EstadoCitaDao import EstadoCitaDao
 
 estacitapi = Blueprint('estacitapi', __name__)
 
-# Lista de estados de la cita validos
+# Lista de estados de la cita válidos
 ESTADOCITA_VALIDOS= ['RESERVADO', 'CONFIRMADO', 'REALIZADO', 'CANCELADO']
-
 
 # Trae todos los Estados de la Cita
 @estacitapi.route('/estadocita', methods=['GET'])
@@ -67,13 +66,13 @@ def addEstadoCita():
     for campo in campos_requeridos:
         if campo not in data or data[campo] is None or len(data[campo].strip()) == 0:
             return jsonify({
-                            'success': False,
-                            'error': f'El campo {campo} es obligatorio y no puede estar vacío.'
-                            }), 400
+                'success': False,
+                'error': f'El campo {campo} es obligatorio y no puede estar vacío.'
+            }), 400
 
     try:
         descripcion = data['descripcion'].upper()
-        
+
         # Validar si el ESTADO está en la lista de TURNOS válidos
         if descripcion not in ESTADOCITA_VALIDOS:
             return jsonify({
@@ -81,8 +80,16 @@ def addEstadoCita():
                 'error': 'Estado de la cita inválido. Solo se permiten Estado de "Confirmado", "Reservado", "Cancelado", "Realizado".'
             }), 400
         
+        # Verificar si ya existe el estado con esa descripcion
+        existe = estacitdao.existeDescripcion(descripcion)
+        if existe:
+            return jsonify({
+                'success': False,
+                'error': f'El estado de cita "{descripcion}" ya está registrado.'
+            }), 409  # 409 Conflict
+        
         estado_id = estacitdao.guardarEstadoCita(descripcion)
-        if estado_id is not None:
+        if estado_id is not None and estado_id is not False:
             return jsonify({
                 'success': True,
                 'data': {'estado_id':estado_id, 'descripcion': descripcion},
@@ -109,19 +116,28 @@ def updateEstadoCita(estado_id):
     for campo in campos_requeridos:
         if campo not in data or data[campo] is None or len(data[campo].strip()) == 0:
             return jsonify({
-                            'success': False,
-                            'error': f'El campo {campo} es obligatorio y no puede estar vacío.'
-                            }), 400
-    descripcion = data['descripcion']
+                'success': False,
+                'error': f'El campo {campo} es obligatorio y no puede estar vacío.'
+            }), 400
+    descripcion = data['descripcion'].upper()
     
     # Validar si el ESTADO está en la lista de TURNOS válidos
     if descripcion not in ESTADOCITA_VALIDOS:
-            return jsonify({
-                'success': False,
-                'error': 'Estado de la cita inválido. Solo se permiten Estado de "Confirmado", "Reservado", "Cancelado", "Realizado".'
-            }), 400
+        return jsonify({
+            'success': False,
+            'error': 'Estado de la cita inválido. Solo se permiten Estado de "Confirmado", "Reservado", "Cancelado", "Realizado".'
+        }), 400
+    
+    # Verificar si otro registro ya tiene esa descripcion (evitar duplicados al actualizar)
+    existe = estacitdao.existeDescripcionExceptoId(descripcion, estado_id)
+    if existe:
+        return jsonify({
+            'success': False,
+            'error': f'El estado de cita "{descripcion}" ya está registrado en otro registro.'
+        }), 409
+
     try:
-        if estacitdao.updateEstadoCita(estado_id, descripcion.upper()):
+        if estacitdao.updateEstadoCita(estado_id, descripcion):
             return jsonify({
                 'success': True,
                 'data': {'estado_id': estado_id, 'descripcion': descripcion},
@@ -144,7 +160,6 @@ def deleteEstadoCita(estado_id):
     estacitdao = EstadoCitaDao()
 
     try:
-        # Usar el retorno de eliminarEstadoCita para determinar el éxito
         if estacitdao.deleteEstadoCita(estado_id):
             return jsonify({
                 'success': True,
