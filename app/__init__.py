@@ -47,7 +47,7 @@ from app.rutas.Agendamiento.agendmedica.agenda_routes import agendmod
 from app.rutas.Agendamiento.regispaciente.registrop_routes import registropmod
 from app.rutas.Agendamiento.medico.medico_routes import medicomod
 from app.rutas.Agendamiento.personal.personal_routes import personalmod
-
+from app.rutas.Agendamiento.avisosRecordatorios.AvisosRecordatorios_routes import avisomod
 
 # registrar referenciales
 modulo0 = '/referenciales' 
@@ -77,6 +77,8 @@ app.register_blueprint(agendmod, url_prefix=f'{modulo0}/agendmedica')  # cita
 app.register_blueprint(registropmod, url_prefix=f'{modulo0}/registrop')
 app.register_blueprint(medicomod, url_prefix=f'{modulo0}/medico')
 app.register_blueprint(personalmod, url_prefix=f'{modulo0}/medico')
+
+app.register_blueprint(avisomod, url_prefix=f'{modulo0}/avisos')
 
 from app.rutas.referenciales.disponibilidad_horaria.disponibilidad_api import disponibilidadapi
 #ciudad
@@ -116,10 +118,11 @@ from app.rutas.referenciales.turno.turno_api import turnoapi
 #agendamiento
 from app.rutas.Agendamiento.registcita.registrarc_api import regiscitaapi
 from app.rutas.Agendamiento.agendmedica.agenda_api import agendaapi
-from app.rutas.Agendamiento.regispaciente.registrarp_api import registropapi
+from app.rutas.Agendamiento.regispaciente.registrarp_api import pacienteapi
 from app.rutas.Agendamiento.medico.medico_api import medicoapi
 from app.rutas.Agendamiento.personal.personal_api import personalapi
 
+from app.rutas.Agendamiento.avisosRecordatorios.AvisosRecordatorio_api import avisoapi
 
 # APIS v1
 #Ciudad
@@ -190,11 +193,12 @@ version1 = '/api/v1'
 app.register_blueprint(agendaapi, url_prefix=version1)
 
 version1 = '/api/v1'
-app.register_blueprint(registropapi, url_prefix=version1)
+app.register_blueprint(pacienteapi, url_prefix=version1)
 
 version1 = '/api/v1'
 app.register_blueprint(medicoapi, url_prefix=version1)
 
+app.register_blueprint(avisoapi, url_prefix=version1)
 
 
 @app.route('/login')
