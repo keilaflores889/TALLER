@@ -69,22 +69,53 @@ class DisponibilidadDao:
             cur.close()
             con.close()
 
-    def existeDisponibilidad(self, id_medico, hora_inicio, hora_fin, fecha, excluir_id=None):
+    def getDisponibilidadesPorMedicoFecha(self, id_medico, fecha):
         """
-        Verifica si ya existe una disponibilidad con los mismos datos.
-        Si se pasa excluir_id, ignora ese registro (para update).
+        Retorna todas las disponibilidades de un médico en una fecha específica.
         """
         sql = """
-        SELECT COUNT(*) 
+        SELECT id_disponibilidad, disponibilidad_hora_inicio, disponibilidad_hora_fin, disponibilidad_cupos
+        FROM disponibilidad_horaria
+        WHERE id_medico = %s AND disponibilidad_fecha = %s
+        ORDER BY disponibilidad_hora_inicio
+        """
+        conexion = Conexion()
+        con = conexion.getConexion()
+        cur = con.cursor()
+        try:
+            cur.execute(sql, (id_medico, fecha))
+            rows = cur.fetchall()
+            return [
+                {
+                    'id_disponibilidad': r[0],
+                    'disponibilidad_hora_inicio': str(r[1]),
+                    'disponibilidad_hora_fin': str(r[2]),
+                    'disponibilidad_cupos': r[3]
+                } for r in rows
+            ]
+        except Exception as e:
+            app.logger.error(f"Error al obtener disponibilidades por médico y fecha: {str(e)}")
+            return []
+        finally:
+            cur.close()
+            con.close()
+
+    def existeDisponibilidad(self, id_medico, hora_inicio, hora_fin, fecha, excluir_id=None):
+        """
+        Verifica si existe una disponibilidad que solapa con el intervalo [hora_inicio, hora_fin)
+        para el mismo médico y fecha. Si excluir_id se pasa, lo excluye de la búsqueda (útil en updates).
+        """
+        # La condición NOT (existing_end <= new_start OR existing_start >= new_end)
+        sql = """
+        SELECT id_disponibilidad
         FROM disponibilidad_horaria
         WHERE id_medico = %s
           AND disponibilidad_fecha = %s
-          AND disponibilidad_hora_inicio = %s
-          AND disponibilidad_hora_fin = %s
+          AND NOT (disponibilidad_hora_fin <= %s OR disponibilidad_hora_inicio >= %s)
         """
         params = [id_medico, fecha, hora_inicio, hora_fin]
         if excluir_id:
-            sql += " AND id_disponibilidad <> %s"
+            sql += " AND id_disponibilidad != %s"
             params.append(excluir_id)
 
         conexion = Conexion()
@@ -92,11 +123,14 @@ class DisponibilidadDao:
         cur = con.cursor()
         try:
             cur.execute(sql, tuple(params))
-            cantidad = cur.fetchone()[0]
-            return cantidad > 0
+            existe = cur.fetchone() is not None
+            if existe:
+                app.logger.debug(f"Existe disponibilidad solapada: medico={id_medico}, fecha={fecha}, inicio={hora_inicio}, fin={hora_fin}, excluir_id={excluir_id}")
+            return existe
         except Exception as e:
-            app.logger.error(f"Error al verificar duplicado: {str(e)}")
-            return True  # Para evitar insertar si hay error
+            app.logger.error(f"Error en existeDisponibilidad: {str(e)}")
+            # En caso de error devolvemos False para no bloquear la lógica (mantén logs para depurar)
+            return False
         finally:
             cur.close()
             con.close()
@@ -104,7 +138,7 @@ class DisponibilidadDao:
     def guardarDisponibilidad(self, id_medico, hora_inicio, hora_fin, fecha, cupos):
         if self.existeDisponibilidad(id_medico, hora_inicio, hora_fin, fecha):
             app.logger.warning("Disponibilidad duplicada detectada")
-            return False  # No se guarda duplicado
+            return False
 
         sql = """
         INSERT INTO disponibilidad_horaria(id_medico, disponibilidad_hora_inicio, 
@@ -131,7 +165,7 @@ class DisponibilidadDao:
     def updateDisponibilidad(self, id_disponibilidad, id_medico, hora_inicio, hora_fin, fecha, cupos):
         if self.existeDisponibilidad(id_medico, hora_inicio, hora_fin, fecha, excluir_id=id_disponibilidad):
             app.logger.warning("Disponibilidad duplicada detectada en update")
-            return False  # No se actualiza duplicado
+            return False
 
         sql = """
         UPDATE disponibilidad_horaria
@@ -175,3 +209,4 @@ class DisponibilidadDao:
         finally:
             cur.close()
             con.close()
+    

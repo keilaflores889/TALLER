@@ -1,5 +1,6 @@
 from flask import Blueprint, request, jsonify, current_app as app
 from app.dao.referenciales.disponibilidad_horaria.DisponibilidadHorariaDao import DisponibilidadDao
+from datetime import datetime
 
 disponibilidadapi = Blueprint('disponibilidadapi', __name__)
 
@@ -36,11 +37,16 @@ def addDisponibilidad():
             return jsonify({'success': False, 'error': f'El campo {campo} es obligatorio'}), 400
 
     try:
+        # Normalizar formatos
+        fecha = datetime.strptime(data['disponibilidad_fecha'], "%Y-%m-%d").date()
+        hora_inicio = datetime.strptime(data['disponibilidad_hora_inicio'], "%H:%M").time()
+        hora_fin = datetime.strptime(data['disponibilidad_hora_fin'], "%H:%M").time()
+
         new_id = dao.guardarDisponibilidad(
             data['id_medico'],
-            data['disponibilidad_hora_inicio'],
-            data['disponibilidad_hora_fin'],
-            data['disponibilidad_fecha'],
+            hora_inicio,
+            hora_fin,
+            fecha,
             data['disponibilidad_cupos']
         )
         if new_id:
@@ -48,6 +54,7 @@ def addDisponibilidad():
         return jsonify({'success': False, 'error': 'Este horario ya está registrado'}), 500
     except Exception as e:
         app.logger.error(f"Error al agregar disponibilidad: {str(e)}")
+        return jsonify({'success': False, 'error': 'Error interno'}), 500
         return jsonify({'success': False, 'error': 'Error interno'}), 500
 
 @disponibilidadapi.route('/disponibilidades/<int:id_disponibilidad>', methods=['PUT'])
@@ -87,3 +94,4 @@ def deleteDisponibilidad(id_disponibilidad):
     except Exception as e:
         app.logger.error(f"Error al eliminar disponibilidad: {str(e)}")
         return jsonify({'success': False, 'error': 'Error interno'}), 500
+
