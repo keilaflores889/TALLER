@@ -21,7 +21,7 @@ from app.rutas.login.login_routes import logmod
 app.register_blueprint(logmod)
 
 
-# importar referenciales
+# importar referenciales agendamiento
 from app.rutas.vista.vista_routes import vistamod #vista principal
 from app.rutas.referenciales.ciudad.ciudad_routes import ciumod #ciudad
 
@@ -41,13 +41,19 @@ from app.rutas.referenciales.duracion_consulta.duracion_consulta_routes import d
 from app.rutas.referenciales.turno.turno_routes import turmod  #turno
 
 
-#importacion de cita
+
+#importacion de modulo de agendamiento
 from app.rutas.Agendamiento.registcita.registrarc_routes import registrocmod
 from app.rutas.Agendamiento.agendmedica.agenda_routes import agendmod
 from app.rutas.Agendamiento.regispaciente.registrop_routes import registropmod
 from app.rutas.Agendamiento.medico.medico_routes import medicomod
 from app.rutas.Agendamiento.personal.personal_routes import personalmod
 from app.rutas.Agendamiento.avisosRecordatorios.AvisosRecordatorios_routes import avisomod
+
+
+#referenciales de consultorio
+from app.rutas.referenciales_consultorio.medicamento.medicamento_routes import medicamentomod
+from app.rutas.referenciales_consultorio.sintoma.sintoma_routes import sintomod
 
 # registrar referenciales
 modulo0 = '/referenciales' 
@@ -69,6 +75,12 @@ app.register_blueprint(duraconsumod, url_prefix=f'{modulo0}/duracionconsulta') #
 app.register_blueprint(turmod, url_prefix=f'{modulo0}/turno') #turno
 
 
+# registrar referenciales de consultorio
+modulo0 = '/referenciales_consultorio'
+app.register_blueprint(medicamentomod, url_prefix=f'{modulo0}/medicamento')
+app.register_blueprint(sintomod, url_prefix=f'{modulo0}/sintoma')
+
+
 
 # registrar agendamientos
 modulo0 = '/agendamientos'
@@ -76,7 +88,7 @@ app.register_blueprint(registrocmod, url_prefix=f'{modulo0}/registcita')  # cita
 app.register_blueprint(agendmod, url_prefix=f'{modulo0}/agendmedica')  # cita
 app.register_blueprint(registropmod, url_prefix=f'{modulo0}/registrop')
 app.register_blueprint(medicomod, url_prefix=f'{modulo0}/medico')
-app.register_blueprint(personalmod, url_prefix=f'{modulo0}/medico')
+app.register_blueprint(personalmod, url_prefix=f'{modulo0}/personal')
 
 app.register_blueprint(avisomod, url_prefix=f'{modulo0}/avisos')
 
@@ -123,6 +135,11 @@ from app.rutas.Agendamiento.medico.medico_api import medicoapi
 from app.rutas.Agendamiento.personal.personal_api import personalapi
 
 from app.rutas.Agendamiento.avisosRecordatorios.AvisosRecordatorio_api import avisoapi
+
+
+#consultorio
+from app.rutas.referenciales_consultorio.medicamento.medicamento_api import medicamentoapi
+from app.rutas.referenciales_consultorio.sintoma.sintoma_api import sintomaapi
 
 # APIS v1
 #Ciudad
@@ -200,6 +217,13 @@ app.register_blueprint(medicoapi, url_prefix=version1)
 
 app.register_blueprint(avisoapi, url_prefix=version1)
 
+
+#referenciales consultorio
+version1 = '/api/v1'
+app.register_blueprint(medicamentoapi, url_prefix=version1)
+
+version1 = '/api/v1'
+app.register_blueprint(sintomaapi, url_prefix=version1)
 
 @app.route('/login')
 def login():

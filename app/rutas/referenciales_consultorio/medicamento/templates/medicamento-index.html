@@ -1,0 +1,286 @@
+{% extends 'base.html' %}
+
+{% block titulo %}
+Medicamentos
+{% endblock %}
+
+{% block contenido %}
+<div class="container mt-4">
+  <h3>Listar Medicamentos</h3>
+
+  <!-- tarjeta -->
+  <div class="card">
+    <div class="card-header">
+      <button type="button" class="btn btn-outline-info" id="btnAgregar">Agregar</button>
+    </div>
+    <div class="card-body">
+      <table class="table table-striped w-100" id="tbl">
+        <thead class="table-info">
+          <tr>
+            <th>Nombre</th>
+            <th>Dosis</th>
+            <th>Indicaciones</th>
+            <th>Forma Farmacéutica</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+  <!-- /tarjeta -->
+
+  <!-- Modal Formulario -->
+  <div class="modal" id="modalFormulario">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+      <div class="modal-content">
+
+        <div class="modal-header">
+          <h4 class="modal-title" id="modalTitle"></h4>
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+        </div>
+
+        <div class="modal-body">
+          <input type="hidden" id="txtId">
+
+          <div class="form-group">
+            <label for="txtNombre">Nombre del Medicamento:</label>
+            <input type="text" class="form-control" id="txtNombre" placeholder="Ingrese nombre del medicamento">
+          </div>
+
+          <div class="form-group">
+            <label for="txtDosis">Dosis:</label>
+            <input type="text" class="form-control" id="txtDosis" placeholder="Ingrese dosis">
+          </div>
+
+          <div class="form-group">
+            <label for="txtIndicaciones">Indicaciones:</label>
+            <textarea class="form-control" id="txtIndicaciones" placeholder="Ingrese indicaciones"></textarea>
+          </div>
+
+          <div class="form-group">
+            <label for="txtPresentacion">Presentación:</label>
+            <select class="form-control" id="txtPresentacion">
+              <option value="">-- Seleccione --</option>
+              <option value="Tabletas">Tabletas</option>
+              <option value="Cápsulas">Cápsulas</option>
+              <option value="Jarabe">Jarabe</option>
+              <option value="Inyectable">Inyectable</option>
+              <option value="Gotas">Gotas</option>
+              <option value="Pomada">Pomada</option>
+              <option value="Supositorio">Supositorio</option>
+              <option value="Aerosol">Aerosol</option>
+              <option value="Otros">Otros</option>
+            </select>
+          </div>
+        </div>
+
+        
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary" id="btnGuardar">Guardar</button>
+          <button type="button" class="btn btn-danger" data-dismiss="modal">Cerrar</button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+</div>
+{% endblock %}
+
+{% block js %}
+<script>
+const CSRFToken = "{{ csrf_token() }}" || null;
+
+// Expresiones regulares para validaciones
+const regexSoloLetras = /^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/;
+const regexDosisValida =/^[a-zA-Z0-9áéíóúÁÉÍÓÚñÑ\s\/\-]+$/; // permite letras, números, espacios, / y -
+
+const regexIndicaciones = /^[a-zA-Z0-9áéíóúÁÉÍÓÚñÑ\s.,;:()\-]+$/;
+
+const initDatatable = () => {
+  $('#tbl').DataTable({
+    language: {
+      url: "{{ url_for('static', filename='vendor/datatables/es-ES.json') }}",
+    },
+    ajax: '/api/v1/medicamentos',
+    columns: [
+      { data: 'nombre_medicamento' },
+      { data: 'dosis' },
+      { data: 'indicaciones' },
+      { data: 'forma_farmaceutica' },
+      {
+        data: function (row) {
+          return `<button type="button" name="btn_editar" class="btn btn-info" 
+                      data-id="${row.id_medicamento}" title="Editar">
+                    <i class="fas fa-edit"></i>
+                  </button>
+                  <button type="button" name="btn_eliminar" class="btn btn-danger" 
+                      data-id="${row.id_medicamento}" title="Eliminar">
+                    <i class="fas fa-trash-alt"></i>
+                  </button>`;
+        }
+      }
+    ]
+  });
+};
+
+const agregar = () => {
+  $('#btnAgregar').on('click', function () {
+    $('#modalTitle').text("Agregar Medicamento");
+    $('#txtId').val("");
+    $('#txtNombre').val("");
+    $('#txtDosis').val("");
+    $('#txtIndicaciones').val("");
+    $('#txtPresentacion').val("");
+    $('#modalFormulario').modal();
+  });
+};
+
+const guardar = () => {
+  $('#btnGuardar').on('click', function () {
+    const id = $('#txtId').val();
+    const nombre = $('#txtNombre').val().trim();
+    const dosis = $('#txtDosis').val().trim();
+    const indicaciones = $('#txtIndicaciones').val().trim();
+    const forma = $('#txtPresentacion').val();
+
+    const datos = {
+      nombre_medicamento: nombre,
+      dosis: dosis,
+      indicaciones: indicaciones,
+      forma_farmaceutica: forma
+    };
+    const tabla = $('#tbl').DataTable();
+
+    // Validaciones
+    if (!nombre) {
+      Swal.fire("Error", "El campo Nombre es obligatorio.", "error");
+      return;
+    }
+    if (!regexSoloLetras.test(nombre)) {
+      Swal.fire("Error", "El nombre solo puede contener letras y espacios.", "error");
+      return;
+    }
+
+    if (!dosis) {
+      Swal.fire("Error", "El campo Dosis es obligatorio.", "error");
+      return;
+    }
+    if (!regexDosisValida.test(dosis)) {
+      Swal.fire("Error", "La dosis solo puede contener letras, números, espacios, / o -.", "error");
+      return;
+    }
+
+    if (!indicaciones) {
+      Swal.fire("Error", "El campo Indicaciones es obligatorio.", "error");
+      return;
+    }
+    if (!regexIndicaciones.test(indicaciones)) {
+      Swal.fire("Error", "Las indicaciones contienen caracteres inválidos.", "error");
+      return;
+    }
+
+    if (!forma) {
+      Swal.fire("Error", "Debe seleccionar una Forma Farmacéutica.", "error");
+      return;
+    }
+
+    const url = id ? `/api/v1/medicamentos/${id}` : '/api/v1/medicamentos';
+    const method = id ? 'PUT' : 'POST';
+
+    fetch(url, {
+      method: method,
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': CSRFToken
+      },
+      body: JSON.stringify(datos)
+    })
+      .then(resp => resp.json())
+      .then(data => {
+        if (data && data.success) {
+          tabla.ajax.reload();
+          $('#modalFormulario').modal("hide");
+          Swal.fire("Éxito", id ? "Medicamento actualizado" : "Medicamento agregado", "success");
+        } else {
+          Swal.fire("Error", data.error || "No se pudo guardar", "error");
+        }
+      })
+      .catch(err => {
+        console.error(err);
+        Swal.fire("Error", "Ocurrió un error al guardar.", "error");
+      });
+  });
+};
+
+const editar = () => {
+  $('#tbl').on('click', 'button[name="btn_editar"]', function () {
+    const id = $(this).data('id');
+    fetch(`/api/v1/medicamentos/${id}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': CSRFToken
+      }
+    })
+      .then(resp => resp.json())
+      .then(data => {
+        if (data.success) {
+          const m = data.data;
+          $('#modalTitle').text("Editar Medicamento");
+          $('#txtId').val(m.id_medicamento);
+          $('#txtNombre').val(m.nombre_medicamento);
+          $('#txtDosis').val(m.dosis);
+          $('#txtIndicaciones').val(m.indicaciones);
+          $('#txtPresentacion').val(m.forma_farmaceutica); 
+          $('#modalFormulario').modal();
+        } else {
+          Swal.fire("Error", data.error, "error");
+        }
+      });
+  });
+};
+
+const eliminar = () => {
+  $('#tbl').on('click', 'button[name="btn_eliminar"]', function () {
+    const id = $(this).data('id');
+    Swal.fire({
+      title: "¿Deseas eliminar este registro?",
+      showCancelButton: true,
+      confirmButtonText: "Sí",
+      cancelButtonText: "No"
+    }).then((result) => {
+      if (result.isConfirmed) {
+        fetch(`/api/v1/medicamentos/${id}`, {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': CSRFToken
+          }
+        })
+          .then(resp => resp.json())
+          .then(data => {
+            if (data && data.success) {
+              $('#tbl').DataTable().ajax.reload();
+              Swal.fire("Eliminado", "El medicamento ha sido eliminado", "success");
+            } else {
+              Swal.fire("Error", data.error, "error");
+            }
+          });
+      }
+    });
+  });
+};
+
+$(function () {
+  initDatatable();
+  agregar();
+  guardar();
+  editar();
+  eliminar();
+});
+
+</script>
+{% endblock %}
