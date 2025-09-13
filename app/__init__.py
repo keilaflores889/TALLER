@@ -56,6 +56,7 @@ from app.rutas.referenciales_consultorio.medicamento.medicamento_routes import m
 from app.rutas.referenciales_consultorio.sintoma.sintoma_routes import sintomod
 from app.rutas.referenciales_consultorio.tipo_analisis.analisis_routes import analisismod
 from app.rutas.referenciales_consultorio.tipo_estudio.estudio_routes import estudiomod
+from app.rutas.referenciales_consultorio.tipo_procedimiento_medico.procedimiento_routes import procedimientomod
 
 # registrar referenciales
 modulo0 = '/referenciales' 
@@ -83,6 +84,7 @@ app.register_blueprint(medicamentomod, url_prefix=f'{modulo0}/medicamento')
 app.register_blueprint(sintomod, url_prefix=f'{modulo0}/sintoma')
 app.register_blueprint(analisismod, url_prefix=f'{modulo0}/analisis')
 app.register_blueprint(estudiomod, url_prefix=f'{modulo0}/estudio')
+app.register_blueprint(procedimientomod, url_prefix=f'{modulo0}/procedimiento')
 
 # registrar agendamientos
 modulo0 = '/agendamientos'
@@ -144,6 +146,7 @@ from app.rutas.referenciales_consultorio.medicamento.medicamento_api import medi
 from app.rutas.referenciales_consultorio.sintoma.sintoma_api import sintomaapi
 from app.rutas.referenciales_consultorio.tipo_analisis.analisis_api import analisisapi
 from app.rutas.referenciales_consultorio.tipo_estudio.estudio_api import estudioapi
+from app.rutas.referenciales_consultorio.tipo_procedimiento_medico.procedimiento_api import procedimientoapi
 
 # APIS v1
 #Ciudad
@@ -233,6 +236,8 @@ app.register_blueprint(sintomaapi, url_prefix=version1)
 version1 = '/api/v1'
 app.register_blueprint(analisisapi, url_prefix=version1)
 
+version1 = '/api/v1'
+app.register_blueprint(procedimientoapi, url_prefix=version1)
 
 
 
