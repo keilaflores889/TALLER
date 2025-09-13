@@ -1,0 +1,225 @@
+{% extends 'base.html' %}
+
+{% block titulo %}
+Estudios
+{% endblock %}
+
+{% block contenido %}
+<div class="container mt-4">
+    <h3>Listar Estudios</h3>
+
+    <!-- tarjeta -->
+    <div class="card">
+      <div class="card-header">
+        <button type="button" class="btn btn-outline-info" id="btnAgregar">Agregar</button>
+      </div>
+      <div class="card-body">
+        <table class="table table-striped" id="tbl">
+          <thead class="table-info">
+            <tr>
+              <th>Estudios</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+    <!-- /tarjeta -->
+
+    <!-- Modal formulario -->
+    <div class="modal" id="modalFormulario">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+
+          <div class="modal-header">
+            <h4 class="modal-title" id="modalTitle"></h4>
+            <button type="button" class="close" data-dismiss="modal">&times;</button>
+          </div>
+
+          <div class="modal-body">
+            <div class="form-group">
+              <input type="hidden" id="txtIdEstudio">
+              <label for="txtDescripcion">Estudio:</label>
+              <textarea type="text" class="form-control" placeholder="Ingrese un tipo de estudio" id="txtDescripcion"></textarea>
+            </div>
+          </div>
+
+          <div class="modal-footer">
+            <button type="button" class="btn btn-primary" id="btnGuardar">Guardar</button>
+            <button type="button" class="btn btn-danger" data-dismiss="modal">Cerrar</button>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+</div>
+{% endblock %}
+
+{% block js %}
+<script>
+  const CSRFToken = "{{ csrf_token() }}" || null;
+
+  // Validación: solo letras, espacios, acentos y opcionalmente "/"
+  function descripcionValida(descripcion) {
+    const regex = /^[A-Za-zÁÉÍÓÚÑáéíóúñ\s/]+$/;
+    return regex.test(descripcion.trim());
+  }
+
+  const initDatatable = () => {
+    $('#tbl').DataTable({
+      language: {
+        url: "{{ url_for('static', filename='vendor/datatables/es-ES.json') }}",
+      },
+      ajax:'/api/v1/estudios',
+      columns: [
+        { data: 'descripcion_estudio' },
+        {
+          data: function(row) {
+            return `<button type="button" name="btn_editar" class="btn btn-info" data-id_estudio="${row.id_tipo_estudio}" title="Editar"><i class="fas fa-edit"></i></button>
+                    <button type="button" name="btn_eliminar" class="btn btn-danger" data-id_estudio="${row.id_tipo_estudio}" title="Eliminar"><i class="fas fa-trash-alt"></i></button>`;
+          }
+        }
+      ],
+      createdRow: function(row, data, dataIndex) {
+        // permite que el texto largo se divida en varias líneas
+        $('td:eq(0)', row).css({
+          "white-space": "normal",
+          "word-wrap": "break-word",
+          "max-width": "250px"
+        });
+      }
+    });
+  }
+
+  const agregar = () => {
+    $('#btnAgregar').on('click', function(){
+      $('#modalTitle').text("Agregar un Estudio");
+      $('#txtIdEstudio').val("");
+      $('#txtDescripcion').val("");
+      $('#modalFormulario').modal();
+    });
+  }
+
+  const guardar = () => {
+  $('#btnGuardar').on('click', function() {
+    const id_estudio = $('#txtIdEstudio').val();
+    const descripcion = $('#txtDescripcion').val().trim();
+    const tabla = $('#tbl').DataTable();
+
+    if (!descripcionValida(descripcion)) {
+      Swal.fire("Error", "La descripción solo puede contener letras, espacios, acentos y '/'.", "error");
+      return;
+    }
+
+    const payload = { descripcion };
+    const url = id_estudio ? `/api/v1/estudios/${id_estudio}` : `/api/v1/estudios`;
+    const method = id_estudio ? 'PUT' : 'POST';
+
+    fetch(url, {
+      method: method,
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': CSRFToken
+      },
+      body: JSON.stringify(payload)
+    })
+      .then(resp => resp.json())
+      .then(data => {
+        if (data && data.success) {
+          tabla.ajax.reload();
+          Swal.fire(
+            "Éxito",
+            id_estudio ? "El estudio fue actualizado correctamente." : "El estudio fue agregado correctamente.",
+            "success"
+          );
+        } else if (data.error && data.error.includes("ya existe")) {
+          // 🚫 Caso de duplicado -> mensaje amigable
+          Swal.fire("Atención", "Este estudio ya está registrado, no es necesario volver a cargarlo.", "warning");
+        } else {
+          Swal.fire("Error", data.error || "No se pudo guardar.", "error");
+        }
+      })
+      .catch(err => {
+        console.error(err);
+        Swal.fire("Error", "Ocurrió un problema al guardar.", "error");
+      });
+
+    $('#txtDescripcion').val("");
+    $('#modalFormulario').modal("hide");
+  });
+};
+
+
+  const editar = () => {
+    $('#tbl').on('click', 'button[name="btn_editar"]', function() {
+      Swal.fire({
+        title: "¿Deseas editar este registro?",
+        showCancelButton: true,
+        confirmButtonText: "Si",
+        cancelButtonText: "No"
+      }).then((result) => {
+        if (result.isConfirmed) {
+          $('#modalTitle').text("Editar un Estudio");
+          const id_estudio = $(this).data('id_estudio');
+          $('#txtIdEstudio').val(id_estudio);
+
+          fetch(`/api/v1/estudios/${id_estudio}`)
+          .then(resp => resp.json())
+          .then(data => {
+            $('#txtDescripcion').val(data.data.descripcion_estudio);
+            $('#modalFormulario').modal();
+          });
+        }
+      });
+    });
+  }
+
+  const eliminar = () => {
+    $('#tbl').on('click', 'button[name="btn_eliminar"]', function() {
+      const id_estudio = $(this).data('id_estudio');
+
+      Swal.fire({
+        title: "¿Deseas eliminar este registro?",
+        showCancelButton: true,
+        confirmButtonText: "Si",
+        cancelButtonText: "No"
+      }).then((result) => {
+        if (result.isConfirmed) {
+          fetch(`/api/v1/estudios/${id_estudio}`, {
+            method: 'DELETE',
+            headers: {
+              'Content-Type': 'application/json',
+              'X-CSRFToken': CSRFToken
+            }
+          })
+          .then(resp => resp.json())
+          .then(data => {
+            if(data && data.success) {
+              const fila = $(this).closest('tr');
+              const tabla = $('#tbl').DataTable();
+              tabla.row(fila).remove().draw();
+              Swal.fire("Eliminado", "", "success");
+            } else {
+              Swal.fire("Error", data.error || "No se pudo eliminar.");
+            }
+          });
+        }
+      });
+    });
+  }
+
+  const addEvents = () => {
+    agregar();
+    guardar();
+    editar();
+    eliminar();
+  }
+
+  $(function() {
+    initDatatable();
+    addEvents();
+  });
+</script>
+{% endblock %}
