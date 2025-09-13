@@ -1,12 +1,12 @@
 {% extends 'base.html' %}
 
 {% block titulo %}
-Estudios
+Procedimientos
 {% endblock %}
 
 {% block contenido %}
 <div class="container mt-4">
-    <h3>Listar Estudios</h3>
+    <h3>Listar Procedimientos</h3>
 
     <!-- tarjeta -->
     <div class="card">
@@ -17,7 +17,7 @@ Estudios
         <table class="table table-striped" id="tbl">
           <thead class="table-info">
             <tr>
-              <th>Estudios</th>
+              <th>Procedimiento</th>
               <th>Acciones</th>
             </tr>
           </thead>
@@ -39,9 +39,9 @@ Estudios
 
           <div class="modal-body">
             <div class="form-group">
-              <input type="hidden" id="txtIdEstudio">
-              <label for="txtDescripcion">Estudio:</label>
-              <textarea type="text" class="form-control" placeholder="Ingrese un tipo de estudio" id="txtDescripcion"></textarea>
+              <input type="hidden" id="txtIdProcedimiento">
+              <label for="txtDescripcion">Procedimiento:</label>
+              <textarea type="text" class="form-control" placeholder="Ingrese un tipo de procedimiento" id="txtDescripcion"></textarea>
             </div>
           </div>
 
@@ -61,9 +61,9 @@ Estudios
 <script>
   const CSRFToken = "{{ csrf_token() }}" || null;
 
-  // Validación: solo letras, espacios, acentos y opcionalmente "/"
+  // Validación: letras, números, espacios, acentos y "/"
   function descripcionValida(descripcion) {
-    const regex = /^[A-Za-zÁÉÍÓÚÑáéíóúñ\s/]+$/;
+    const regex = /^[A-Za-z0-9ÁÉÍÓÚÑáéíóúñ\s/]+$/;
     return regex.test(descripcion.trim());
   }
 
@@ -72,18 +72,17 @@ Estudios
       language: {
         url: "{{ url_for('static', filename='vendor/datatables/es-ES.json') }}",
       },
-      ajax:'/api/v1/estudios',
+      ajax:'/api/v1/procedimientos',
       columns: [
-        { data: 'descripcion_estudio' },
+        { data: 'descripcion_procedimiento' },
         {
           data: function(row) {
-            return `<button type="button" name="btn_editar" class="btn btn-info" data-id_estudio="${row.id_tipo_estudio}" title="Editar"><i class="fas fa-edit"></i></button>
-                    <button type="button" name="btn_eliminar" class="btn btn-danger" data-id_estudio="${row.id_tipo_estudio}" title="Eliminar"><i class="fas fa-trash-alt"></i></button>`;
+            return `<button type="button" name="btn_editar" class="btn btn-info" data-id_procedimiento="${row.id_tipo_procedimiento}" title="Editar"><i class="fas fa-edit"></i></button>
+                    <button type="button" name="btn_eliminar" class="btn btn-danger" data-id_procedimiento="${row.id_tipo_procedimiento}" title="Eliminar"><i class="fas fa-trash-alt"></i></button>`;
           }
         }
       ],
       createdRow: function(row, data, dataIndex) {
-        // permite que el texto largo se divida en varias líneas
         $('td:eq(0)', row).css({
           "white-space": "normal",
           "word-wrap": "break-word",
@@ -95,48 +94,47 @@ Estudios
 
   const agregar = () => {
     $('#btnAgregar').on('click', function(){
-      $('#modalTitle').text("Agregar un Estudio");
-      $('#txtIdEstudio').val("");
+      $('#modalTitle').text("Agregar un Procedimiento");
+      $('#txtIdProcedimiento').val("");
       $('#txtDescripcion').val("");
       $('#modalFormulario').modal();
     });
   }
 
   const guardar = () => {
-  $('#btnGuardar').on('click', function() {
-    const id_estudio = $('#txtIdEstudio').val();
-    const descripcion = $('#txtDescripcion').val().trim();
-    const tabla = $('#tbl').DataTable();
+    $('#btnGuardar').on('click', function() {
+      const id_procedimiento = $('#txtIdProcedimiento').val();
+      const descripcion = $('#txtDescripcion').val().trim();
+      const tabla = $('#tbl').DataTable();
 
-    if (!descripcionValida(descripcion)) {
-      Swal.fire("Error", "La descripción solo puede contener letras, espacios, acentos y '/'.", "error");
-      return;
-    }
+      if (!descripcionValida(descripcion)) {
+        Swal.fire("Error", "La descripción solo puede contener letras, números, espacios, acentos y '/'.", "error");
+        return;
+      }
 
-    const payload = { descripcion };
-    const url = id_estudio ? `/api/v1/estudios/${id_estudio}` : `/api/v1/estudios`;
-    const method = id_estudio ? 'PUT' : 'POST';
+      const payload = { descripcion };
+      const url = id_procedimiento ? `/api/v1/procedimientos/${id_procedimiento}` : `/api/v1/procedimientos`;
+      const method = id_procedimiento ? 'PUT' : 'POST';
 
-    fetch(url, {
-      method: method,
-      headers: {
-        'Content-Type': 'application/json',
-        'X-CSRFToken': CSRFToken
-      },
-      body: JSON.stringify(payload)
-    })
+      fetch(url, {
+        method: method,
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': CSRFToken
+        },
+        body: JSON.stringify(payload)
+      })
       .then(resp => resp.json())
       .then(data => {
         if (data && data.success) {
           tabla.ajax.reload();
           Swal.fire(
             "Éxito",
-            id_estudio ? "El estudio fue actualizado correctamente." : "El estudio fue agregado correctamente.",
+            id_procedimiento ? "El procedimiento fue actualizado correctamente." : "El procedimiento fue agregado correctamente.",
             "success"
           );
         } else if (data.error && data.error.includes("ya existe")) {
-          // 🚫 Caso de duplicado -> mensaje amigable
-          Swal.fire("Atención", "Este estudio ya está registrado, no es necesario volver a cargarlo.", "warning");
+          Swal.fire("Atención", "Este procedimiento ya está registrado, no es necesario volver a cargarlo.", "warning");
         } else {
           Swal.fire("Error", data.error || "No se pudo guardar.", "error");
         }
@@ -146,11 +144,10 @@ Estudios
         Swal.fire("Error", "Ocurrió un problema al guardar.", "error");
       });
 
-    $('#txtDescripcion').val("");
-    $('#modalFormulario').modal("hide");
-  });
-};
-
+      $('#txtDescripcion').val("");
+      $('#modalFormulario').modal("hide");
+    });
+  }
 
   const editar = () => {
     $('#tbl').on('click', 'button[name="btn_editar"]', function() {
@@ -161,14 +158,14 @@ Estudios
         cancelButtonText: "No"
       }).then((result) => {
         if (result.isConfirmed) {
-          $('#modalTitle').text("Editar un Estudio");
-          const id_estudio = $(this).data('id_estudio');
-          $('#txtIdEstudio').val(id_estudio);
+          $('#modalTitle').text("Editar un Procedimiento");
+          const id_procedimiento = $(this).data('id_procedimiento');
+          $('#txtIdProcedimiento').val(id_procedimiento);
 
-          fetch(`/api/v1/estudios/${id_estudio}`)
+          fetch(`/api/v1/procedimientos/${id_procedimiento}`)
           .then(resp => resp.json())
           .then(data => {
-            $('#txtDescripcion').val(data.data.descripcion_estudio);
+            $('#txtDescripcion').val(data.data.descripcion_procedimiento);
             $('#modalFormulario').modal();
           });
         }
@@ -178,7 +175,7 @@ Estudios
 
   const eliminar = () => {
     $('#tbl').on('click', 'button[name="btn_eliminar"]', function() {
-      const id_estudio = $(this).data('id_estudio');
+      const id_procedimiento = $(this).data('id_procedimiento');
 
       Swal.fire({
         title: "¿Deseas eliminar este registro?",
@@ -187,7 +184,7 @@ Estudios
         cancelButtonText: "No"
       }).then((result) => {
         if (result.isConfirmed) {
-          fetch(`/api/v1/estudios/${id_estudio}`, {
+          fetch(`/api/v1/procedimientos/${id_procedimiento}`, {
             method: 'DELETE',
             headers: {
               'Content-Type': 'application/json',
