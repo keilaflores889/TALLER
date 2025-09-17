@@ -1,0 +1,687 @@
+{% extends 'base.html' %}
+
+{% block titulo %}
+Fichas Médicas
+{% endblock %}
+
+{% block contenido %}
+<div class="container mt-4">
+  <h3>Listar Fichas Médicas</h3>
+
+  <div class="card">
+    <div class="card-header">
+      <button type="button" class="btn btn-outline-info" id="btnAgregar">Agregar</button>
+    </div>
+    <div class="card-body">
+      <div style="overflow-x: auto; white-space: nowrap;">
+        <table class="table table-striped" id="tbl">
+          <thead class="table-info">
+            <tr>
+              <th>Paciente</th>
+              <th>Cédula</th>
+              <th>Edad</th>
+              <th>Médico</th>
+              <th>Fecha de registro</th>
+              <th>Alergias</th>
+              <th>Enfermedades</th>
+              <th>Diagnóstico</th>
+              <th>Sintomas</th>
+              <th>Tratamiento</th>
+              <th>Cirugias realizadas</th>
+              <th>Receta Medica</th>
+              <th>Medicamento en consumo</th>
+              <th>Motivo de consulta</th>
+              <th>Observación</th>
+              <th>Estado</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Formulario Ficha -->
+  <!-- Modal Formulario Ficha -->
+<div class="modal fade" id="modalFormulario" tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-xl modal-dialog-scrollable" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title" id="modalTitle">Nueva Ficha Médica</h4>
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+      </div>
+
+      <div class="modal-body">
+        <input type="hidden" id="txtIdFicha">
+
+        <div class="row">
+          <!-- Paciente -->
+<div class="col-md-6">
+  <div class="form-group">
+    <input type="hidden" id="id_paciente">
+    <label>Paciente: <span style="color:red">*</span></label>
+    <input type="text" id="txtPaciente" class="form-control" placeholder="Click para seleccionar Paciente" readonly required>
+    <div class="text-danger small" id="error_txtPaciente" style="display:none;">Campo obligatorio</div>
+  </div>
+</div>
+
+<!-- Cédula -->
+<div class="col-md-6">
+  <div class="form-group">
+    <label>Cédula: <span style="color:red">*</span></label>
+    <input type="text" id="cedula" class="form-control" placeholder="Cédula del paciente" required>
+    <div class="text-danger small" id="error_cedula" style="display:none;">Campo obligatorio</div>
+  </div>
+</div>
+
+<!-- Edad -->
+<div class="col-md-6">
+  <div class="form-group">
+    <label>Edad: <span style="color:red">*</span></label>
+    <input type="text" id="edad" class="form-control" readonly required>
+    <div class="text-danger small" id="error_edad" style="display:none;">Campo obligatorio</div>
+  </div>
+</div>
+
+<!-- Médico -->
+<div class="col-md-6">
+  <div class="form-group">
+    <input type="hidden" id="id_medico">
+    <label>Médico: <span style="color:red">*</span></label>
+    <input type="text" id="txtMedico" class="form-control" placeholder="Click para seleccionar Médico" readonly required>
+    <div class="text-danger small" id="error_txtMedico" style="display:none;">Campo obligatorio</div>
+  </div>
+</div>
+
+<!-- Fecha de Registro -->
+<div class="col-md-6">
+  <div class="form-group">
+    <label>Fecha de Registro: <span style="color:red">*</span></label>
+    <input type="date" id="fecha_registro" class="form-control" required>
+    <div class="text-danger small" id="error_fecha_registro" style="display:none;">Campo obligatorio</div>
+  </div>
+</div>
+
+          <!-- Alergias -->
+          <div class="col-md-6">
+            <div class="form-group">
+              <label>Alergias:</label>
+              <input type="text" id="alergias" class="form-control" placeholder="Alergias del paciente">
+            </div>
+          </div>
+
+          <!-- Enfermedades -->
+          <div class="col-md-6">
+            <div class="form-group">
+              <label>Enfermedades:</label>
+              <input type="text" id="enfermedades" class="form-control" placeholder="Enfermedades del paciente">
+            </div>
+          </div>
+
+          <!-- Diagnósticos -->
+          <div class="col-md-12">
+            <div class="form-group">
+              <label>Diagnósticos:</label>
+              <textarea id="diagnosticos" class="form-control" rows="2"></textarea>
+            </div>
+          </div>
+
+          <!-- Síntomas -->
+          <div class="col-md-12">
+            <div class="form-group">
+              <label>Síntomas:</label>
+              <textarea id="sintomas" class="form-control" rows="2"></textarea>
+            </div>
+          </div>
+
+          <!-- Tratamientos -->
+          <div class="col-md-12">
+            <div class="form-group">
+              <label>Tratamientos:</label>
+              <textarea id="tratamientos" class="form-control" rows="2"></textarea>
+            </div>
+          </div>
+
+          <!-- Cirugías realizadas -->
+          <div class="col-md-6">
+            <div class="form-group">
+              <label>Cirugías realizadas:</label>
+              <input type="text" id="cirugias_realizadas" class="form-control" placeholder="Ej: Apendicectomía">
+            </div>
+          </div>
+
+          <!-- Recetas médicas -->
+          <div class="col-md-6">
+            <div class="form-group">
+              <label>Recetas médicas:</label>
+              <input type="text" id="recetas_medicas" class="form-control" placeholder="Breve resumen de receta">
+            </div>
+          </div>
+
+          <!-- Medicamentos en consumo -->
+          <div class="col-md-12">
+            <div class="form-group">
+              <label>Medicamentos en consumo:</label>
+              <input type="text" id="medicamentos_en_consumo" class="form-control" placeholder="Click o dejar vacio en caso de que no consuma medicamentos"readonly>
+                <div id="medicamentos_lista"></div>
+            </div>
+          </div>
+
+          <!-- Motivos de consulta -->
+          <div class="col-md-12">
+            <div class="form-group">
+              <label>Motivo de consulta:</label>
+              <textarea id="motivos_consultas" class="form-control" rows="2"></textarea>
+            </div>
+          </div>
+
+          <!-- Observaciones -->
+          <div class="col-md-12">
+            <div class="form-group">
+              <label>Observaciones:</label>
+              <textarea id="observaciones" class="form-control" rows="2"></textarea>
+            </div>
+          </div>
+
+          <!-- Estado -->
+          <div class="col-md-6">
+            <div class="form-group">
+              <label>Estado:</label>
+              <select id="estado" class="form-control">
+                <option value="En seguimiento">En seguimiento</option>
+                <option value="Tratado">Tratado</option>
+                <option value="En tratamiento">En tratamiento</option>
+              </select>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" id="btnGuardar">Guardar</button>
+        <button type="button" class="btn btn-danger" data-dismiss="modal">Cerrar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+  <!-- Modales de selección (Paciente, Médico, Medicamento) -->
+ <div class="modal fade" id="modalBuscarPaciente" tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title" id="modalPacienteTitle">Seleccionar Paciente</h4>
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="table-responsive">
+          <table class="table table-striped table-bordered w-100" id="tblPaciente">
+            <thead>
+              <tr>
+                <th>Nombre</th>
+                <th>Apellido</th>
+                <th>Cedula</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+ </div>
+</div>
+
+
+  <div class="modal fade" id="modalBuscarMedico" tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title" id="modalMedicoTitle">Seleccionar Medico</h4>
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="table-responsive">
+          <table class="table table-striped table-bordered w-100" id="tblMedico">
+            <thead>
+              <tr>
+                <th>Nombre</th>
+                <th>Apellido</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+  <div class="modal fade" id="modalBuscarMedicamento" tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title" id="modalMedicamentoTitle">Seleccionar Medicamento</h4>
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="table-responsive">
+          <table class="table table-striped table-bordered w-100" id="tblMedicamento">
+            <thead>
+              <tr>
+                <th>Nombre</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+</div>
+
+<!-- Librerías -->
+<link rel="stylesheet" href="https://cdn.datatables.net/1.10.21/css/dataTables.bootstrap4.min.css">
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+
+{% endblock %}
+
+
+{% block js %}
+<script>
+const CSRFToken = "{{ csrf_token() }}" || null;
+
+
+// --- fecha registro ---
+function formatDateForInput(fecha) {
+  if (!fecha) return '';
+  const d = new Date(fecha);
+  if (isNaN(d)) return '';
+  const day = String(d.getUTCDate()).padStart(2, '0');
+  const month = String(d.getUTCMonth() + 1).padStart(2, '0');
+  const year = d.getUTCFullYear();
+  return `${year}-${month}-${day}`;
+}
+// --- fecha nacimiento ---
+const fecha_nac = $(this).data('fecha_nacimiento');
+let edad = null;
+if(fecha_nac){
+    const f = new Date(fecha_nac);
+    const today = new Date();
+    edad = today.getFullYear() - f.getFullYear();
+    const m = today.getMonth() - f.getMonth();
+    if(m < 0 || (m === 0 && today.getDate() < f.getDate())) edad--;
+}
+$('#edad').val(edad);
+
+// --- Tabla principal Fichas Médicas ---
+const initDatatable = () => {
+  if ($.fn.DataTable.isDataTable('#tbl')) {
+    $('#tbl').DataTable().destroy();
+  }
+
+  $('#tbl').DataTable({
+    language: { url: "{{ url_for('static', filename='vendor/datatables/es-ES.json') }}" },
+    ajax: { url: '/api/v1/fichas', dataSrc: 'data' },
+    columns: [
+      { data: row => `${row.paciente_nombre} ${row.paciente_apellido}` },
+      { data: 'cedula' },
+     { data: 'edad' },
+      { data: row => `${row.medico_nombre} ${row.medico_apellido}` },
+      { data: 'fecha_registro', render: function(data) {
+  if (!data) return '';
+  const d = new Date(data);
+  if (isNaN(d)) return '';
+  const day = String(d.getUTCDate()).padStart(2, '0');
+  const month = String(d.getUTCMonth() + 1).padStart(2, '0');
+  const year = d.getUTCFullYear();
+  return `${day}/${month}/${year}`;
+}
+},
+      { data: 'alergias' },
+      { data: 'enfermedades' },
+      { data: 'diagnosticos' },
+      { data: 'sintomas' },
+      { data: 'tratamientos' },
+      { data: 'cirugias_realizadas' },
+      { data: 'recetas_medicas' },
+      { data: row => (row.medicamentos && row.medicamentos.length > 0) 
+                      ? row.medicamentos.map(m => m.nombre_medicamento).join(', ') 
+                      : 'Ninguno' },
+      { data: 'motivos_consultas' },
+      { data: 'observaciones' },
+      { data: 'estado', render: d => {
+          let color='#155724', bg='#d4edda';
+          if(d==='Tratado'){ color='#721c24'; bg='#f8d7da'; }
+          if(d==='En tratamiento'){ color='#856404'; bg='#fff3cd'; }
+          return `<span style="color:${color}; background-color:${bg}; padding:2px 6px; border-radius:4px;">${d}</span>`;
+        }
+      },
+      { data: row => `
+        <button class="btn btn-info btn-sm" name="btn_editar" data-id_ficha="${row.id_ficha_medica}"><i class="fas fa-edit"></i></button>
+        <button class="btn btn-danger btn-sm" name="btn_eliminar" data-id_ficha="${row.id_ficha_medica}"><i class="fas fa-trash-alt"></i></button>
+         <button class="btn btn-secondary btn-sm" name="btn_pdf" data-id_ficha="${row.id_ficha_medica}">
+    <i class="fas fa-print"></i>
+  </button>
+` }
+    ]
+  });
+};
+
+// --- Descargar PDF ---
+$('#tbl').on('click','button[name="btn_pdf"]', function(){
+  const idFicha = $(this).data('id_ficha');
+  window.open(`/api/v1/fichas/${idFicha}/pdf`, '_blank');
+});
+// --- Modal Paciente ---
+const initDatatablePaciente = () => {
+  $('#tblPaciente').DataTable({
+    language: { url: "{{ url_for('static', filename='vendor/datatables/es-ES.json') }}" },
+    ajax: { url:'/api/v1/paciente', dataSrc: 'data' },
+    columns: [
+      { data: 'nombre' },
+      { data: 'apellido' },
+      { data: 'cedula_entidad' },
+      { data: null, render: row => `
+        <button type="button" name="btn_seleccionar_Paciente" class="btn btn-primary" 
+          data-id="${row.id_paciente}" 
+          data-nombre="${row.nombre}" 
+          data-apellido="${row.apellido}" 
+          data-cedula="${row.cedula_entidad}"
+          data-fecha_nacimiento="${row.fecha_nacimiento}">
+          Seleccionar
+        </button>` }
+    ]
+  });
+
+  $('#tblPaciente').on('click', 'button[name="btn_seleccionar_Paciente"]', function () {
+    const id = $(this).data('id');
+    const nombre = $(this).data('nombre');
+    const apellido = $(this).data('apellido');
+    const cedula = $(this).data('cedula');
+    const fecha_nac = $(this).data('fecha_nacimiento');
+
+    
+
+    // Calcular edad automáticamente
+    let edad = null;
+    if(fecha_nac){
+      const f = new Date(fecha_nac);
+      const today = new Date();
+      edad = today.getFullYear() - f.getFullYear();
+      const m = today.getMonth() - f.getMonth();
+      if(m < 0 || (m === 0 && today.getDate() < f.getDate())) edad--;
+    }
+
+    // Setear valores en el formulario
+    $('#txtPaciente').val(`${nombre} ${apellido}`);
+    $('#id_paciente').val(id);
+    $('#cedula').val(cedula);
+    $('#edad').val(edad);  // <--- Aquí se pone la edad calculada
+    $('#modalBuscarPaciente').modal('hide');
+  });
+};
+
+// --- Modal Médico ---
+const initDatatableMedico = () => {
+  $('#tblMedico').DataTable({
+    language: { url: "{{ url_for('static', filename='vendor/datatables/es-ES.json') }}" },
+    ajax:'/api/v1/medico',
+    columns:[
+      { data:'nombre' },
+      { data:'apellido' },
+      { data:null, render: row => `
+        <button class="btn btn-primary btn-sm" name="btn_seleccionar_Medico"
+          data-id="${row.id_medico}"
+          data-nombre="${row.nombre}"
+          data-apellido="${row.apellido}">
+          Seleccionar
+        </button>` }
+    ]
+  });
+
+  $('#tblMedico').on('click','button[name="btn_seleccionar_Medico"]', function(){
+    $('#id_medico').val($(this).data('id'));
+    $('#txtMedico').val(`${$(this).data('nombre')} ${$(this).data('apellido')}`);
+    $('#modalBuscarMedico').modal('hide');
+  });
+};
+
+// --- Modal Medicamento ---
+let medicamentosSeleccionados = []; // [{id, nombre}, ...]
+
+const initDatatableMedicamento = () => {
+  $('#tblMedicamento').DataTable({
+    language: { url: "{{ url_for('static', filename='vendor/datatables/es-ES.json') }}" },
+    ajax:'/api/v1/medicamentos',
+    columns:[
+      { data:'nombre_medicamento' },
+      { data:null, render: row => `
+        <button class="btn btn-primary btn-sm" 
+          name="btn_seleccionar_medicamento" 
+          data-id="${row.id_medicamento}" 
+          data-nombre="${row.nombre_medicamento}">
+          Seleccionar
+        </button>` }
+    ]
+  });
+
+  $('#tblMedicamento').on('click','button[name="btn_seleccionar_medicamento"]', function(){
+    const id = $(this).data('id');
+    const nombre = $(this).data('nombre');
+
+    if(!medicamentosSeleccionados.some(m => m.id === id)){
+      medicamentosSeleccionados.push({id, nombre});
+      renderMedicamentos();
+    }
+    $('#modalBuscarMedicamento').modal('hide');
+  });
+};
+
+function renderMedicamentos(){
+  $('#medicamentos_lista').empty();
+  medicamentosSeleccionados.forEach(m => {
+    $('#medicamentos_lista').append(`
+      <span class="badge badge-primary mr-1">
+        ${m.nombre}
+        <i class="fas fa-times remove-medicamento" style="cursor:pointer;" data-id="${m.id}"></i>
+      </span>
+    `);
+  });
+  $('#medicamentos_en_consumo').val(medicamentosSeleccionados.map(m=>m.nombre).join(', '));
+}
+
+$(document).on('click', '.remove-medicamento', function(){
+  const id = $(this).data('id');
+  medicamentosSeleccionados = medicamentosSeleccionados.filter(m => m.id !== id);
+  renderMedicamentos();
+});
+
+// --- Abrir modales ---
+$('#txtPaciente').click(()=>$('#modalBuscarPaciente').modal('show'));
+$('#txtMedico').click(()=>$('#modalBuscarMedico').modal('show'));
+$('#medicamentos_en_consumo').click(()=>$('#modalBuscarMedicamento').modal('show'));
+
+// --- Agregar ficha ---
+$('#btnAgregar').click(()=>{
+  $('#modalTitle').text("Agregar Ficha Médica");
+  $('#txtIdFicha,#txtPaciente,#cedula,#txtMedico,#fecha_registro,#alergias,#enfermedades,#diagnosticos,#sintomas,#tratamientos,#cirugias_realizadas,#recetas_medicas,#medicamentos_en_consumo,#motivos_consultas,#observaciones').val('');
+  $('#id_paciente,#id_medico').val('');
+  $('#estado').val('En seguimiento');
+  medicamentosSeleccionados = [];
+  renderMedicamentos();
+  $('#modalFormulario').modal('show');
+});
+
+// --- Guardar ficha ---
+$('#btnGuardar').on('click', () => {
+$('#modalTitle').text("Agregar Ficha Médica");
+
+// --- Validación de campos obligatorios ---
+let camposValidos = true;
+
+// lista de campos obligatorios
+const obligatorios = [
+  {id:'txtPaciente', errorId:'error_txtPaciente'},
+  {id:'cedula', errorId:'error_cedula'},
+  {id:'edad', errorId:'error_edad'},
+  {id:'txtMedico', errorId:'error_txtMedico'},
+  {id:'fecha_registro', errorId:'error_fecha_registro'}
+];
+
+// recorrer cada campo
+obligatorios.forEach(c => {
+  const val = $(`#${c.id}`).val();
+  if(!val){
+    $(`#${c.errorId}`).show();
+    camposValidos = false;
+  } else {
+    $(`#${c.errorId}`).hide();
+  }
+});
+
+if(!camposValidos){
+  return; // no enviar si hay campos obligatorios vacíos
+}
+
+
+
+  // calcular edad en base a fecha de nacimiento
+  const fecha_nac = $('#txtPaciente').data('fecha_nacimiento'); // necesitamos que al seleccionar paciente guardes fecha_nac
+  let edad = null;
+  if(fecha_nac){
+      const f = new Date(fecha_nac);
+      const today = new Date();
+      edad = today.getFullYear() - f.getFullYear();
+      const m = today.getMonth() - f.getMonth();
+      if(m < 0 || (m === 0 && today.getDate() < f.getDate())) edad--;
+  }
+
+  const idFicha = $('#txtIdFicha').val();
+  const payload = {
+    id_paciente: $('#id_paciente').val(),
+    cedula: $('#cedula').val(),
+    edad: $('#edad').val(),
+    id_medico: $('#id_medico').val(),
+    fecha_registro: $('#fecha_registro').val(),
+    alergias: $('#alergias').val(),
+    enfermedades: $('#enfermedades').val(),
+    diagnosticos: $('#diagnosticos').val(),
+    sintomas: $('#sintomas').val(),
+    tratamientos: $('#tratamientos').val(),
+    cirugias_realizadas: $('#cirugias_realizadas').val(),
+    recetas_medicas: $('#recetas_medicas').val(),
+    motivos_consultas: $('#motivos_consultas').val(),
+    observaciones: $('#observaciones').val(),
+    estado: $('#estado').val(),
+    medicamentos: medicamentosSeleccionados.length ? 
+               medicamentosSeleccionados.map(m => ({id: m.id, nombre: m.nombre})) : []
+
+  };
+  const tabla = $('#tbl').DataTable();
+  const url = idFicha ? `/api/v1/fichas/${idFicha}` : '/api/v1/fichas';
+  const method = idFicha ? 'PUT' : 'POST';
+
+  fetch(url,{
+    method,
+    headers:{'Content-Type':'application/json','X-CSRFToken':CSRFToken},
+    body: JSON.stringify(payload)
+  })
+  .then(r=>r.json())
+  .then(d=>{
+    if(d.success){
+      tabla.ajax.reload();
+      Swal.fire(idFicha?"Actualizado":"Registrado","Ficha guardada correctamente.","success");
+    } else Swal.fire("Error", d.error,"error");
+  }).catch(()=>Swal.fire("Error","Ocurrió un error al guardar la ficha médica.","error"));
+
+  $('#modalFormulario').modal('hide');
+});
+
+// --- Editar ficha ---
+$(document).on('click','button[name="btn_editar"]', function(){
+  const idFicha = $(this).data('id_ficha');
+  fetch(`/api/v1/fichas/${idFicha}`)
+    .then(r=>r.json())
+    .then(d=>{
+      const f = d.data;
+      $('#txtIdFicha').val(f.id_ficha_medica);
+      $('#id_paciente').val(f.id_paciente);
+      $('#txtPaciente').val(`${f.paciente_nombre} ${f.paciente_apellido}`);
+      $('#edad').val(f.edad); 
+      $('#cedula').val(f.cedula);
+      $('#id_medico').val(f.id_medico);
+      $('#txtMedico').val(`${f.medico_nombre} ${f.medico_apellido}`);
+      $('#fecha_registro').val(formatDateForInput(f.fecha_registro));
+
+
+
+
+
+      if(f.medicamentos && Array.isArray(f.medicamentos)){
+        medicamentosSeleccionados = f.medicamentos.map(m=>({id:m.id_medicamento, nombre:m.nombre_medicamento}));
+      } else {
+        medicamentosSeleccionados = [];
+      }
+      renderMedicamentos();
+
+      $('#alergias').val(f.alergias);
+      $('#enfermedades').val(f.enfermedades);
+      $('#diagnosticos').val(f.diagnosticos);
+      $('#sintomas').val(f.sintomas);
+      $('#tratamientos').val(f.tratamientos);
+      $('#cirugias_realizadas').val(f.cirugias_realizadas);
+      $('#recetas_medicas').val(f.recetas_medicas);
+      $('#motivos_consultas').val(f.motivos_consultas);
+      $('#observaciones').val(f.observaciones);
+      $('#estado').val(f.estado);
+      $('#modalFormulario').modal('show');
+    });
+});
+
+// --- Eliminar ficha ---
+$(document).on('click','button[name="btn_eliminar"]', function(){
+  const idFicha = $(this).data('id_ficha');
+  const fila = $(this).closest('tr');
+  Swal.fire({title:"¿Deseas eliminar este registro?", showCancelButton:true, confirmButtonText:"Si", cancelButtonText:"No"})
+  .then(r=>{
+    if(r.isConfirmed){
+      fetch(`/api/v1/fichas/${idFicha}`, { method:'DELETE', headers:{'Content-Type':'application/json','X-CSRFToken':CSRFToken} })
+        .then(r=>r.json())
+        .then(d=>{
+          if(d.success){
+            $('#tbl').DataTable().row(fila).remove().draw();
+            Swal.fire("Eliminado","","success");
+          } else Swal.fire("Error", d.error,"error");
+        });
+    }
+  });
+});
+
+
+// --- Inicialización ---
+$(function(){
+  
+  initDatatable();
+  initDatatablePaciente();
+  initDatatableMedico();
+  initDatatableMedicamento();
+});
+</script>
+{% endblock %}
+
+
+
+
