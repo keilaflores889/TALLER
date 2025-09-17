@@ -144,25 +144,20 @@ Usuarios
         });
       } else {
         // insert
-        fetch(`/api/v1/usuarios`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-            , 'X-CSRFToken': CSRFToken
-          }, body: JSON.stringify({ nickname, clave, estado })
-        })
-        .then(resp => resp.json())
-        .then(data => {
-          if(data && !data.error && data.success) {
-            tabla.ajax.reload();
-            Swal.fire("Guardado", "El usuario ha sido agregado correctamente.", "success");
-          } else {
-            Swal.fire(data.error);
-          }
-        }).catch(err => {
-          console.error(err);
-          Swal.fire("Error", "Ocurrió un error al guardar el usuario.", "error");
-        });
+        fetch('/api/v1/login', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ nickname: 'KEILA', clave: '12345' })
+})
+.then(resp => resp.json())
+.then(data => {
+    if(data.success) {
+        console.log('Login exitoso:', data.data);
+        // Guardar info en sesión o localStorage si querés
+    } else {
+        console.warn('Error login:', data.error);
+    }
+});
       }
       $('#txtNickname').val("");
       $('#txtClave').val("");

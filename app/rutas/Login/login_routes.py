@@ -27,9 +27,9 @@ def login():
                 # session['grupo'] = usuario_encontrado['grupo']
                 return redirect(url_for('login.vista'))
             else:
-                flash('Contraseña incorrecta.', 'warning')
+                flash('Contraseña incorrecta.')
         else:
-            flash('Error de login, no existe este usuario.', 'warning')
+            flash('no existe este usuario.',)
         return redirect(url_for('login.login'))  
     elif request.method == 'GET':
         return render_template('login.html')
