@@ -49,7 +49,7 @@ from app.rutas.Agendamiento.regispaciente.registrop_routes import registropmod
 from app.rutas.Agendamiento.medico.medico_routes import medicomod
 from app.rutas.Agendamiento.personal.personal_routes import personalmod
 from app.rutas.Agendamiento.avisosRecordatorios.AvisosRecordatorios_routes import avisomod
-
+from app.rutas.Agendamiento.ficha_medica.ficha_medica_routes import fichamod
 
 #referenciales de consultorio
 from app.rutas.referenciales_consultorio.medicamento.medicamento_routes import medicamentomod
@@ -57,6 +57,7 @@ from app.rutas.referenciales_consultorio.sintoma.sintoma_routes import sintomod
 from app.rutas.referenciales_consultorio.tipo_analisis.analisis_routes import analisismod
 from app.rutas.referenciales_consultorio.tipo_estudio.estudio_routes import estudiomod
 from app.rutas.referenciales_consultorio.tipo_procedimiento_medico.procedimiento_routes import procedimientomod
+from app.rutas.referenciales_consultorio.tipo_diagnostico.tipo_diagnostico_routes import diagnosticomod
 
 # registrar referenciales
 modulo0 = '/referenciales' 
@@ -85,6 +86,7 @@ app.register_blueprint(sintomod, url_prefix=f'{modulo0}/sintoma')
 app.register_blueprint(analisismod, url_prefix=f'{modulo0}/analisis')
 app.register_blueprint(estudiomod, url_prefix=f'{modulo0}/estudio')
 app.register_blueprint(procedimientomod, url_prefix=f'{modulo0}/procedimiento')
+app.register_blueprint(diagnosticomod, url_prefix=f'{modulo0}/diagnostico')
 
 # registrar agendamientos
 modulo0 = '/agendamientos'
@@ -95,6 +97,8 @@ app.register_blueprint(medicomod, url_prefix=f'{modulo0}/medico')
 app.register_blueprint(personalmod, url_prefix=f'{modulo0}/personal')
 
 app.register_blueprint(avisomod, url_prefix=f'{modulo0}/avisos')
+app.register_blueprint(fichamod, url_prefix=f'{modulo0}/ficha')
+
 
 from app.rutas.referenciales.disponibilidad_horaria.disponibilidad_api import disponibilidadapi
 #ciudad
@@ -139,7 +143,7 @@ from app.rutas.Agendamiento.medico.medico_api import medicoapi
 from app.rutas.Agendamiento.personal.personal_api import personalapi
 
 from app.rutas.Agendamiento.avisosRecordatorios.AvisosRecordatorio_api import avisoapi
-
+from app.rutas.Agendamiento.ficha_medica.ficha_medica_api import fichaapi
 
 #consultorio
 from app.rutas.referenciales_consultorio.medicamento.medicamento_api import medicamentoapi
@@ -147,6 +151,7 @@ from app.rutas.referenciales_consultorio.sintoma.sintoma_api import sintomaapi
 from app.rutas.referenciales_consultorio.tipo_analisis.analisis_api import analisisapi
 from app.rutas.referenciales_consultorio.tipo_estudio.estudio_api import estudioapi
 from app.rutas.referenciales_consultorio.tipo_procedimiento_medico.procedimiento_api import procedimientoapi
+from app.rutas.referenciales_consultorio.tipo_diagnostico.tipo_diagnostico_api import diagnosticoapi
 
 # APIS v1
 #Ciudad
@@ -224,6 +229,8 @@ app.register_blueprint(medicoapi, url_prefix=version1)
 
 app.register_blueprint(avisoapi, url_prefix=version1)
 
+app.register_blueprint(fichaapi, url_prefix=version1)
+
 app.register_blueprint(estudioapi, url_prefix=version1)
 
 #referenciales consultorio
@@ -239,7 +246,8 @@ app.register_blueprint(analisisapi, url_prefix=version1)
 version1 = '/api/v1'
 app.register_blueprint(procedimientoapi, url_prefix=version1)
 
-
+version1 = '/api/v1'
+app.register_blueprint(diagnosticoapi, url_prefix=version1)
 
 @app.route('/login')
 def login():

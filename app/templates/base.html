@@ -78,6 +78,7 @@
             <a class="collapse-item" href="{{ url_for('medico.medicoIndex') }}">Registrar Médico</a>
             <a class="collapse-item" href="{{ url_for('registcita.registrarcIndex') }}">Registrar Citas</a>
             <a class="collapse-item" href="{{ url_for('avisosRecordatorios.AvisosRecordatoriosIndex') }}">Registrar Avisos</a>
+            <a class="collapse-item" href="{{ url_for('ficha.fichaIndex') }}">Ficha Médica</a>
         </div>
     </div>
 </li>
@@ -112,6 +113,7 @@
     </a>
     <div id="collapseRefConsultorio" class="collapse" aria-labelledby="headingRefConsultorio" data-parent="#accordionSidebar">
         <div class="bg-white py-2 collapse-inner rounded">
+            <a class="collapse-item" href="{{ url_for('diagnostico.diagnosticoIndex') }}">Tipo diagnostico</a>
             <a class="collapse-item" href="{{ url_for('medicamento.medicamentoIndex') }}">Medicamentos</a>
             <a class="collapse-item" href="{{ url_for('sintoma.sintomaIndex') }}">Sintomas</a>
             <a class="collapse-item" href="{{ url_for('analisis.analisisIndex') }}">Tipo de analisis</a>
