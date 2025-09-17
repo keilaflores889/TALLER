@@ -1,129 +1,112 @@
-# Data access object - DAO
 from flask import current_app as app
 from app.conexion.Conexion import Conexion
+from werkzeug.security import generate_password_hash, check_password_hash
 
 class UsuarioDao:
 
+    # Listar todos los usuarios (sin mostrar la clave)
     def getUsuarios(self):
-        usuariosSQL = """
-        SELECT id_usuario, nickname, clave, estado
-        FROM usuarios
-        """
+        sql = "SELECT id_usuario, nickname, estado FROM usuarios"
         conexion = Conexion()
         con = conexion.getConexion()
         cur = con.cursor()
         try:
-            cur.execute(usuariosSQL)
-            usuarios = cur.fetchall()  # Trae datos de la BD
-
-            # Transformar los datos en una lista de diccionarios
-            return [{'id_usuario': usuario[0], 'nickname': usuario[1], 'clave': usuario[2], 'estado': usuario[3]} for usuario in usuarios]
-
+            cur.execute(sql)
+            usuarios = cur.fetchall()
+            return [{'id_usuario': u[0], 'nickname': u[1], 'estado': u[2]} for u in usuarios]
         except Exception as e:
-            app.logger.error(f"Error al obtener todos los usuarios: {str(e)}")
+            app.logger.error(f"Error al obtener usuarios: {str(e)}")
             return []
-
         finally:
             cur.close()
             con.close()
 
+    # Obtener usuario por ID (sin mostrar la clave)
     def getUsuarioById(self, id_usuario):
-        usuarioSQL = """
-        SELECT id_usuario, nickname, clave, estado
-        FROM usuarios WHERE id_usuario=%s
-        """
+        sql = "SELECT id_usuario, nickname, estado FROM usuarios WHERE id_usuario=%s"
         conexion = Conexion()
         con = conexion.getConexion()
         cur = con.cursor()
         try:
-            cur.execute(usuarioSQL, (id_usuario,))
-            usuarioEncontrado = cur.fetchone()  # Obtener una sola fila
-            if usuarioEncontrado:
-                return {
-                    "id_usuario": usuarioEncontrado[0],
-                    "nickname": usuarioEncontrado[1],
-                    "clave": usuarioEncontrado[2],
-                    "estado": usuarioEncontrado[3]
-                }  # Retornar los datos del usuario
-            else:
-                return None  # Retornar None si no se encuentra el usuario
-        except Exception as e:
-            app.logger.error(f"Error al obtener usuario: {str(e)}")
+            cur.execute(sql, (id_usuario,))
+            u = cur.fetchone()
+            if u:
+                return {'id_usuario': u[0], 'nickname': u[1], 'estado': u[2]}
             return None
-
         finally:
             cur.close()
             con.close()
 
+    # Guardar usuario (hash automático)
     def guardarUsuario(self, nickname, clave, estado):
-        insertUsuarioSQL = """
-        INSERT INTO usuarios(nickname, clave, estado) 
-        VALUES(%s, %s, %s) RETURNING id_usuario
-        """
+        sql = "INSERT INTO usuarios(nickname, clave, estado) VALUES (%s, %s, %s) RETURNING id_usuario"
         conexion = Conexion()
         con = conexion.getConexion()
         cur = con.cursor()
-
         try:
-            cur.execute(insertUsuarioSQL, (nickname, clave, estado))
+            hashed = generate_password_hash(clave)
+            cur.execute(sql, (nickname, hashed, estado))
             usuario_id = cur.fetchone()[0]
-            con.commit()  # Confirmar la inserción
+            con.commit()
             return usuario_id
-
         except Exception as e:
-            app.logger.error(f"Error al insertar usuario: {str(e)}")
-            con.rollback()  # Retroceder si hubo error
+            app.logger.error(f"Error al guardar usuario: {str(e)}")
+            con.rollback()
             return False
-
         finally:
             cur.close()
             con.close()
 
+    # Actualizar usuario (hash automático si se cambia la clave)
     def updateUsuario(self, id_usuario, nickname, clave, estado):
-        updateUsuarioSQL = """
-        UPDATE usuarios
-        SET nickname=%s, clave=%s, estado=%s
-        WHERE id_usuario=%s
-        """
+        sql = "UPDATE usuarios SET nickname=%s, clave=%s, estado=%s WHERE id_usuario=%s"
         conexion = Conexion()
         con = conexion.getConexion()
         cur = con.cursor()
-
         try:
-            cur.execute(updateUsuarioSQL, (nickname, clave, estado, id_usuario))
-            filas_afectadas = cur.rowcount  # Número de filas afectadas
+            hashed = generate_password_hash(clave)
+            cur.execute(sql, (nickname, hashed, estado, id_usuario))
+            filas_afectadas = cur.rowcount
             con.commit()
-            return filas_afectadas > 0  # Retornar True si se actualizó al menos una fila
-
+            return filas_afectadas > 0
         except Exception as e:
             app.logger.error(f"Error al actualizar usuario: {str(e)}")
             con.rollback()
             return False
-
         finally:
             cur.close()
             con.close()
 
+    # Eliminar usuario
     def deleteUsuario(self, id_usuario):
-        deleteUsuarioSQL = """
-        DELETE FROM usuarios
-        WHERE id_usuario=%s
-        """
+        sql = "DELETE FROM usuarios WHERE id_usuario=%s"
         conexion = Conexion()
         con = conexion.getConexion()
         cur = con.cursor()
-
         try:
-            cur.execute(deleteUsuarioSQL, (id_usuario,))
-            rows_affected = cur.rowcount
+            cur.execute(sql, (id_usuario,))
+            filas = cur.rowcount
             con.commit()
-            return rows_affected > 0  # Retornar True si se eliminó al menos una fila
+            return filas > 0
+        finally:
+            cur.close()
+            con.close()
 
-        except Exception as e:
-            app.logger.error(f"Error al eliminar usuario: {str(e)}")
-            con.rollback()
+    # Verificar login
+    def verificarLogin(self, nickname, clave_ingresada):
+        sql = "SELECT id_usuario, clave, estado FROM usuarios WHERE nickname=%s"
+        conexion = Conexion()
+        con = conexion.getConexion()
+        cur = con.cursor()
+        try:
+            cur.execute(sql, (nickname,))
+            u = cur.fetchone()
+            if not u:
+                return False
+            usuario_id, hash_guardado, estado = u
+            if check_password_hash(hash_guardado, clave_ingresada) and estado:
+                return {'id_usuario': usuario_id, 'nickname': nickname, 'estado': estado}
             return False
-
         finally:
             cur.close()
             con.close()
