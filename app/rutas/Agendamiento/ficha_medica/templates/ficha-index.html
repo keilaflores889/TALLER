@@ -47,7 +47,7 @@ Fichas Médicas
 <div class="modal fade" id="modalFormulario" tabindex="-1" role="dialog">
   <div class="modal-dialog modal-xl modal-dialog-scrollable" role="document">
     <div class="modal-content">
-      <div class="modal-header">
+      <div class="modal-header table-info">
         <h4 class="modal-title" id="modalTitle">Nueva Ficha Médica</h4>
         <button type="button" class="close" data-dismiss="modal">&times;</button>
       </div>
@@ -187,15 +187,15 @@ Fichas Médicas
           <!-- Estado -->
           <div class="col-md-6">
             <div class="form-group">
-              <label>Estado:</label>
-              <select id="estado" class="form-control">
-                <option value="En seguimiento">En seguimiento</option>
-                <option value="Tratado">Tratado</option>
-                <option value="En tratamiento">En tratamiento</option>
-              </select>
+              <label for="estado">Estado:</label>
+                 <select id="estado" class="form-control">
+                    <option value="" selected disabled hidden>Seleccione el estado</option>
+                    <option value="En seguimiento">En seguimiento</option>
+                    <option value="Tratado">Tratado</option>
+                    <option value="En tratamiento">En tratamiento</option>
+                  </select>
             </div>
           </div>
-
         </div>
       </div>
 
@@ -514,12 +514,37 @@ $('#txtPaciente').click(()=>$('#modalBuscarPaciente').modal('show'));
 $('#txtMedico').click(()=>$('#modalBuscarMedico').modal('show'));
 $('#medicamentos_en_consumo').click(()=>$('#modalBuscarMedicamento').modal('show'));
 
+
+// --- Función para limpiar modal ---
+function limpiarModal() {
+  // limpiar todos los inputs de texto y textarea
+  $('#txtIdFicha,#txtPaciente,#cedula,#txtMedico,#fecha_registro,#alergias,#enfermedades,#diagnosticos,#sintomas,#tratamientos,#cirugias_realizadas,#recetas_medicas,#medicamentos_en_consumo,#motivos_consultas,#observaciones,#edad').val('');
+
+  // limpiar ids ocultos
+  $('#id_paciente,#id_medico').val('');
+
+  // estado por defecto
+  $('#estado').val('En seguimiento');
+
+  // limpiar errores de validación
+  $('#error_txtPaciente,#error_cedula,#error_edad,#error_txtMedico,#error_fecha_registro').hide();
+  $('#estado').val('');
+  // reiniciar medicamentos seleccionados
+  medicamentosSeleccionados = [];
+  renderMedicamentos();
+
+  // resetear título por defecto
+  $('#modalTitle').text("Agregar Ficha Médica");
+}
+
+
 // --- Agregar ficha ---
 $('#btnAgregar').click(()=>{
   $('#modalTitle').text("Agregar Ficha Médica");
   $('#txtIdFicha,#txtPaciente,#cedula,#txtMedico,#fecha_registro,#alergias,#enfermedades,#diagnosticos,#sintomas,#tratamientos,#cirugias_realizadas,#recetas_medicas,#medicamentos_en_consumo,#motivos_consultas,#observaciones').val('');
   $('#id_paciente,#id_medico').val('');
   $('#estado').val('En seguimiento');
+   limpiarModal(); 
   medicamentosSeleccionados = [];
   renderMedicamentos();
   $('#modalFormulario').modal('show');

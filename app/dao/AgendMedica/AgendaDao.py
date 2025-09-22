@@ -148,14 +148,15 @@ class AgendaDao:
         sql = """
         INSERT INTO agenda_medica (
             id_medico, id_dia, id_turno, codigo, id_personal, id_especialidad,
-            fecha_agenda, horario_disponible, cupos, estado
-        ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+            fecha_agenda, horario_disponible, cupos, estado, cupos_maximos
+        ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
         RETURNING id_agenda_medica;
         """
         conexion = Conexion()
         con = conexion.getConexion()
         cur = con.cursor()
         try:
+            cupos = agenda.get('cupos', 0)
             cur.execute(sql, (
                 agenda['id_medico'],
                 agenda['id_dia'],
@@ -165,8 +166,9 @@ class AgendaDao:
                 agenda['id_especialidad'],
                 agenda.get('fecha_agenda'),
                 agenda.get('horario_disponible', ''),
-                agenda.get('cupos', 0),
-                agenda.get('estado', True)
+                cupos,
+                agenda.get('estado', True),
+                cupos  # cupos_maximos = cupos
             ))
             id_agenda = cur.fetchone()[0]
             con.commit()
@@ -204,13 +206,18 @@ class AgendaDao:
             horario_disponible = %s,
             cupos = %s,
             estado = %s,
-            fecha_agenda = %s
+            fecha_agenda = %s,
+            cupos_maximos = CASE 
+                WHEN cupos_maximos IS NULL THEN %s
+                ELSE cupos_maximos
+            END
         WHERE id_agenda_medica = %s;
         """
         conexion = Conexion()
         con = conexion.getConexion()
         cur = con.cursor()
         try:
+            cupos = agenda.get('cupos', 0)
             cur.execute(sql, (
                 agenda['id_medico'],
                 agenda['id_dia'],
@@ -219,9 +226,10 @@ class AgendaDao:
                 agenda['id_personal'],
                 agenda['id_especialidad'],
                 agenda.get('horario_disponible', ''),
-                agenda.get('cupos', 0),
+                cupos,
                 agenda.get('estado', True),
                 agenda.get('fecha_agenda'),
+                cupos,  # Solo asigna cupos_maximos si es NULL
                 id_agenda
             ))
             con.commit()

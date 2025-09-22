@@ -35,98 +35,139 @@ Registrar Cita
     <!-- /Tarjeta -->
   
     <!-- Modal -->
-    <!-- Modal Registro/Edición Cita -->
-    <div class="modal" id="modalFormulario">
-      <div class="modal-dialog modal-dialog-centered modal-lg">
-        <div class="modal-content">
-          <!-- Header -->
-          <div class="modal-header">
-            <h4 class="modal-title" id="modalTitle">Nueva Cita</h4>
-            <button type="button" class="close" data-dismiss="modal">&times;</button>
-          </div>
+<!-- Modal Registro/Edición Cita -->
+<div class="modal fade" id="modalFormulario" tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+    <div class="modal-content shadow-lg rounded-3">
+      
+      <!-- Header -->
+      <div class="modal-header bg-info text-white">
+        <h5 class="modal-title fw-bold" id="modalTitle">Nueva Cita</h5>
+        <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
 
-          <!-- Cuerpo -->
-          <div class="modal-body">
-            <input type="hidden" id="txtIdCita">
-            <div class="row">
+      <!-- Body -->
+      <div class="modal-body">
+        <input type="hidden" id="txtIdCita">
+        <input type="hidden" id="id_agenda_medica" value="{{ id_agenda_medica }}">
 
-              <!-- Columna izquierda -->
-              <div class="col-md-6">
+        <!-- Agenda Médica ocupa todo el ancho -->
+        <div class="form-group">
+          <label class="fw-semibold">Agenda Médica</label>
+          <input type="text" id="txtagenda" class="form-control" 
+                 placeholder="Click para seleccionar agenda" readonly>
+        </div>
 
-                <!-- Fecha -->
-                <div class="form-group">
-                  <label for="fecha">Fecha de la Cita:</label>
-                  <input type="date" id="fecha" class="form-control">
-                </div>
+        <!-- Resto de campos en dos columnas -->
+        <div class="row g-3">
+          
+          <!-- Columna Izquierda -->
+          <div class="col-md-6">
+            
+            <!-- Fecha -->
+            <div class="form-group">
+              <label class="fw-semibold">Fecha de la Cita</label>
+              <input type="date" id="fecha" class="form-control">
+            </div>
 
-                <!-- Médico -->
-                <div class="form-group">
-                  <input type="hidden" id="id_medico">
-                  <label for="medico">Médico:</label>
-                  <input type="text" id="txtmedico" class="form-control" placeholder="Click para ingresar médico" readonly>
-                </div>
+            <!-- Médico -->
+            <div class="form-group">
+              <label class="fw-semibold">Médico</label>
+              <input type="hidden" id="id_medico">
+              <input type="text" id="txtmedico" class="form-control" 
+                     placeholder="Click para seleccionar médico" readonly>
+            </div>
 
-                <!-- Especialidad -->
-                <div class="form-group">
-                  <input type="hidden" id="id_especialidad">
-                  <label for="especialidad">Especialidad:</label>
-                  <input type="text" id="txtespecialidad" class="form-control" placeholder="Click para ingresar especialidad" readonly>
-                </div>
+            <!-- Especialidad -->
+            <div class="form-group">
+              <label class="fw-semibold">Especialidad</label>
+              <input type="hidden" id="id_especialidad">
+              <input type="text" id="txtespecialidad" class="form-control" 
+                     placeholder="Click para seleccionar especialidad" readonly>
+            </div>
 
-                <!-- Paciente -->
-                <div class="form-group">
-                  <input type="hidden" id="id_paciente">
-                  <label for="paciente">Paciente:</label>
-                  <input type="text" id="txtpaciente" class="form-control" placeholder="Click para ingresar paciente" readonly>
-                </div>
-
-              </div>
-
-              <!-- Columna derecha -->
-              <div class="col-md-6">
-
-                <!-- Turno -->
-                <div class="form-group">
-                  <input type="hidden" id="id_turno">
-                  <label for="turno">Turno:</label>
-                  <input type="text" id="txtturno" class="form-control" placeholder="Click para ingresar turno" readonly>
-                </div>
-
-                <!-- Hora -->
-                <div class="form-group">
-                  <label for="hora">Hora de la Cita:</label>
-                  <input type="time" id="hora" class="form-control">
-                </div>
-
-                <!-- Motivo -->
-                <div class="form-group">
-                  <label for="motivo">Motivo de la Consulta:</label>
-                  <textarea id="txtmotivo" class="form-control" rows="3" placeholder="Describa el motivo de la consulta"></textarea>
-                </div>
-
-                <!-- Estado -->
-                <div class="form-group">
-                  <input type="hidden" id="id_estado">
-                  <label for="estado">Estado de la Cita:</label>
-                  <input type="text" id="txtestado" class="form-control" placeholder="Click para ingresar estado de la cita" readonly>
-                </div>
-
-              </div>
-
+            <!-- Paciente -->
+            <div class="form-group">
+              <label class="fw-semibold">Paciente</label>
+              <input type="hidden" id="id_paciente">
+              <input type="text" id="txtpaciente" class="form-control" 
+                     placeholder="Click para seleccionar paciente" readonly>
             </div>
           </div>
 
-          <!-- Footer -->
-          <div class="modal-footer">
-            <button type="button" class="btn btn-primary" id="btnGuardarCita">Guardar</button>
-            <button type="button" class="btn btn-danger" data-dismiss="modal">Cerrar</button>
+          <!-- Columna Derecha -->
+          <div class="col-md-6">
+
+            <!-- Turno -->
+            <div class="form-group">
+              <label class="fw-semibold">Turno</label>
+              <input type="hidden" id="id_turno">
+              <input type="text" id="txtturno" class="form-control" 
+                     placeholder="Click para seleccionar turno" readonly>
+            </div>
+
+            <!-- Hora -->
+            <div class="form-group">
+              <label class="fw-semibold">Hora de la Cita</label>
+              <input type="time" id="hora" class="form-control">
+            </div>
+
+            <!-- Motivo -->
+            <div class="form-group">
+              <label class="fw-semibold">Motivo de la Consulta</label>
+              <textarea id="txtmotivo" class="form-control" rows="3" 
+                        placeholder="Describa el motivo de la consulta"></textarea>
+            </div>
+
+            <!-- Estado -->
+            <div class="form-group">
+              <label class="fw-semibold">Estado de la Cita</label>
+              <input type="hidden" id="id_estado">
+              <input type="text" id="txtestado" class="form-control" 
+                     placeholder="Click para seleccionar estado" readonly>
+            </div>
           </div>
         </div>
       </div>
+
+      <!-- Footer (igual que antes) -->
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" id="btnGuardarCita">Guardar</button>
+        <button type="button" class="btn btn-danger" data-dismiss="modal">Cerrar</button>
+      </div>
     </div>
+  </div>
 </div>
 
   
+<!-- Modal Buscar Agenda -->
+<div class="modal fade" id="modalBuscarAgenda" tabindex="-1">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Buscar Agenda</h5>
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <table id="tblAgenda" class="table table-bordered table-striped">
+          <thead>
+            <tr>
+              <th>Médico</th>
+              <th>Especialidad</th>
+              <th>Fecha</th>
+              <th>Turno</th>
+              <th>Acción</th>
+            </tr>
+          </thead>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+
 <!-- Modal de selección de Medico -->
 <div class="modal fade" id="modalBuscarMedico" tabindex="-1" role="dialog">
   <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
@@ -253,7 +294,7 @@ Registrar Cita
     </div>
   </div>
 </div>
-
+</div>
 <!-- Librerías necesarias -->
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -267,6 +308,10 @@ Registrar Cita
 {% block js %}
 <script>
 const CSRFToken = "{{ csrf_token() }}" || null;
+
+// 👉 id_agenda_medica se inyecta desde Flask
+let AGENDA_ID = null; 
+let id_cita = null;
 
 // ------------------------ HELPERS ------------------------
 function formatDateForInput(fecha) {
@@ -286,15 +331,14 @@ const initDatatable = () => {
     ajax: '/api/v1/registroc',
     columns: [
       { data: 'fecha_cita', render: function(data) {
-  if (!data) return '';
-  const d = new Date(data);
-  if (isNaN(d)) return '';
-  const day = String(d.getUTCDate()).padStart(2, '0');
-  const month = String(d.getUTCMonth() + 1).padStart(2, '0');
-  const year = d.getUTCFullYear();
-  return `${day}/${month}/${year}`;
-},
-  },
+        if (!data) return '';
+        const d = new Date(data);
+        if (isNaN(d)) return '';
+        const day = String(d.getUTCDate()).padStart(2, '0');
+        const month = String(d.getUTCMonth() + 1).padStart(2, '0');
+        const year = d.getUTCFullYear();
+        return `${day}/${month}/${year}`;
+      }},
       { data: row => `${row.medico_nombre} ${row.medico_apellido}` },
       { data: 'especialidad' },
       { data: row => `${row.paciente_nombre} ${row.paciente_apellido}` },
@@ -312,6 +356,80 @@ const initDatatable = () => {
     ]
   });
 };
+
+// --------- LISTA AGENDAS ---------
+// --------- LISTA AGENDAS ---------
+const initDatatableAgenda = () => {
+  $('#tblAgenda').DataTable({
+    language: { 
+      url: "{{ url_for('static', filename='vendor/datatables/es-ES.json') }}" 
+    },
+    ajax: '/api/v1/agenda',
+    columns: [
+  { data: row => `${row.medico_nombre || ''} ${row.medico_apellido || ''}` },
+  { data: 'especialidad' },
+  {
+    data: 'fecha_agenda',
+    render: function(data) {
+      if (!data) return '';
+      const d = new Date(data);
+      if (isNaN(d)) return '';
+      const day = String(d.getUTCDate()).padStart(2, '0');
+      const month = String(d.getUTCMonth() + 1).padStart(2, '0');
+      const year = d.getUTCFullYear();
+      return `${day}/${month}/${year}`;
+    }
+  },
+  { data: 'turno' },
+  { 
+    data: null, 
+    render: (row) => {
+      const nombre = row.medico_nombre || '';
+      const apellido = row.medico_apellido || '';
+      const turno = row.turno || '';
+      let fechaLabel = '';
+      if (row.fecha_agenda) {
+        const d = new Date(row.fecha_agenda);
+        if (!isNaN(d)) {
+          const day = String(d.getUTCDate()).padStart(2, '0');
+          const month = String(d.getUTCMonth() + 1).padStart(2, '0');
+          const year = d.getUTCFullYear();
+          fechaLabel = `${day}/${month}/${year}`;
+        }
+      }
+      return `
+  <button type="button" name="btn_seleccionar_Agenda" class="btn btn-sm btn-primary"
+    data-id="${row.id_agenda_medica}" 
+    data-label="${nombre} ${apellido} - ${row.especialidad || ''} - ${fechaLabel} (${turno})">
+    Seleccionar
+  </button>`;
+
+    }
+  }
+]
+
+  });
+
+  // Evento Seleccionar Agenda
+  $('#tblAgenda').on('click', 'button[name="btn_seleccionar_Agenda"]', function () {
+    const idAgenda = $(this).data('id');
+    const label = $(this).data('label');
+
+    // Poner valores en el modal de Cita
+    $('#id_agenda_medica').val(idAgenda);
+    $('#txtagenda').val(label);
+
+    // Actualizamos variable global
+    AGENDA_ID = idAgenda;
+
+    // Cerrar modal de búsqueda
+    $('#modalBuscarAgenda').modal('hide');
+  });
+};
+
+const buscarAgenda = () => 
+  $('#txtagenda').on('click', () => $('#modalBuscarAgenda').modal());
+
 
 // ------------------------ PACIENTE ------------------------
 const initDatatablep = () => {
@@ -428,10 +546,37 @@ const initDatatableTurno = () => {
 };
 const buscarTurno = () => $('#txtturno').on('click', () => $('#modalBuscarTurno').modal());
 
+// Función para limpiar el modal
+function limpiarModal() {
+    // Limpiar campos ocultos
+    $('#txtIdCita').val('');
+    $('#id_paciente').val('');
+    $('#id_medico').val('');
+    $('#id_especialidad').val('');
+    $('#id_turno').val('');
+    $('#id_estado').val('');
+    $('#id_agenda_medica').val('');
+    
+    // Limpiar campos visibles
+    $('#txtpaciente').val('');
+    $('#txtmedico').val('');
+    $('#txtespecialidad').val('');
+    $('#txtturno').val('');
+    $('#txtestado').val('');
+    $('#txtagenda').val('');
+    $('#fecha').val('');
+    $('#hora').val('');
+    $('#txtmotivo').val('');
+    
+    // Resetear título del modal
+    $('#modalTitle').text("Registrar Cita");
+}
+
 // ------------------------ AGREGAR / GUARDAR ------------------------
 const agregar = () => {
   $('#btnAgregar').on('click', () => {
     $('#txtIdCita').val('');
+    $('#txtIdAgenda').val('');
     $('#txtpaciente, #id_paciente').val('');
     $('#txtmedico, #id_medico').val('');
     $('#txtespecialidad, #id_especialidad').val('');
@@ -439,7 +584,13 @@ const agregar = () => {
     $('#fecha, #hora').val('');
     $('#txtestado, #id_estado').val('');
     $('#txtmotivo').val('');
+    $('#id_agenda_medica').val('');
+    // <--- asignamos el valor de la agenda actual
+    $('#id_agenda_medica').val(AGENDA_ID);
     $('#modalTitle').text("Registrar Cita");
+    $('#modalFormulario').modal('show');
+    limpiarModal();  // Llamar la función de limpieza
+    $('#id_agenda_medica').val(AGENDA_ID);
     $('#modalFormulario').modal('show');
   });
 };
@@ -447,6 +598,10 @@ const agregar = () => {
 const guardar = () => {
   $('#btnGuardarCita').on('click', () => {
     const idCita = $('#txtIdCita').val();
+
+    // siempre usamos la variable global AGENDA_ID
+    const id_agenda_medica = AGENDA_ID || null;  
+
     const payload = {
       id_paciente: $('#id_paciente').val(),
       id_medico: $('#id_medico').val(),
@@ -455,30 +610,51 @@ const guardar = () => {
       fecha_cita: $('#fecha').val(),
       hora: $('#hora').val(),
       id_estado: $('#id_estado').val(),
-      motivo_consulta: $('#txtmotivo').val()
+      motivo_consulta: $('#txtmotivo').val(),
+      id_agenda_medica: id_agenda_medica
     };
-    const tabla = $('#tbl').DataTable();
 
+    console.log("Payload enviado:", payload); // ✅ verificación
+
+    // validar agenda
+    if (!id_agenda_medica) {
+      Swal.fire("Error", "No se ha vinculado la cita con una agenda médica.", "error");
+      return;
+    }
+
+    const tabla = $('#tbl').DataTable();
     const url = idCita ? `/api/v1/registroc/${idCita}` : '/api/v1/registroc';
     const method = idCita ? 'PUT' : 'POST';
 
     fetch(url, {
       method: method,
-      headers: { 'Content-Type': 'application/json', 'X-CSRFToken': CSRFToken },
+      headers: { 
+        'Content-Type': 'application/json', 
+        'X-CSRFToken': CSRFToken 
+      },
       body: JSON.stringify(payload)
     })
     .then(resp => resp.json())
     .then(data => {
-      if(data && !data.error && data.success){
+      if (data && !data.error && data.success) {
         tabla.ajax.reload();
-        Swal.fire(idCita ? "Actualizado" : "Registrado", "La cita se guardó correctamente.", "success");
+        Swal.fire(
+          idCita ? "Actualizado" : "Registrado", 
+          "La cita se guardó correctamente.", 
+          "success"
+        );
         $('#modalFormulario').modal('hide');
-      } else Swal.fire("Error", data.error, "error");
+      } else {
+        Swal.fire("Error", data.error || "No se pudo guardar la cita.", "error");
+      }
     })
     .catch(err => Swal.fire("Error", "Ocurrió un error al guardar la cita.", "error"));
   });
 };
 
+
+
+// ------------------------ EDITAR ------------------------
 // ------------------------ EDITAR ------------------------
 const editar = () => {
   $('#tbl').on('click', 'button[name="btn_editar"]', function () {
@@ -486,37 +662,62 @@ const editar = () => {
     fetch(`/api/v1/registroc/${idCita}`)
       .then(resp => resp.json())
       .then(data => {
-        if(data && data.success && data.data){
+        if (data && data.success && data.data) {
           const cita = data.data;
+
+          // Rellenar campos básicos
           $('#txtIdCita').val(idCita);
-
           $('#fecha').val(formatDateForInput(cita.fecha_cita));
-
           $('#hora').val(cita.hora ? cita.hora.slice(0,5) : "");
+          $('#txtmotivo').val(cita.motivo_consulta);
 
-          $('#id_medico').val(cita.id_medico);
-          $('#txtmedico').val(`${cita.medico_nombre} ${cita.medico_apellido}`);
-
-          $('#id_especialidad').val(cita.id_especialidad);
-          $('#txtespecialidad').val(cita.especialidad);
-
+          // Paciente
           $('#id_paciente').val(cita.id_paciente);
           $('#txtpaciente').val(`${cita.paciente_nombre} ${cita.paciente_apellido}`);
 
+          // Médico
+          $('#id_medico').val(cita.id_medico);
+          $('#txtmedico').val(`${cita.medico_nombre} ${cita.medico_apellido}`);
+
+          // Especialidad
+          $('#id_especialidad').val(cita.id_especialidad);
+          $('#txtespecialidad').val(cita.especialidad);
+
+          // Turno
           $('#id_turno').val(cita.id_turno);
           $('#txtturno').val(cita.turno);
 
+          // Estado
           $('#id_estado').val(cita.id_estado);
           $('#txtestado').val(cita.estado);
 
-          $('#txtmotivo').val(cita.motivo_consulta);
+          // Agenda
+          $('#id_agenda_medica').val(cita.id_agenda_medica);
 
+          let agendaLabel = '';
+          if (cita.agenda_descripcion && cita.agenda_fecha) {
+            const d = new Date(cita.agenda_fecha);
+            const day = String(d.getUTCDate()).padStart(2,'0');
+            const month = String(d.getUTCMonth()+1).padStart(2,'0');
+            const year = d.getUTCFullYear();
+            agendaLabel = `${cita.agenda_descripcion} - ${day}/${month}/${year} (${cita.turno})`;
+          }
+          $('#txtagenda').val(agendaLabel);
+
+          // Actualizamos la variable global
+          AGENDA_ID = cita.id_agenda_medica;
+
+          // Modal
           $('#modalTitle').text("Editar Cita");
-          $('#modalFormulario').modal();
-        } else Swal.fire("Error", data.error || "No se pudo cargar la cita", "error");
-      });
+          $('#modalFormulario').modal('show');
+        } else {
+          Swal.fire("Error", data.error || "No se pudo cargar la cita", "error");
+        }
+      })
+      .catch(err => Swal.fire("Error", "Ocurrió un error al cargar la cita", "error"));
   });
 };
+
 
 // ------------------------ ELIMINAR ------------------------
 const eliminar = () => {
@@ -545,6 +746,8 @@ const eliminar = () => {
 
 // ------------------------ INICIALIZACIÓN ------------------------
 $(function(){
+  AGENDA_ID = $('#id_agenda_medica').val();  
+  console.log("AGENDA_ID cargado:", AGENDA_ID);
   initDatatable();
   initDatatablep();
   initDatatablem();
@@ -560,7 +763,11 @@ $(function(){
   buscarEspecialidad();
   buscarEstado();
   buscarTurno();
+  initDatatableAgenda();
+buscarAgenda();
 });
 </script>
 {% endblock %}
+
+
 
