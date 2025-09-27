@@ -14,8 +14,8 @@ Odontogramas
       <button type="button" class="btn btn-outline-info" id="btnNuevo">+ Nuevo Odontograma</button>
     </div>
     <div class="card-body">
-      <table id="tbl" class="table table-bordered table-striped">
-        <thead class="table-info">
+      <table id="tbl" class="table table-bordered table-striped" >
+        <thead class="table-info" >
           <tr>
             <th>ID</th>
             <th>Paciente</th>
@@ -162,7 +162,7 @@ Odontogramas
       </div>
       <div class="modal-footer">
         <button type="button" id="btnGuardar" class="btn btn-primary">Guardar</button>
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+        <button type="button" class="btn btn-danger" data-dismiss="modal">Cerrar</button>
       </div>
     </div>
   </div>
@@ -275,17 +275,31 @@ const initDatatable = () => {
       { data: 'medico' },
       { data: 'ficha_medica' },
       { data: 'fecha', render: (data) => new Date(data).toLocaleDateString() },
-      { data: 'estado' },
+      { data: 'estado',
+      render: function(data) {
+        if(data === "Activo") {
+         return '<span style="color: #155724; background-color: #d4edda; padding: 2px 6px; border-radius: 4px;">Activo</span>';
+    } else {
+      return '<span style="color: #721c24; background-color: #f8d7da; padding: 2px 6px; border-radius: 4px;">Finalizado</span>';
+    }
+  }
+},
       { data: 'observaciones' },
       { data: null, render: (data, type, row) => `
-        <button class="btn btn-sm btn-info" name="btn_editar" data-id="${row.id_odontograma}">Editar</button>
-        <button class="btn btn-sm btn-danger" name="btn_eliminar" data-id="${row.id_odontograma}">Eliminar</button>
+        <button class="btn btn-sm btn-success" name="btn_ver" data-id="${row.id_odontograma}" title="Ver Odontograma">
+          <i class="fas fa-eye"></i>ver odonto</button>
+        <button class="btn btn-info btn-sm" name="btn_editar" data-id="${row.id_odontograma}" title="Editar">
+          <i class="fas fa-edit"></i> 
+        </button>
+        <button class="btn btn-danger btn-sm" name="btn_eliminar" data-id="${row.id_odontograma}" title="Eliminar">
+          <i class="fas fa-trash-alt"></i> 
+        </button>
       `}
     ]
   });
 };
 
-// 🔧 FUNCIÓN PARA FORMATEAR FECHA
+// Función para formatear fecha para input tipo date
 function formatearFechaParaInput(fechaStr) {
   if (!fechaStr) return '';
   
@@ -399,7 +413,7 @@ $(document).on("click", "#odontogramaSVG rect", function() {
   });
 });
 
-// Guardar (MODIFICADO)
+// Guardar
 $("#btnGuardar").click(() => {
   const id = $("#id_odontograma").val();
   const payload = {
@@ -444,7 +458,165 @@ $("#btnGuardar").click(() => {
   });
 });
 
-// 🔧 EDITAR CORREGIDO - CON MANEJO CORRECTO DE FECHA
+// VER ODONTOGRAMA - Mostrar información completa con SVG
+$('#tbl').on('click', 'button[name="btn_ver"]', function() {
+  const id = $(this).data('id');
+  
+  fetch(`/api/v1/odontograma/${id}`)
+    .then(resp => resp.json())
+    .then(data => {
+      const o = data.data;
+      
+      // Crear el modal de visualización
+      const modalHTML = `
+        <div class="modal fade" id="modalVerOdontograma" tabindex="-1" role="dialog">
+          <div class="modal-dialog modal-xl" role="document" style="max-width: 1300px;">
+            <div class="modal-content">
+              <div class="modal-header bg-info text-white">
+                <h5 class="modal-title">
+                  <i class="fas fa-tooth"></i> Odontograma - ${o.paciente}
+                </h5>
+                <button type="button" class="close text-white" data-dismiss="modal">
+                  <span>&times;</span>
+                </button>
+              </div>
+              <div class="modal-body">
+                <!-- Información del Paciente -->
+                <div class="row mb-3">
+                  <div class="col-md-6">
+                    <div class="card">
+                      <div class="card-header">
+                        <h6><i class="fas fa-user"></i> Información del Paciente</h6>
+                      </div>
+                      <div class="card-body">
+                        <p><strong>Paciente:</strong> ${o.paciente}</p>
+                        <p><strong>Cédula:</strong> ${o.cedula}</p>
+                        <p><strong>Edad:</strong> ${o.edad} años</p>
+                        <p><strong>Médico:</strong> ${o.medico}</p>
+                        <p><strong>Ficha Médica:</strong> ${o.ficha_medica}</p>
+                        <p><strong>Fecha:</strong> ${new Date(o.fecha).toLocaleDateString()}</p>
+                        <p><strong>Estado:</strong> <span class="badge badge-success">${o.estado}</span></p>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="card">
+                      <div class="card-header">
+                        <h6><i class="fas fa-info-circle"></i> Leyenda</h6>
+                      </div>
+                      <div class="card-body">
+                        <div id="leyendaVer"></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+                <!-- Odontograma -->
+                <div class="row">
+                  <div class="col-12">
+                    <div class="card">
+                      <div class="card-header">
+                        <h6><i class="fas fa-teeth"></i> Odontograma</h6>
+                      </div>
+                      <div class="card-body text-center">
+                        <div id="odontogramaVer" style="border: 2px solid #dee2e6; border-radius: 8px; padding: 20px; background-color: #f8f9fa;">
+                          <!-- Aquí se cargará el SVG -->
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+                ${o.observaciones ? `
+                <div class="row mt-3">
+                  <div class="col-12">
+                    <div class="card">
+                      <div class="card-header">
+                        <h6><i class="fas fa-comment"></i> Observaciones</h6>
+                      </div>
+                      <div class="card-body">
+                        <p>${o.observaciones}</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                ` : ''}
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                  <i class="fas fa-times"></i> Cerrar
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+      
+      // Remover modal anterior si existe
+      $('#modalVerOdontograma').remove();
+      
+      // Agregar el modal al body
+      $('body').append(modalHTML);
+      
+      // Generar leyenda en el modal
+      let leyendaHTML = '<h6>Estados:</h6><ul class="list-unstyled mb-2">';
+      for (const key in estadosOdontograma) {
+        const estado = estadosOdontograma[key];
+        leyendaHTML += `
+          <li class="mb-1 d-flex align-items-center">
+            <span style="display:inline-block;width:15px;height:15px;background:${estado.color};margin-right:5px;border:1px solid #000;"></span>
+            <small>${estado.nombre}</small>
+          </li>
+        `;
+      }
+      leyendaHTML += '</ul>';
+      
+      leyendaHTML += '<h6>Superficies:</h6><ul class="list-unstyled">';
+      for (const abrev in superficiesDentales) {
+        const superficie = superficiesDentales[abrev];
+        leyendaHTML += `<li class="mb-1"><small><strong>${abrev}:</strong> ${superficie}</small></li>`;
+      }
+      leyendaHTML += '</ul>';
+      
+      $('#leyendaVer').html(leyendaHTML);
+      
+      // Clonar el SVG del odontograma
+      if ($('#odontogramaSVG').length > 0) {
+        const svgClone = $('#odontogramaSVG').clone();
+        svgClone.attr('id', 'odontogramaSVGVer');
+        
+        // Limpiar el SVG clonado (ponerlo en blanco)
+        svgClone.find('rect').attr('fill', 'white');
+        
+        // Aplicar los colores según los detalles del odontograma
+        if (o.detalle && Array.isArray(o.detalle)) {
+          o.detalle.forEach(d => {
+            let color = "#FFFFFF";
+            if (d.id_estado_dental == 2) color = "#8B4513";  // Caries
+            if (d.id_estado_dental == 3) color = "#C0C0C0";  // Obturación
+            if (d.id_estado_dental == 4) color = "#FF0000";  // Extracción
+            if (d.id_estado_dental == 5) color = "#FF1493";  // Endodoncia
+
+            svgClone.find(`g[data-diente="${d.diente}"] rect[data-superficie="${d.superficie}"]`)
+              .attr("fill", color);
+          });
+        }
+        
+        $('#odontogramaVer').html(svgClone);
+      } else {
+        $('#odontogramaVer').html('<p class="text-muted">No se pudo cargar el odontograma visual</p>');
+      }
+      
+      // Mostrar el modal
+      $('#modalVerOdontograma').modal('show');
+    })
+    .catch(error => {
+      console.error('Error cargando odontograma:', error);
+      Swal.fire("Error", "No se pudo cargar el odontograma", "error");
+    });
+});
+
+// EDITAR CORREGIDO - CON MANEJO CORRECTO DE FECHA
 $('#tbl').on('click', 'button[name="btn_editar"]', function() {
   const id = $(this).data('id');
   fetch(`/api/v1/odontograma/${id}`)
@@ -464,7 +636,7 @@ $('#tbl').on('click', 'button[name="btn_editar"]', function() {
       $('#estado').val(o.estado);
       $('#observaciones').val(o.observaciones);
 
-      // 🔧 CORRECCIÓN CRÍTICA: Manejar múltiples campos de fecha
+      // CORRECCIÓN CRÍTICA: Manejar múltiples campos de fecha
       let fechaFormateada = '';
       
       // Intentar con diferentes campos que pueden contener la fecha
