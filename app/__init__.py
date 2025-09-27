@@ -51,6 +51,8 @@ from app.rutas.Agendamiento.personal.personal_routes import personalmod
 from app.rutas.Agendamiento.avisosRecordatorios.AvisosRecordatorios_routes import avisomod
 from app.rutas.Agendamiento.ficha_medica.ficha_medica_routes import fichamod
 
+from app.rutas.Agendamiento.odontograma.odontograma_routes import odontogramamod
+
 #referenciales de consultorio
 from app.rutas.referenciales_consultorio.medicamento.medicamento_routes import medicamentomod
 from app.rutas.referenciales_consultorio.sintoma.sintoma_routes import sintomod
@@ -98,7 +100,7 @@ app.register_blueprint(personalmod, url_prefix=f'{modulo0}/personal')
 
 app.register_blueprint(avisomod, url_prefix=f'{modulo0}/avisos')
 app.register_blueprint(fichamod, url_prefix=f'{modulo0}/ficha')
-
+app.register_blueprint(odontogramamod, url_prefix=f'{modulo0}/odontograma')
 
 from app.rutas.referenciales.disponibilidad_horaria.disponibilidad_api import disponibilidadapi
 #ciudad
@@ -145,6 +147,7 @@ from app.rutas.Agendamiento.personal.personal_api import personalapi
 from app.rutas.Agendamiento.avisosRecordatorios.AvisosRecordatorio_api import avisoapi
 from app.rutas.Agendamiento.ficha_medica.ficha_medica_api import fichaapi
 
+from app.rutas.Agendamiento.odontograma.odontograma_api import odontogramaapi
 #consultorio
 from app.rutas.referenciales_consultorio.medicamento.medicamento_api import medicamentoapi
 from app.rutas.referenciales_consultorio.sintoma.sintoma_api import sintomaapi
@@ -211,8 +214,8 @@ app.register_blueprint(duraconsuapi, url_prefix=version1)
 #turno
 app.register_blueprint(turnoapi, url_prefix=version1)
 
-
-
+version1 = '/api/v1'
+app.register_blueprint(odontogramaapi, url_prefix=version1)
 # Cita
 
 version1 = '/api/v1'

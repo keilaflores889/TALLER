@@ -1,0 +1,600 @@
+{% extends 'base.html' %}
+
+{% block titulo %}
+Odontogramas
+{% endblock %}
+
+{% block contenido %}
+<div class="container mt-50">
+  <h3>Listar Odontogramas</h3>
+
+  <!-- Card -->
+  <div class="card">
+    <div class="card-header">
+      <button type="button" class="btn btn-outline-info" id="btnNuevo">+ Nuevo Odontograma</button>
+    </div>
+    <div class="card-body">
+      <table id="tbl" class="table table-bordered table-striped">
+        <thead class="table-info">
+          <tr>
+            <th>ID</th>
+            <th>Paciente</th>
+            <th>Cédula</th>
+            <th>Edad</th>
+            <th>Médico</th>
+            <th>Ficha Médica</th>
+            <th>Fecha</th>
+            <th>Estado</th>
+            <th>Observaciones</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Odontograma -->
+<div class="modal fade" id="modalFormulario" tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-lg modal-dialog-scrollable"style="max-width: 1300px;" >
+    <div class="modal-content">
+      <div class="modal-header bg-info text-white">
+        <h5 class="modal-title" id="modalTitle">Agregar Odontograma</h5>
+        <button type="button" class="close text-white" data-dismiss="modal"><span>&times;</span></button>
+      </div>
+
+      <div class="modal-body">
+        <form id="formOdontograma">
+          <input type="hidden" id="id_odontograma" name="id_odontograma" />
+          <input type="hidden" id="id_ficha_medica" name="id_ficha_medica" />
+
+          <!-- Ficha Médica -->
+<div class="form-group">
+  <label>Ficha Médica:</label>
+  <div class="input-group">
+    <input type="text" class="form-control" id="ficha_medica" readonly placeholder="Click para seleccionar ficha médica">
+    <div class="input-group-append">
+      <button type="button" class="btn btn-outline-secondary" id="btnBuscarFicha">Buscar</button>
+    </div>
+  </div>
+</div>
+
+<div class="form-row">
+  <!-- Columna izquierda -->
+  <div class="col-md-6">
+    <div class="form-group">
+      <label>Paciente:</label>
+      <input type="text" class="form-control" id="paciente" readonly placeholder="Se completará al seleccionar ficha médica">
+    </div>
+    <div class="form-group">
+      <label>Cédula:</label>
+      <input type="text" class="form-control" id="cedula" readonly>
+    </div>
+    <div class="form-group">
+      <label>Edad:</label>
+      <input type="text" class="form-control" id="edad" readonly>
+    </div>
+  </div>
+
+  <!-- Columna derecha -->
+  <div class="col-md-6">
+    <div class="form-group">
+      <label>Fecha Registro:</label>
+      <input type="date" class="form-control" id="fecha_registro" name="fecha_registro" required>
+    </div>
+    <div class="form-group">
+      <label>Estado:</label>
+      <select id="estado" name="estado" class="form-control">
+        <option value="Activo">Activo</option>
+        <option value="Finalizado">Finalizado</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>Médico:</label>
+      <input type="text" class="form-control" id="medico" readonly placeholder="Se completará al seleccionar ficha médica">
+    </div>
+  </div>
+</div>
+
+<div class="form-group">
+  <label>Observaciones:</label>
+  <textarea class="form-control" id="observaciones" rows="2"></textarea>
+</div>
+
+          <h5 class="mt-3 text-center">ODONTOGRAMA</h5>
+          <div class="d-flex justify-content-center">
+            <div id="leyendaOdontograma" class="mr-4"></div>
+            <svg id="odontogramaSVG" width="1800" height="800">
+              <!-- ================= Arcada Superior Permanente ================= -->
+              <text x="10" y="30" font-size="16" font-weight="bold">Arcada Superior Permanente</text>
+              {% set sup_perm = [18,17,16,15,14,13,12,11,21,22,23,24,25,26,27,28] %}
+              {% for i in sup_perm %}
+              <g data-diente="{{ i }}" transform="translate({{ loop.index0*70+80 }},50)">
+                <rect x="0" y="0" width="40" height="20" fill="white" stroke="black" data-superficie="O"></rect>
+                <rect x="0" y="20" width="20" height="40" fill="white" stroke="black" data-superficie="M"></rect>
+                <rect x="20" y="20" width="20" height="40" fill="white" stroke="black" data-superficie="D"></rect>
+                <rect x="0" y="60" width="40" height="20" fill="white" stroke="black" data-superficie="L"></rect>
+                <text x="20" y="95" font-size="12" text-anchor="middle">{{ i }}</text>
+              </g>
+              {% endfor %}
+
+              <!-- ================= Arcada Superior Temporal ================= -->
+              <text x="10" y="180" font-size="16" font-weight="bold">Arcada Superior Temporal</text>
+              {% set sup_temp = [55,54,53,52,51,61,62,63,64,65] %}
+              {% for i in sup_temp %}
+              <g data-diente="{{ i }}" transform="translate({{ loop.index0*70+80 }},200)">
+                <rect x="0" y="0" width="40" height="20" fill="white" stroke="black" data-superficie="O"></rect>
+                <rect x="0" y="20" width="20" height="40" fill="white" stroke="black" data-superficie="M"></rect>
+                <rect x="20" y="20" width="20" height="40" fill="white" stroke="black" data-superficie="D"></rect>
+                <rect x="0" y="60" width="40" height="20" fill="white" stroke="black" data-superficie="L"></rect>
+                <text x="20" y="95" font-size="12" text-anchor="middle">{{ i }}</text>
+              </g>
+              {% endfor %}
+
+              <!-- ================= Arcada Inferior Temporal ================= -->
+              <text x="10" y="330" font-size="16" font-weight="bold">Arcada Inferior Temporal</text>
+              {% set inf_temp = [85,84,83,82,81,71,72,73,74,75] %}
+              {% for i in inf_temp %}
+              <g data-diente="{{ i }}" transform="translate({{ loop.index0*70+80 }},350)">
+                <rect x="0" y="0" width="40" height="20" fill="white" stroke="black" data-superficie="O"></rect>
+                <rect x="0" y="20" width="20" height="40" fill="white" stroke="black" data-superficie="M"></rect>
+                <rect x="20" y="20" width="20" height="40" fill="white" stroke="black" data-superficie="D"></rect>
+                <rect x="0" y="60" width="40" height="20" fill="white" stroke="black" data-superficie="L"></rect>
+                <text x="20" y="95" font-size="12" text-anchor="middle">{{ i }}</text>
+              </g>
+              {% endfor %}
+
+              <!-- ================= Arcada Inferior Permanente ================= -->
+              <text x="10" y="480" font-size="16" font-weight="bold">Arcada Inferior Permanente</text>
+              {% set inf_perm = [48,47,46,45,44,43,42,41,31,32,33,34,35,36,37,38] %}
+              {% for i in inf_perm %}
+              <g data-diente="{{ i }}" transform="translate({{ loop.index0*70+80 }},500)">
+                <rect x="0" y="0" width="40" height="20" fill="white" stroke="black" data-superficie="O"></rect>
+                <rect x="0" y="20" width="20" height="40" fill="white" stroke="black" data-superficie="M"></rect>
+                <rect x="20" y="20" width="20" height="40" fill="white" stroke="black" data-superficie="D"></rect>
+                <rect x="0" y="60" width="40" height="20" fill="white" stroke="black" data-superficie="L"></rect>
+                <text x="20" y="95" font-size="12" text-anchor="middle">{{ i }}</text>
+              </g>
+              {% endfor %}
+            </svg>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" id="btnGuardar" class="btn btn-primary">Guardar</button>
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Selección de Ficha -->
+<div class="modal fade" id="modalFicha" tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header bg-info text-white">
+        <h5 class="modal-title">Seleccionar Ficha Médica</h5>
+        <button type="button" class="close text-white" data-dismiss="modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <table id="tblFichas" class="table table-striped table-bordered w-100">
+          <thead class="table-info">
+            <tr>
+              <th>ID</th>
+              <th>Paciente</th>
+              <th>Cédula</th>
+              <th>Edad</th>
+              <th>Médico</th>
+              <th>Acción</th>
+            </tr>
+          </thead>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Librerías -->
+<link rel="stylesheet" href="https://cdn.datatables.net/1.10.21/css/dataTables.bootstrap4.min.css">
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+{% endblock %}
+
+{% block js %}
+<script>
+// Leyenda de odontograma vizualización de los estados de los dientes
+const estadosOdontograma = {
+  1: { nombre: 'Sano', color: '#FFFFFF' },
+  2: { nombre: 'Caries', color: '#8B4513' },
+  3: { nombre: 'Obturación', color: '#C0C0C0' },
+  4: { nombre: 'Extracción', color: '#FF0000' },
+  5: { nombre: 'Endodoncia', color: '#FF1493' }
+};
+
+// Superficies dentales con abreviaciones
+const superficiesDentales = {
+  'O': 'Oclusal',
+  'V': 'Vestibular', 
+  'L': 'Lingual',
+  'M': 'Mesial',
+  'D': 'Distal'
+};
+
+const generarLeyenda = () => {
+  let leyendaHTML = '';
+  
+  // Estados de los dientes (con colores)
+  leyendaHTML += '<h6>Estados:</h6><ul class="list-unstyled">';
+  for (const key in estadosOdontograma) {
+    const estado = estadosOdontograma[key];
+    leyendaHTML += `
+      <li class="mb-1 d-flex align-items-center">
+        <span style="display:inline-block;width:20px;height:20px;background:${estado.color};margin-right:8px;border:1px solid #000;"></span>
+        <span>${estado.nombre}</span>
+      </li>
+    `;
+  }
+  leyendaHTML += '</ul>';
+  
+  // Superficies dentales (debajo de los colores)
+  leyendaHTML += '<h6>Superficies:</h6><ul class="list-unstyled">';
+  for (const abrev in superficiesDentales) {
+    const superficie = superficiesDentales[abrev];
+    leyendaHTML += `
+      <li class="mb-1">
+        <strong>${abrev}:</strong> ${superficie}
+      </li>
+    `;
+  }
+  leyendaHTML += '</ul>';
+  
+  document.getElementById('leyendaOdontograma').innerHTML = leyendaHTML;
+};
+
+// Llamar al abrir el modal
+$('#modalFormulario').on('shown.bs.modal', function () {
+  generarLeyenda();
+});
+
+const CSRFToken = "{{ csrf_token() }}" || null;
+let odontogramaData = [];
+
+const initDatatable = () => {
+  $('#tbl').DataTable({
+     language: { 
+      url: "{{ url_for('static', filename='vendor/datatables/es-ES.json') }}"},
+      ajax: { url: '/api/v1/odontograma', dataSrc: 'data' },
+    columns: [
+      { data: 'id_odontograma' },
+      { data: 'paciente' },
+      { data: 'cedula' },
+      { data: 'edad' },
+      { data: 'medico' },
+      { data: 'ficha_medica' },
+      { data: 'fecha', render: (data) => new Date(data).toLocaleDateString() },
+      { data: 'estado' },
+      { data: 'observaciones' },
+      { data: null, render: (data, type, row) => `
+        <button class="btn btn-sm btn-info" name="btn_editar" data-id="${row.id_odontograma}">Editar</button>
+        <button class="btn btn-sm btn-danger" name="btn_eliminar" data-id="${row.id_odontograma}">Eliminar</button>
+      `}
+    ]
+  });
+};
+
+// 🔧 FUNCIÓN PARA FORMATEAR FECHA
+function formatearFechaParaInput(fechaStr) {
+  if (!fechaStr) return '';
+  
+  try {
+    let fecha;
+    
+    // Si viene en formato ISO completo (2024-01-15T10:30:00.000Z)
+    if (fechaStr.includes('T')) {
+      fecha = new Date(fechaStr);
+    }
+    // Si viene como objeto Date de JavaScript
+    else if (fechaStr instanceof Date) {
+      fecha = fechaStr;
+    }
+    // Si viene como string de fecha
+    else {
+      fecha = new Date(fechaStr);
+    }
+    
+    // Verificar que la fecha es válida
+    if (isNaN(fecha.getTime())) {
+      console.error('Fecha inválida:', fechaStr);
+      return '';
+    }
+    
+    // Formatear como YYYY-MM-DD para input type="date"
+    const año = fecha.getFullYear();
+    const mes = String(fecha.getMonth() + 1).padStart(2, '0');
+    const dia = String(fecha.getDate()).padStart(2, '0');
+    
+    return `${año}-${mes}-${dia}`;
+  } catch (error) {
+    console.error('Error formateando fecha:', error, 'Fecha original:', fechaStr);
+    return '';
+  }
+}
+
+function recolectarOdontograma() {
+  let datos = [];
+  $("#odontogramaSVG g").each(function () {
+    const diente = $(this).data("diente");
+    $(this).find("rect").each(function () {
+      const superficie = $(this).data("superficie");
+      const fill = $(this).attr("fill");
+      if (fill && fill !== "white") {
+        // buscar estado según color
+        let estado = 1; // por defecto sano
+        if (fill === "#8B4513") estado = 2;
+        if (fill === "#C0C0C0") estado = 3;
+        if (fill === "#FF0000") estado = 4;
+        if (fill === "#FF1493") estado = 5;
+
+        datos.push({
+          diente: diente,
+          superficie: superficie,
+          estado: estado,
+          color: fill
+        });
+      }
+    });
+  });
+  return datos;
+}
+
+// Botón nuevo
+$('#btnNuevo').on('click', () => {
+  $('#modalTitle').text("Agregar Odontograma");
+  $('#formOdontograma')[0].reset();
+  $('#id_odontograma').val('');
+  $('#id_ficha_medica').val('');
+  odontogramaData = [];
+  $('#odontogramaSVG rect').attr("fill", "white");
+  $('#modalFormulario').modal('show');
+});
+
+// Selección de superficie
+$(document).on("click", "#odontogramaSVG rect", function() {
+  const diente = $(this).closest("g").data("diente");
+  const superficie = $(this).data("superficie");
+
+  Swal.fire({
+    title: `Diente ${diente} - ${superficie}`,
+    input: 'select',
+    inputOptions: {
+      1: 'Sano',
+      2: 'Caries',
+      3: 'Obturación',
+      4: 'Extracción',
+      5: 'Endodoncia'
+    },
+    inputPlaceholder: 'Seleccione estado',
+    showCancelButton: true
+  }).then(result => {
+    if (result.isConfirmed) {
+      const estado = result.value;
+      let color = "#FFFFFF";
+      if (estado == 2) color = "#8B4513";
+      if (estado == 3) color = "#C0C0C0";
+      if (estado == 4) color = "#FF0000";
+      if (estado == 5) color = "#FF1493";
+
+      $(this).attr("fill", color);
+
+      odontogramaData.push({
+        diente: diente,
+        superficie: superficie,
+        estado: estado,
+        color: color
+      });
+    }
+  });
+});
+
+// Guardar (MODIFICADO)
+$("#btnGuardar").click(() => {
+  const id = $("#id_odontograma").val();
+  const payload = {
+    id_ficha_medica: $("#id_ficha_medica").val(),
+    paciente: $("#paciente").val(),
+    medico: $("#medico").val(),
+    cedula: $("#cedula").val(),
+    edad: $("#edad").val(),
+    ficha_medica: $("#ficha_medica").val(),
+    fecha_registro: $("#fecha_registro").val(),
+    estado: $("#estado").val(),
+    observaciones: $("#observaciones").val(),
+    detalles: recolectarOdontograma()
+  };
+
+  let url = "/api/v1/odontograma";
+  let method = "POST";
+
+  if (id) {  // si existe, es edición
+    url = `/api/v1/odontograma/${id}`;
+    method = "PUT";
+  }
+
+  fetch(url, {
+    method: method,
+    headers: {
+      "Content-Type": "application/json",
+      "X-CSRFToken": CSRFToken
+    },
+    body: JSON.stringify(payload)
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (data.success) {
+      $('#modalFormulario').modal('hide');
+      $('#tbl').DataTable().ajax.reload();
+      odontogramaData = [];
+      Swal.fire("Éxito", "Odontograma guardado correctamente", "success");
+    } else {
+      Swal.fire("Error", data.error, "error");
+    }
+  });
+});
+
+// 🔧 EDITAR CORREGIDO - CON MANEJO CORRECTO DE FECHA
+$('#tbl').on('click', 'button[name="btn_editar"]', function() {
+  const id = $(this).data('id');
+  fetch(`/api/v1/odontograma/${id}`)
+    .then(resp => resp.json())
+    .then(data => {
+      const o = data.data;
+      console.log('Datos recibidos:', o); // Para debugging
+      
+      $('#modalTitle').text("Editar Odontograma");
+      $('#id_odontograma').val(o.id_odontograma);
+      $('#id_ficha_medica').val(o.id_ficha_medica);
+      $('#paciente').val(o.paciente);
+      $('#medico').val(o.medico);
+      $('#cedula').val(o.cedula);
+      $('#edad').val(o.edad);
+      $('#ficha_medica').val(o.ficha_medica);
+      $('#estado').val(o.estado);
+      $('#observaciones').val(o.observaciones);
+
+      // 🔧 CORRECCIÓN CRÍTICA: Manejar múltiples campos de fecha
+      let fechaFormateada = '';
+      
+      // Intentar con diferentes campos que pueden contener la fecha
+      if (o.fecha_registro) {
+        fechaFormateada = formatearFechaParaInput(o.fecha_registro);
+        console.log('Fecha desde fecha_registro:', o.fecha_registro, 'Formateada:', fechaFormateada);
+      } else if (o.fecha) {
+        fechaFormateada = formatearFechaParaInput(o.fecha);
+        console.log('Fecha desde fecha:', o.fecha, 'Formateada:', fechaFormateada);
+      }
+      
+      // Asignar la fecha formateada al campo
+      if (fechaFormateada) {
+        $('#fecha_registro').val(fechaFormateada);
+        console.log('Fecha asignada al input:', fechaFormateada);
+      } else {
+        console.warn('No se pudo formatear la fecha. Datos originales:', {
+          fecha_registro: o.fecha_registro,
+          fecha: o.fecha
+        });
+      }
+
+      // Limpiar odontograma previo
+      odontogramaData = [];
+      $('#odontogramaSVG rect').attr("fill", "white");
+
+      // Cargar detalle del odontograma
+      if (o.detalle) {
+        o.detalle.forEach(d => {
+          // Calcular color según estado
+          let color = "#FFFFFF";
+          if (d.id_estado_dental == 2) color = "#8B4513";
+          if (d.id_estado_dental == 3) color = "#C0C0C0";
+          if (d.id_estado_dental == 4) color = "#FF0000";
+          if (d.id_estado_dental == 5) color = "#FF1493";
+
+          odontogramaData.push({
+            diente: d.diente,
+            superficie: d.superficie,
+            estado: d.id_estado_dental,
+            color: color
+          });
+
+          $(`#odontogramaSVG g[data-diente="${d.diente}"] rect[data-superficie="${d.superficie}"]`)
+            .attr("fill", color);
+        });
+      }
+
+      $('#modalFormulario').modal('show');
+    })
+    .catch(error => {
+      console.error('Error cargando odontograma:', error);
+      Swal.fire("Error", "No se pudo cargar el odontograma", "error");
+    });
+});
+
+// Eliminar (MODIFICADO)
+$('#tbl').on('click', 'button[name="btn_eliminar"]', function() {
+  const id = $(this).data('id');
+  Swal.fire({
+    title: "¿Eliminar registro?",
+    showCancelButton: true,
+    confirmButtonText: "Sí",
+    cancelButtonText: "No"
+  }).then(result => {
+    if (result.isConfirmed) {
+      fetch(`/api/v1/odontograma/${id}`, {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json', 'X-CSRFToken': CSRFToken }
+      })
+      .then(resp => resp.json())
+      .then(data => {
+        if (data.success) {
+          $('#tbl').DataTable().ajax.reload();
+          Swal.fire("Eliminado", "Registro eliminado", "success");
+        } else {
+          Swal.fire("Error", data.error, "error");
+        }
+      });
+    }
+  });
+});
+
+// Buscar ficha médica
+$("#btnBuscarFicha, #ficha_medica").on("click", function() {
+  $('#modalFicha').modal('show');
+  $('#tblFichas').DataTable({
+    destroy: true,
+    ajax: '/api/v1/fichas',
+    columns: [
+      { 
+        data: row => `FM-${row.id_ficha_medica} - ${row.paciente_nombre}` 
+      },
+      { data: row => `${row.paciente_nombre} ${row.paciente_apellido}` },
+      { data: 'cedula' },
+      { data: 'edad' },
+      { data: row => `${row.medico_nombre} ${row.medico_apellido}` },
+      { data: null, render: (data,type,row) =>
+        `<button class="btn btn-sm btn-primary seleccionar-ficha"
+            data-id="${row.id_ficha_medica}"
+            data-paciente="${row.paciente_nombre} ${row.paciente_apellido}"
+            data-cedula="${row.cedula}"
+            data-edad="${row.edad}"
+            data-medico="${row.medico_nombre} ${row.medico_apellido}">
+            Seleccionar
+        </button>` }
+    ]
+  });
+});
+
+// Seleccionar ficha
+$(document).on("click", ".seleccionar-ficha", function() {
+  const id = $(this).data("id");
+  const paciente = $(this).data("paciente");
+  const cedula = $(this).data("cedula");
+  const edad = $(this).data("edad");
+  const medico = $(this).data("medico");
+
+  $("#id_ficha_medica").val(id);
+  $("#ficha_medica").val(`FM-${id} - ${paciente}`);
+  $("#paciente").val(paciente);
+  $("#cedula").val(cedula);
+  $("#edad").val(edad);
+  $("#medico").val(medico);
+  $('#modalFicha').modal('hide');
+});
+
+$(function() {
+  initDatatable();
+});
+</script>
+{% endblock %}
+
