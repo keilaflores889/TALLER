@@ -79,10 +79,10 @@ Diagnósticos
         { data: 'tipo_diagnostico' },
         { data: function(row) {
             return `
-              <button type="button" name="btn_editar" class="btn btn-info" data-id="${row.id_diagnostico}" title="Editar">
+              <button type="button" name="btn_editar" class="btn btn-info" data-id="${row.id_tipo_diagnostico}" title="Editar">
                 <i class="fas fa-edit"></i>
               </button>
-              <button type="button" name="btn_eliminar" class="btn btn-danger" data-id="${row.id_diagnostico}" title="Eliminar">
+              <button type="button" name="btn_eliminar" class="btn btn-danger" data-id="${row.id_tipo_diagnostico}" title="Eliminar">
                 <i class="fas fa-trash-alt"></i>
               </button>`;
           }
@@ -176,7 +176,7 @@ Diagnósticos
           .then(data => {
             if (data.success) {
               $('#modalTitle').text("Editar Diagnóstico");
-              $('#txtIdDiagnostico').val(data.data.id_diagnostico);
+              $('#txtIdDiagnostico').val(data.data.id_tipo_diagnostico);
               $('#txtDescripcion').val(data.data.descripcion_diagnostico);
               $('#txtTipo').val(data.data.tipo_diagnostico);
               $('#modalFormulario').modal();

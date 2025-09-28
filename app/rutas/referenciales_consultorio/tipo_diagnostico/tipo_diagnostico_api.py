@@ -21,11 +21,11 @@ def getDiagnosticos():
 
 
 # Obtener un diagnóstico por ID
-@diagnosticoapi.route('/diagnosticos/<int:id_diagnostico>', methods=['GET'])
-def getDiagnostico(id_diagnostico):
+@diagnosticoapi.route('/diagnosticos/<int:id_tipo_diagnostico>', methods=['GET'])
+def getDiagnostico(id_tipo_diagnostico):
     dao = TipoDiagnosticoDao()
     try:
-        diagnostico = dao.getTipoDiagnosticoById(id_diagnostico)
+        diagnostico = dao.getTipoDiagnosticoById(id_tipo_diagnostico)
         if diagnostico:
             return jsonify({'success': True, 'data': diagnostico, 'error': None}), 200
         else:
@@ -74,8 +74,8 @@ def addDiagnostico():
 
 
 # Actualizar un diagnóstico
-@diagnosticoapi.route('/diagnosticos/<int:id_diagnostico>', methods=['PUT'])
-def updateDiagnostico(id_diagnostico):
+@diagnosticoapi.route('/diagnosticos/<int:id_tipo_diagnostico>', methods=['PUT'])
+def updateDiagnostico(id_tipo_diagnostico):
     data = request.get_json()
     dao = TipoDiagnosticoDao()
 
@@ -93,10 +93,10 @@ def updateDiagnostico(id_diagnostico):
         return jsonify({'success': False, 'error': 'El tipo diagnóstico solo puede contener letras, espacios y "/"'}), 400
 
     try:
-        actualizado = dao.updateTipoDiagnostico(id_diagnostico, descripcion_diagnostico, tipo_diagnostico)
+        actualizado = dao.updateTipoDiagnostico(id_tipo_diagnostico, descripcion_diagnostico, tipo_diagnostico)
         if actualizado:
             return jsonify({'success': True, 'data': {
-                'id': id_diagnostico,
+                'id': id_tipo_diagnostico,
                 'descripcion_diagnostico': descripcion_diagnostico,
                 'tipo_diagnostico': tipo_diagnostico
             }, 'error': None}), 200
@@ -108,13 +108,13 @@ def updateDiagnostico(id_diagnostico):
 
 
 # Eliminar un diagnóstico
-@diagnosticoapi.route('/diagnosticos/<int:id_diagnostico>', methods=['DELETE'])
-def deleteDiagnostico(id_diagnostico):
+@diagnosticoapi.route('/diagnosticos/<int:id_tipo_diagnostico>', methods=['DELETE'])
+def deleteDiagnostico(id_tipo_diagnostico):
     dao = TipoDiagnosticoDao()
     try:
-        eliminado = dao.deleteTipoDiagnostico(id_diagnostico)
+        eliminado = dao.deleteTipoDiagnostico(id_tipo_diagnostico)
         if eliminado:
-            return jsonify({'success': True, 'mensaje': f'Diagnóstico con ID {id_diagnostico} eliminado correctamente.', 'error': None}), 200
+            return jsonify({'success': True, 'mensaje': f'Diagnóstico con ID {id_tipo_diagnostico} eliminado correctamente.', 'error': None}), 200
         else:
             return jsonify({'success': False, 'error': 'No se encontró el diagnóstico o no se pudo eliminar.'}), 404
     except Exception as e:

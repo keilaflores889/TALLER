@@ -6,7 +6,7 @@ class TipoDiagnosticoDao:
 
     def getTiposDiagnostico(self):
         sql = """
-        SELECT id_diagnostico, descripcion_diagnostico, tipo_diagnostico
+        SELECT id_tipo_diagnostico, descripcion_diagnostico, tipo_diagnostico
         FROM tipo_diagnostico
         ORDER BY descripcion_diagnostico ASC
         """
@@ -18,7 +18,7 @@ class TipoDiagnosticoDao:
             diagnosticos = cur.fetchall()
             return [
                 {
-                    'id_diagnostico': diag[0],
+                    'id_tipo_diagnostico': diag[0],
                     'descripcion_diagnostico': diag[1],
                     'tipo_diagnostico': diag[2]
                 }
@@ -33,9 +33,9 @@ class TipoDiagnosticoDao:
 
     def getTipoDiagnosticoById(self, id_diagnostico):
         sql = """
-        SELECT id_diagnostico, descripcion_diagnostico, tipo_diagnostico
+        SELECT id_tipo_diagnostico, descripcion_diagnostico, tipo_diagnostico
         FROM tipo_diagnostico
-        WHERE id_diagnostico = %s
+        WHERE id_tipo_diagnostico = %s
         """
         conexion = Conexion()
         con = conexion.getConexion()
@@ -45,7 +45,7 @@ class TipoDiagnosticoDao:
             diagnostico = cur.fetchone()
             if diagnostico:
                 return {
-                    "id_diagnostico": diagnostico[0],
+                    "id_tipo_diagnostico": diagnostico[0],
                     "descripcion_diagnostico": diagnostico[1],
                     "tipo_diagnostico": diagnostico[2]
                 }
@@ -79,7 +79,7 @@ class TipoDiagnosticoDao:
         sql = """
         INSERT INTO tipo_diagnostico(descripcion_diagnostico, tipo_diagnostico)
         VALUES (%s, %s)
-        RETURNING id_diagnostico
+        RETURNING id_tipo_diagnostico
         """
         conexion = Conexion()
         con = conexion.getConexion()
@@ -105,18 +105,18 @@ class TipoDiagnosticoDao:
             cur.close()
             con.close()
 
-    def updateTipoDiagnostico(self, id_diagnostico, descripcion_diagnostico, tipo_diagnostico):
+    def updateTipoDiagnostico(self, id_tipo_diagnostico, descripcion_diagnostico, tipo_diagnostico):
         sql = """
         UPDATE tipo_diagnostico
         SET descripcion_diagnostico = %s,
             tipo_diagnostico = %s
-        WHERE id_diagnostico = %s
+        WHERE id_tipo_diagnostico = %s
         """
         conexion = Conexion()
         con = conexion.getConexion()
         cur = con.cursor()
         try:
-            cur.execute(sql, (descripcion_diagnostico, tipo_diagnostico, id_diagnostico))
+            cur.execute(sql, (descripcion_diagnostico, tipo_diagnostico, id_tipo_diagnostico))
             filas = cur.rowcount
             con.commit()
             return filas > 0
@@ -131,7 +131,7 @@ class TipoDiagnosticoDao:
     def deleteTipoDiagnostico(self, id_diagnostico):
         sql = """
         DELETE FROM tipo_diagnostico
-        WHERE id_diagnostico = %s
+        WHERE id_tipo_diagnostico = %s
         """
         conexion = Conexion()
         con = conexion.getConexion()
