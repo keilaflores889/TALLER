@@ -31,7 +31,7 @@ class TipoDiagnosticoDao:
             cur.close()
             con.close()
 
-    def getTipoDiagnosticoById(self, id_diagnostico):
+    def getTipoDiagnosticoById(self, id_tipo_diagnostico):
         sql = """
         SELECT id_tipo_diagnostico, descripcion_diagnostico, tipo_diagnostico
         FROM tipo_diagnostico
@@ -41,7 +41,7 @@ class TipoDiagnosticoDao:
         con = conexion.getConexion()
         cur = con.cursor()
         try:
-            cur.execute(sql, (id_diagnostico,))
+            cur.execute(sql, (id_tipo_diagnostico,))
             diagnostico = cur.fetchone()
             if diagnostico:
                 return {
