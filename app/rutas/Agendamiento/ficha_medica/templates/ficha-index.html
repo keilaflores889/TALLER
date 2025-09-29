@@ -22,11 +22,15 @@ Fichas Médicas
               <th>Edad</th>
               <th>Médico</th>
               <th>Fecha de registro</th>
+              <th>Consultorio</th>
               <th>Alergias</th>
               <th>Enfermedades</th>
               <th>Diagnóstico</th>
+              <th>Tipo Diagnóstico</th>
               <th>Sintomas</th>
               <th>Tratamiento</th>
+              <th>Procedimiento Médico</th>
+              <th>Tipo Procedimiento</th>
               <th>Cirugias realizadas</th>
               <th>Receta Medica</th>
               <th>Medicamento en consumo</th>
@@ -42,7 +46,6 @@ Fichas Médicas
     </div>
   </div>
 
-  <!-- Modal Formulario Ficha -->
   <!-- Modal Formulario Ficha -->
 <div class="modal fade" id="modalFormulario" tabindex="-1" role="dialog">
   <div class="modal-dialog modal-xl modal-dialog-scrollable" role="document">
@@ -103,6 +106,15 @@ Fichas Médicas
   </div>
 </div>
 
+<!-- Consultorio -->
+<div class="col-md-6">
+  <div class="form-group">
+    <input type="hidden" id="id_consultorio">
+    <label>Consultorio:</label>
+    <input type="text" id="txtConsultorio" class="form-control" placeholder="Click para seleccionar Consultorio" readonly>
+  </div>
+</div>
+
           <!-- Alergias -->
           <div class="col-md-6">
             <div class="form-group">
@@ -120,10 +132,19 @@ Fichas Médicas
           </div>
 
           <!-- Diagnósticos -->
-          <div class="col-md-12">
+          <div class="col-md-6">
             <div class="form-group">
               <label>Diagnósticos:</label>
               <textarea id="diagnosticos" class="form-control" rows="2"></textarea>
+            </div>
+          </div>
+
+          <!-- Tipo Diagnóstico -->
+          <div class="col-md-6">
+            <div class="form-group">
+              <input type="hidden" id="id_tipo_diagnostico">
+              <label>Tipo Diagnóstico:</label>
+              <input type="text" id="txtTipoDiagnostico" class="form-control" placeholder="Click para seleccionar Tipo Diagnóstico" readonly>
             </div>
           </div>
 
@@ -140,6 +161,23 @@ Fichas Médicas
             <div class="form-group">
               <label>Tratamientos:</label>
               <textarea id="tratamientos" class="form-control" rows="2"></textarea>
+            </div>
+          </div>
+
+          <!-- Procedimiento Médico -->
+          <div class="col-md-6">
+            <div class="form-group">
+              <label>Procedimiento Médico:</label>
+              <input type="text" id="procedimiento_medico" class="form-control" placeholder="Descripción del procedimiento">
+            </div>
+          </div>
+
+          <!-- Tipo Procedimiento Médico -->
+          <div class="col-md-6">
+            <div class="form-group">
+              <input type="hidden" id="id_tipo_procedimiento_medico">
+              <label>Tipo Procedimiento:</label>
+              <input type="text" id="txtTipoProcedimiento" class="form-control" placeholder="Click para seleccionar Tipo Procedimiento" readonly>
             </div>
           </div>
 
@@ -163,7 +201,7 @@ Fichas Médicas
           <div class="col-md-12">
             <div class="form-group">
               <label>Medicamentos en consumo:</label>
-              <input type="text" id="medicamentos_en_consumo" class="form-control" placeholder="Click o dejar vacio en caso de que no consuma medicamentos"readonly>
+              <input type="text" id="medicamentos_en_consumo" class="form-control" placeholder="Click o dejar vacio en caso de que no consuma medicamentos" readonly>
                 <div id="medicamentos_lista"></div>
             </div>
           </div>
@@ -207,8 +245,7 @@ Fichas Médicas
   </div>
 </div>
 
-
-  <!-- Modales de selección (Paciente, Médico, Medicamento) -->
+  <!-- Modales de selección existentes (Paciente, Médico, Medicamento) -->
  <div class="modal fade" id="modalBuscarPaciente" tabindex="-1" role="dialog">
   <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
     <div class="modal-content">
@@ -234,7 +271,6 @@ Fichas Médicas
     </div>
  </div>
 </div>
-
 
   <div class="modal fade" id="modalBuscarMedico" tabindex="-1" role="dialog">
   <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
@@ -285,6 +321,82 @@ Fichas Médicas
   </div>
 </div>
 
+<!-- NUEVOS MODALES para los campos agregados -->
+
+<!-- Modal Consultorio -->
+<div class="modal fade" id="modalBuscarConsultorio" tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">Seleccionar Consultorio</h4>
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="table-responsive">
+          <table class="table table-striped table-bordered w-100" id="tblConsultorio">
+            <thead>
+              <tr>
+                <th>Consultorio</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Tipo Diagnóstico -->
+<div class="modal fade" id="modalBuscarTipoDiagnostico" tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">Seleccionar Tipo Diagnóstico</h4>
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="table-responsive">
+          <table class="table table-striped table-bordered w-100" id="tblTipoDiagnostico">
+            <thead>
+              <tr>
+                <th>Descripción</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Tipo Procedimiento Médico -->
+<div class="modal fade" id="modalBuscarTipoProcedimiento" tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">Seleccionar Tipo Procedimiento</h4>
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="table-responsive">
+          <table class="table table-striped table-bordered w-100" id="tblTipoProcedimiento">
+            <thead>
+              <tr>
+                <th>Descripción</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 
 </div>
 
@@ -303,7 +415,6 @@ Fichas Médicas
 <script>
 const CSRFToken = "{{ csrf_token() }}" || null;
 
-
 // --- fecha registro ---
 function formatDateForInput(fecha) {
   if (!fecha) return '';
@@ -314,6 +425,7 @@ function formatDateForInput(fecha) {
   const year = d.getUTCFullYear();
   return `${year}-${month}-${day}`;
 }
+
 // --- fecha nacimiento ---
 const fecha_nac = $(this).data('fecha_nacimiento');
 let edad = null;
@@ -338,23 +450,26 @@ const initDatatable = () => {
     columns: [
       { data: row => `${row.paciente_nombre} ${row.paciente_apellido}` },
       { data: 'cedula' },
-     { data: 'edad' },
+      { data: 'edad' },
       { data: row => `${row.medico_nombre} ${row.medico_apellido}` },
       { data: 'fecha_registro', render: function(data) {
-  if (!data) return '';
-  const d = new Date(data);
-  if (isNaN(d)) return '';
-  const day = String(d.getUTCDate()).padStart(2, '0');
-  const month = String(d.getUTCMonth() + 1).padStart(2, '0');
-  const year = d.getUTCFullYear();
-  return `${day}/${month}/${year}`;
-}
-},
+        if (!data) return '';
+        const d = new Date(data);
+        if (isNaN(d)) return '';
+        const day = String(d.getUTCDate()).padStart(2, '0');
+        const month = String(d.getUTCMonth() + 1).padStart(2, '0');
+        const year = d.getUTCFullYear();
+        return `${day}/${month}/${year}`;
+      }},
+      { data: 'consultorio_nombre', render: d => d || 'N/A' },
       { data: 'alergias' },
       { data: 'enfermedades' },
       { data: 'diagnosticos' },
+      { data: 'tipo_diagnostico', render: d => d || 'N/A' },
       { data: 'sintomas' },
       { data: 'tratamientos' },
+      { data: 'procedimiento_medico' },
+      { data: 'tipo_procedimiento_medico_procedimiento', render: d => d || 'N/A' },
       { data: 'cirugias_realizadas' },
       { data: 'recetas_medicas' },
       { data: row => (row.medicamentos && row.medicamentos.length > 0) 
@@ -385,6 +500,7 @@ $('#tbl').on('click','button[name="btn_pdf"]', function(){
   const idFicha = $(this).data('id_ficha');
   window.open(`/api/v1/fichas/${idFicha}/pdf`, '_blank');
 });
+
 // --- Modal Paciente ---
 const initDatatablePaciente = () => {
   $('#tblPaciente').DataTable({
@@ -413,8 +529,6 @@ const initDatatablePaciente = () => {
     const cedula = $(this).data('cedula');
     const fecha_nac = $(this).data('fecha_nacimiento');
 
-    
-
     // Calcular edad automáticamente
     let edad = null;
     if(fecha_nac){
@@ -429,7 +543,7 @@ const initDatatablePaciente = () => {
     $('#txtPaciente').val(`${nombre} ${apellido}`);
     $('#id_paciente').val(id);
     $('#cedula').val(cedula);
-    $('#edad').val(edad);  // <--- Aquí se pone la edad calculada
+    $('#edad').val(edad);
     $('#modalBuscarPaciente').modal('hide');
   });
 };
@@ -490,6 +604,77 @@ const initDatatableMedicamento = () => {
   });
 };
 
+// --- NUEVOS MODALES ---
+
+// --- Modal Consultorio ---
+const initDatatableConsultorio = () => {
+  $('#tblConsultorio').DataTable({
+    language: { url: "{{ url_for('static', filename='vendor/datatables/es-ES.json') }}" },
+    ajax: '/api/v1/consultorios',
+    columns: [
+      { data: 'nombre_consultorio' },
+      { data: null, render: row => `
+        <button class="btn btn-primary btn-sm" name="btn_seleccionar_consultorio"
+          data-id="${row.codigo}"
+          data-nombre="${row.nombre_consultorio}">
+          Seleccionar
+        </button>` }
+    ]
+  });
+
+  $('#tblConsultorio').on('click', 'button[name="btn_seleccionar_consultorio"]', function(){
+    $('#id_consultorio').val($(this).data('id'));
+    $('#txtConsultorio').val($(this).data('nombre'));
+    $('#modalBuscarConsultorio').modal('hide');
+  });
+};
+
+// --- Modal Tipo Diagnóstico ---
+const initDatatableTipoDiagnostico = () => {
+  $('#tblTipoDiagnostico').DataTable({
+    language: { url: "{{ url_for('static', filename='vendor/datatables/es-ES.json') }}" },
+    ajax: '/api/v1/diagnosticos',
+    columns: [
+      { data: 'tipo_diagnostico' },
+      { data: null, render: row => `
+        <button class="btn btn-primary btn-sm" name="btn_seleccionar_tipo_diagnostico"
+          data-id="${row.id_tipo_diagnostico}"
+          data-tipo_diagnostico="${row.tipo_diagnostico}">
+          Seleccionar
+        </button>` }
+    ]
+  });
+
+  $('#tblTipoDiagnostico').on('click', 'button[name="btn_seleccionar_tipo_diagnostico"]', function(){
+    $('#id_tipo_diagnostico').val($(this).data('id'));
+    $('#txtTipoDiagnostico').val($(this).data('tipo_diagnostico'));
+    $('#modalBuscarTipoDiagnostico').modal('hide');
+  });
+};
+
+// --- Modal Tipo Procedimiento ---
+const initDatatableTipoProcedimiento = () => {
+  $('#tblTipoProcedimiento').DataTable({
+    language: { url: "{{ url_for('static', filename='vendor/datatables/es-ES.json') }}" },
+    ajax: '/api/v1/procedimientos',
+    columns: [
+      { data: 'procedimiento' },
+      { data: null, render: row => `
+        <button class="btn btn-primary btn-sm" name="btn_seleccionar_tipo_procedimiento"
+          data-id="${row.id_tipo_procedimiento}"
+          data-procedimiento="${row.procedimiento}">
+          Seleccionar
+        </button>` }
+    ]
+  });
+
+  $('#tblTipoProcedimiento').on('click', 'button[name="btn_seleccionar_tipo_procedimiento"]', function(){
+    $('#id_tipo_procedimiento_medico').val($(this).data('id'));
+    $('#txtTipoProcedimiento').val($(this).data('procedimiento'));
+    $('#modalBuscarTipoProcedimiento').modal('hide');
+  });
+};
+
 function renderMedicamentos(){
   $('#medicamentos_lista').empty();
   medicamentosSeleccionados.forEach(m => {
@@ -513,15 +698,17 @@ $(document).on('click', '.remove-medicamento', function(){
 $('#txtPaciente').click(()=>$('#modalBuscarPaciente').modal('show'));
 $('#txtMedico').click(()=>$('#modalBuscarMedico').modal('show'));
 $('#medicamentos_en_consumo').click(()=>$('#modalBuscarMedicamento').modal('show'));
-
+$('#txtConsultorio').click(()=>$('#modalBuscarConsultorio').modal('show'));
+$('#txtTipoDiagnostico').click(()=>$('#modalBuscarTipoDiagnostico').modal('show'));
+$('#txtTipoProcedimiento').click(()=>$('#modalBuscarTipoProcedimiento').modal('show'));
 
 // --- Función para limpiar modal ---
 function limpiarModal() {
   // limpiar todos los inputs de texto y textarea
-  $('#txtIdFicha,#txtPaciente,#cedula,#txtMedico,#fecha_registro,#alergias,#enfermedades,#diagnosticos,#sintomas,#tratamientos,#cirugias_realizadas,#recetas_medicas,#medicamentos_en_consumo,#motivos_consultas,#observaciones,#edad').val('');
+  $('#txtIdFicha,#txtPaciente,#cedula,#txtMedico,#fecha_registro,#alergias,#enfermedades,#diagnosticos,#sintomas,#tratamientos,#cirugias_realizadas,#recetas_medicas,#medicamentos_en_consumo,#motivos_consultas,#observaciones,#edad,#procedimiento_medico,#txtConsultorio,#txtTipoDiagnostico,#txtTipoProcedimiento').val('');
 
   // limpiar ids ocultos
-  $('#id_paciente,#id_medico').val('');
+  $('#id_paciente,#id_medico,#id_consultorio,#id_tipo_diagnostico,#id_tipo_procedimiento_medico').val('');
 
   // estado por defecto
   $('#estado').val('En seguimiento');
@@ -529,6 +716,7 @@ function limpiarModal() {
   // limpiar errores de validación
   $('#error_txtPaciente,#error_cedula,#error_edad,#error_txtMedico,#error_fecha_registro').hide();
   $('#estado').val('');
+  
   // reiniciar medicamentos seleccionados
   medicamentosSeleccionados = [];
   renderMedicamentos();
@@ -537,14 +725,13 @@ function limpiarModal() {
   $('#modalTitle').text("Agregar Ficha Médica");
 }
 
-
 // --- Agregar ficha ---
 $('#btnAgregar').click(()=>{
   $('#modalTitle').text("Agregar Ficha Médica");
-  $('#txtIdFicha,#txtPaciente,#cedula,#txtMedico,#fecha_registro,#alergias,#enfermedades,#diagnosticos,#sintomas,#tratamientos,#cirugias_realizadas,#recetas_medicas,#medicamentos_en_consumo,#motivos_consultas,#observaciones').val('');
-  $('#id_paciente,#id_medico').val('');
+  $('#txtIdFicha,#txtPaciente,#cedula,#txtMedico,#fecha_registro,#alergias,#enfermedades,#diagnosticos,#sintomas,#tratamientos,#cirugias_realizadas,#recetas_medicas,#medicamentos_en_consumo,#motivos_consultas,#observaciones,#procedimiento_medico,#txtConsultorio,#txtTipoDiagnostico,#txtTipoProcedimiento').val('');
+  $('#id_paciente,#id_medico,#id_consultorio,#id_tipo_diagnostico,#id_tipo_procedimiento_medico').val('');
   $('#estado').val('En seguimiento');
-   limpiarModal(); 
+  limpiarModal(); 
   medicamentosSeleccionados = [];
   renderMedicamentos();
   $('#modalFormulario').modal('show');
@@ -581,8 +768,6 @@ if(!camposValidos){
   return; // no enviar si hay campos obligatorios vacíos
 }
 
-
-
   // calcular edad en base a fecha de nacimiento
   const fecha_nac = $('#txtPaciente').data('fecha_nacimiento'); // necesitamos que al seleccionar paciente guardes fecha_nac
   let edad = null;
@@ -611,10 +796,14 @@ if(!camposValidos){
     motivos_consultas: $('#motivos_consultas').val(),
     observaciones: $('#observaciones').val(),
     estado: $('#estado').val(),
+    procedimiento_medico: $('#procedimiento_medico').val(),
+    id_consultorio: $('#id_consultorio').val() || null,
+    id_tipo_diagnostico: $('#id_tipo_diagnostico').val() || null,
+    id_tipo_procedimiento_medico: $('#id_tipo_procedimiento_medico').val() || null,
     medicamentos: medicamentosSeleccionados.length ? 
                medicamentosSeleccionados.map(m => ({id: m.id, nombre: m.nombre})) : []
-
   };
+  
   const tabla = $('#tbl').DataTable();
   const url = idFicha ? `/api/v1/fichas/${idFicha}` : '/api/v1/fichas';
   const method = idFicha ? 'PUT' : 'POST';
@@ -650,10 +839,15 @@ $(document).on('click','button[name="btn_editar"]', function(){
       $('#id_medico').val(f.id_medico);
       $('#txtMedico').val(`${f.medico_nombre} ${f.medico_apellido}`);
       $('#fecha_registro').val(formatDateForInput(f.fecha_registro));
-
-
-
-
+      
+      // Nuevos campos
+      $('#procedimiento_medico').val(f.procedimiento_medico);
+      $('#id_consultorio').val(f.id_consultorio);
+      $('#txtConsultorio').val(f.consultorio_nombre || '');
+      $('#id_tipo_diagnostico').val(f.id_tipo_diagnostico);
+      $('#txtTipoDiagnostico').val(f.tipo_diagnostico_descripcion || '');
+      $('#id_tipo_procedimiento_medico').val(f.id_tipo_procedimiento_medico);
+      $('#txtTipoProcedimiento').val(f.tipo_procedimiento_medico_procedimiento || '');
 
       if(f.medicamentos && Array.isArray(f.medicamentos)){
         medicamentosSeleccionados = f.medicamentos.map(m=>({id:m.id_medicamento, nombre:m.nombre_medicamento}));
@@ -695,14 +889,15 @@ $(document).on('click','button[name="btn_eliminar"]', function(){
   });
 });
 
-
 // --- Inicialización ---
 $(function(){
-  
   initDatatable();
   initDatatablePaciente();
   initDatatableMedico();
   initDatatableMedicamento();
+  initDatatableConsultorio();
+  initDatatableTipoDiagnostico();
+  initDatatableTipoProcedimiento();
 });
 </script>
 {% endblock %}

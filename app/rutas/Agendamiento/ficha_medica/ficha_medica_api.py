@@ -56,15 +56,21 @@ def getFichaPDF(id_ficha):
         medicamentos_texto = "<br/>".join([f"• {m.get('nombre_medicamento', '')}" for m in meds])
     else:
          medicamentos_texto = "N/A"
+    
     data = [
         ["Paciente", f"{ficha.get('paciente_nombre', '')} {ficha.get('paciente_apellido', '')}"],
         ["Edad", ficha.get("edad", "")],
         ["Medico", f"{ficha.get('medico_nombre', '')} {ficha.get('medico_apellido', '')}"],
-          ["Fecha registro", fecha_registro],
+        ["Fecha registro", fecha_registro],
+        ["Consultorio", ficha.get("consultorio_nombre", "N/A")],
+        ["Alergias", ficha.get("alergias", "")],
         ["Enfermedades", ficha.get("enfermedades", "")],
         ["Diagnóstico", ficha.get("diagnosticos", "")],
+        ["Tipo Diagnóstico", ficha.get("tipo_diagnostico_descripcion", "N/A")],
         ["Síntomas", ficha.get("sintomas", "")],
         ["Tratamientos", ficha.get("tratamientos", "")],
+        ["Procedimiento Médico", ficha.get("procedimiento_medico", "")],
+        ["Tipo Procedimiento", ficha.get("tipo_procedimiento_medico_descripcion", "N/A")],
         ["Cirugías realizadas", ficha.get("cirugias_realizadas", "")],
         ["Recetas médicas", ficha.get("recetas_medicas", "")],
         ["Medicamentos en consumo", Paragraph(medicamentos_texto, styles['Normal'])], 
@@ -159,10 +165,33 @@ def addFicha():
             data["id_medicamento"] = None
             data["medicamentos_en_consumo"] = ""
 
+        # Asegurar que los campos opcionales estén presentes con valores por defecto
+        campos_opcionales = {
+            "alergias": "",
+            "enfermedades": "",
+            "diagnosticos": "",
+            "sintomas": "",
+            "tratamientos": "",
+            "cirugias_realizadas": "",
+            "recetas_medicas": "",
+            "motivos_consultas": "",
+            "observaciones": "",
+            "estado": "Activo",
+            "procedimiento_medico": "",
+            "cedula": "",
+            "edad": 0
+        }
+        
+        for campo, valor_defecto in campos_opcionales.items():
+            if campo not in data or data[campo] is None:
+                data[campo] = valor_defecto
+
         ficha_id = dao.addFicha(data)
         if ficha_id:
             return jsonify(success=True, data={**data, "id_ficha_medica": ficha_id}, error=None), 201
         return jsonify(success=False, error="No se pudo guardar ficha médica."), 500
+    except ValueError as ve:
+        return jsonify(success=False, error=str(ve)), 400
     except Exception as e:
         app.logger.error(f"Error al agregar ficha: {str(e)}")
         return jsonify(success=False, error="Error interno al guardar ficha médica."), 500
@@ -189,10 +218,33 @@ def updateFicha(id_ficha):
             data["id_medicamento"] = None
             data["medicamentos_en_consumo"] = ""
 
+        # Asegurar que los campos obligatorios estén presentes con valores por defecto si es necesario
+        campos_obligatorios = {
+            "alergias": "",
+            "enfermedades": "",
+            "diagnosticos": "",
+            "sintomas": "",
+            "tratamientos": "",
+            "cirugias_realizadas": "",
+            "recetas_medicas": "",
+            "motivos_consultas": "",
+            "observaciones": "",
+            "estado": "Activo",
+            "procedimiento_medico": "",
+            "cedula": "",
+            "edad": data.get("edad", 0)
+        }
+        
+        for campo, valor_defecto in campos_obligatorios.items():
+            if campo not in data or data[campo] is None:
+                data[campo] = valor_defecto
+
         actualizado = dao.updateFicha(id_ficha, data)
         if actualizado:
             return jsonify(success=True, data={**data, "id_ficha_medica": id_ficha}, error=None), 200
         return jsonify(success=False, error=f"No se encontró ficha con ID {id_ficha} o no se pudo actualizar."), 404
+    except ValueError as ve:
+        return jsonify(success=False, error=str(ve)), 400
     except Exception as e:
         app.logger.error(f"Error al actualizar ficha {id_ficha}: {str(e)}")
         return jsonify(success=False, error="Error interno al actualizar ficha médica."), 500
@@ -206,7 +258,7 @@ def deleteFicha(id_ficha):
     try:
         if dao.deleteFicha(id_ficha):
             return jsonify(success=True, data=f"Ficha {id_ficha} eliminada.", error=None), 200
-        
+        return jsonify(success=False, error=f"No se encontró ficha con ID {id_ficha}."), 404
     except Exception as e:
         app.logger.error(f"Error al eliminar ficha {id_ficha}: {str(e)}")
         return jsonify(success=False, error="Error interno al eliminar ficha médica."), 500

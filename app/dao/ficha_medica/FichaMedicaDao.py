@@ -32,24 +32,50 @@ class FichaMedicaDao:
 
         data["edad"] = edad  # asegura que siempre sea int
 
+        # Validar campos opcionales que son foreign keys (si se proporcionan, deben ser enteros válidos)
+        campos_fk_opcionales = ["id_tipo_diagnostico", "id_tipo_procedimiento_medico", "id_consultorio"]
+        for campo in campos_fk_opcionales:
+            valor = data.get(campo)
+            if valor is not None and valor != "":
+                try:
+                    data[campo] = int(valor)
+                except ValueError:
+                    raise ValueError(f"El campo '{campo}' debe ser un número entero válido")
+
     # ============================
-    # Obtener todas las fichas médicas
+    # Obtener todas las fichas médicas - CORREGIDO
     # ============================
     def getFichas(self):
         try:
             cursor = self.conn.cursor()
             cursor.execute("""
-                SELECT f.*, 
+                SELECT f.id_ficha_medica, f.id_paciente, f.id_medico, f.cedula, f.edad, 
+                       f.fecha_registro, f.alergias, f.enfermedades, f.diagnosticos, 
+                       f.sintomas, f.tratamientos, f.cirugias_realizadas, f.recetas_medicas,
+                       f.motivos_consultas, f.observaciones, f.estado, f.procedimiento_medico,
+                       f.id_tipo_diagnostico, f.id_tipo_procedimiento_medico, f.id_consultorio,
                        p.nombre AS paciente_nombre, p.apellido AS paciente_apellido,
                        m.nombre AS medico_nombre, m.apellido AS medico_apellido,
-                       ARRAY_REMOVE(ARRAY_AGG(fm.id_medicamento), NULL) AS medicamentos_ids,
-                       ARRAY_REMOVE(ARRAY_AGG(md.nombre_medicamento), NULL) AS medicamentos_nombres
+                       td.tipo_diagnostico AS tipo_diagnostico_descripcion,
+                       tpm.procedimiento AS tipo_procedimiento_medico_descripcion,
+                       c.nombre_consultorio AS consultorio_nombre,
+                       COALESCE(ARRAY_REMOVE(ARRAY_AGG(fm.id_medicamento), NULL), ARRAY[]::INTEGER[]) AS medicamentos_ids,
+                       COALESCE(ARRAY_REMOVE(ARRAY_AGG(md.nombre_medicamento), NULL), ARRAY[]::TEXT[]) AS medicamentos_nombres
                 FROM ficha_medica f
                 INNER JOIN paciente p ON f.id_paciente = p.id_paciente
                 INNER JOIN medico m ON f.id_medico = m.id_medico
+                LEFT JOIN tipo_diagnostico td ON f.id_tipo_diagnostico = td.id_tipo_diagnostico
+                LEFT JOIN tipo_procedimiento_medico tpm ON f.id_tipo_procedimiento_medico = tpm.id_tipo_procedimiento
+                LEFT JOIN consultorio c ON f.id_consultorio = c.codigo
                 LEFT JOIN ficha_medicamento fm ON f.id_ficha_medica = fm.id_ficha_medica
                 LEFT JOIN medicamento md ON fm.id_medicamento = md.id_medicamento
-                GROUP BY f.id_ficha_medica, p.nombre, p.apellido, m.nombre, m.apellido
+                GROUP BY f.id_ficha_medica, f.id_paciente, f.id_medico, f.cedula, f.edad, 
+                         f.fecha_registro, f.alergias, f.enfermedades, f.diagnosticos, 
+                         f.sintomas, f.tratamientos, f.cirugias_realizadas, f.recetas_medicas,
+                         f.motivos_consultas, f.observaciones, f.estado, f.procedimiento_medico,
+                         f.id_tipo_diagnostico, f.id_tipo_procedimiento_medico, f.id_consultorio,
+                         p.nombre, p.apellido, m.nombre, m.apellido,
+                         td.tipo_diagnostico, tpm.procedimiento, c.nombre_consultorio
                 ORDER BY f.id_ficha_medica DESC
             """)
             rows = cursor.fetchall()
@@ -69,24 +95,40 @@ class FichaMedicaDao:
             return []
 
     # ============================
-    # Obtener ficha por ID
+    # Obtener ficha por ID - CORREGIDO
     # ============================
     def getFichaById(self, id_ficha):
         try:
             cursor = self.conn.cursor()
             cursor.execute("""
-                SELECT f.*, 
+                SELECT f.id_ficha_medica, f.id_paciente, f.id_medico, f.cedula, f.edad, 
+                       f.fecha_registro, f.alergias, f.enfermedades, f.diagnosticos, 
+                       f.sintomas, f.tratamientos, f.cirugias_realizadas, f.recetas_medicas,
+                       f.motivos_consultas, f.observaciones, f.estado, f.procedimiento_medico,
+                       f.id_tipo_diagnostico, f.id_tipo_procedimiento_medico, f.id_consultorio,
                        p.nombre AS paciente_nombre, p.apellido AS paciente_apellido,
                        m.nombre AS medico_nombre, m.apellido AS medico_apellido,
-                       ARRAY_REMOVE(ARRAY_AGG(fm.id_medicamento), NULL) AS medicamentos_ids,
-                       ARRAY_REMOVE(ARRAY_AGG(md.nombre_medicamento), NULL) AS medicamentos_nombres
+                       td.tipo_diagnostico AS tipo_diagnostico_descripcion,
+                       tpm.procedimiento AS tipo_procedimiento_medico_descripcion,
+                       c.nombre_consultorio AS consultorio_nombre,
+                       COALESCE(ARRAY_REMOVE(ARRAY_AGG(fm.id_medicamento), NULL), ARRAY[]::INTEGER[]) AS medicamentos_ids,
+                       COALESCE(ARRAY_REMOVE(ARRAY_AGG(md.nombre_medicamento), NULL), ARRAY[]::TEXT[]) AS medicamentos_nombres
                 FROM ficha_medica f
                 INNER JOIN paciente p ON f.id_paciente = p.id_paciente
                 INNER JOIN medico m ON f.id_medico = m.id_medico
+                LEFT JOIN tipo_diagnostico td ON f.id_tipo_diagnostico = td.id_tipo_diagnostico
+                LEFT JOIN tipo_procedimiento_medico tpm ON f.id_tipo_procedimiento_medico = tpm.id_tipo_procedimiento
+                LEFT JOIN consultorio c ON f.id_consultorio = c.codigo
                 LEFT JOIN ficha_medicamento fm ON f.id_ficha_medica = fm.id_ficha_medica
                 LEFT JOIN medicamento md ON fm.id_medicamento = md.id_medicamento
                 WHERE f.id_ficha_medica=%s
-                GROUP BY f.id_ficha_medica, p.nombre, p.apellido, m.nombre, m.apellido
+                GROUP BY f.id_ficha_medica, f.id_paciente, f.id_medico, f.cedula, f.edad, 
+                         f.fecha_registro, f.alergias, f.enfermedades, f.diagnosticos, 
+                         f.sintomas, f.tratamientos, f.cirugias_realizadas, f.recetas_medicas,
+                         f.motivos_consultas, f.observaciones, f.estado, f.procedimiento_medico,
+                         f.id_tipo_diagnostico, f.id_tipo_procedimiento_medico, f.id_consultorio,
+                         p.nombre, p.apellido, m.nombre, m.apellido,
+                         td.tipo_diagnostico, tpm.procedimiento, c.nombre_consultorio
             """, (id_ficha,))
             row = cursor.fetchone()
             if not row:
@@ -115,9 +157,10 @@ class FichaMedicaDao:
                     id_paciente, id_medico, cedula, edad, fecha_registro,
                     alergias, enfermedades, diagnosticos, sintomas,
                     tratamientos, cirugias_realizadas, recetas_medicas,
-                    motivos_consultas, observaciones, estado
+                    motivos_consultas, observaciones, estado,
+                    procedimiento_medico, id_tipo_diagnostico, id_tipo_procedimiento_medico, id_consultorio
                 )
-                VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+                VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
                 RETURNING id_ficha_medica
             """, (
                 data.get("id_paciente"),
@@ -134,7 +177,11 @@ class FichaMedicaDao:
                 data.get("recetas_medicas"),
                 data.get("motivos_consultas"),
                 data.get("observaciones"),
-                data.get("estado")
+                data.get("estado"),
+                data.get("procedimiento_medico"),
+                data.get("id_tipo_diagnostico") if data.get("id_tipo_diagnostico") else None,
+                data.get("id_tipo_procedimiento_medico") if data.get("id_tipo_procedimiento_medico") else None,
+                data.get("id_consultorio") if data.get("id_consultorio") else None
             ))
             id_ficha = cursor.fetchone()[0]
             self.conn.commit()
@@ -177,7 +224,11 @@ class FichaMedicaDao:
                     recetas_medicas=%s,
                     motivos_consultas=%s,
                     observaciones=%s,
-                    estado=%s
+                    estado=%s,
+                    procedimiento_medico=%s,
+                    id_tipo_diagnostico=%s,
+                    id_tipo_procedimiento_medico=%s,
+                    id_consultorio=%s
                 WHERE id_ficha_medica=%s
             """, (
                 data.get("id_paciente"),
@@ -195,6 +246,10 @@ class FichaMedicaDao:
                 data.get("motivos_consultas"),
                 data.get("observaciones"),
                 data.get("estado"),
+                data.get("procedimiento_medico"),
+                data.get("id_tipo_diagnostico") if data.get("id_tipo_diagnostico") else None,
+                data.get("id_tipo_procedimiento_medico") if data.get("id_tipo_procedimiento_medico") else None,
+                data.get("id_consultorio") if data.get("id_consultorio") else None,
                 id_ficha
             ))
 
