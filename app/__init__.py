@@ -61,6 +61,10 @@ from app.rutas.referenciales_consultorio.tipo_estudio.estudio_routes import estu
 from app.rutas.referenciales_consultorio.tipo_procedimiento_medico.procedimiento_routes import procedimientomod
 from app.rutas.referenciales_consultorio.tipo_diagnostico.tipo_diagnostico_routes import diagnosticomod
 
+#movimientos modulo consultorio
+from app.rutas.ModuloConsultorio.RegisConsulta.consulta_routes import consultamod
+
+
 # registrar referenciales
 modulo0 = '/referenciales' 
 app.register_blueprint(vistamod, url_prefix=f'{modulo0}/vista') 
@@ -89,6 +93,11 @@ app.register_blueprint(analisismod, url_prefix=f'{modulo0}/analisis')
 app.register_blueprint(estudiomod, url_prefix=f'{modulo0}/estudio')
 app.register_blueprint(procedimientomod, url_prefix=f'{modulo0}/procedimiento')
 app.register_blueprint(diagnosticomod, url_prefix=f'{modulo0}/diagnostico')
+
+# registrar movimientos consultorios
+modulo0 = '/Moduloconsultorios'
+app.register_blueprint(consultamod, url_prefix=f'{modulo0}/consultorios')
+
 
 # registrar agendamientos
 modulo0 = '/agendamientos'
@@ -148,13 +157,18 @@ from app.rutas.Agendamiento.avisosRecordatorios.AvisosRecordatorio_api import av
 from app.rutas.Agendamiento.ficha_medica.ficha_medica_api import fichaapi
 
 from app.rutas.Agendamiento.odontograma.odontograma_api import odontogramaapi
-#consultorio
+#consultorio referenciales
 from app.rutas.referenciales_consultorio.medicamento.medicamento_api import medicamentoapi
 from app.rutas.referenciales_consultorio.sintoma.sintoma_api import sintomaapi
 from app.rutas.referenciales_consultorio.tipo_analisis.analisis_api import analisisapi
 from app.rutas.referenciales_consultorio.tipo_estudio.estudio_api import estudioapi
 from app.rutas.referenciales_consultorio.tipo_procedimiento_medico.procedimiento_api import procedimientoapi
 from app.rutas.referenciales_consultorio.tipo_diagnostico.tipo_diagnostico_api import diagnosticoapi
+
+#movimientos modulo consultorio
+from app.rutas.ModuloConsultorio.RegisConsulta.consulta_api import consultasapi
+
+
 
 # APIS v1
 #Ciudad
@@ -251,6 +265,10 @@ app.register_blueprint(procedimientoapi, url_prefix=version1)
 
 version1 = '/api/v1'
 app.register_blueprint(diagnosticoapi, url_prefix=version1)
+
+#movimientos modulo consultorio
+version1 = '/api/v1'
+app.register_blueprint(consultasapi, url_prefix=version1)
 
 @app.route('/login')
 def login():
