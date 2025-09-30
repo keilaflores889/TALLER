@@ -470,6 +470,7 @@ Consultas Médicas
 <script>
 const CSRFToken = "{{ csrf_token() }}" || null;
 let consultaActualId = null;
+let detalleEditandoId = null;
 
 // --- Formato de fecha ---
 function formatDateForInput(fecha) {
@@ -494,7 +495,7 @@ function formatDateForDisplay(fecha) {
 
 // --- Actualizar estadísticas ---
 function actualizarEstadisticas() {
-  fetch('/api/consultas')
+  fetch('/api/v1/consultas')
     .then(r => r.json())
     .then(d => {
       if (d.success) {
@@ -701,6 +702,8 @@ function limpiarModalDetalle() {
   $('#txtSintoma, #pieza_dental, #diagnostico, #tratamiento, #procedimiento').val('');
   $('#id_sintoma').val('');
   $('#error_txtSintoma, #error_diagnostico, #error_tratamiento').hide();
+  detalleEditandoId = null; // ⬅️ AGREGAR ESTA LÍNEA
+  $('#btnAgregarDetalle').text('Agregar Detalle'); // ⬅️ AGREGAR ESTA LÍNEA
 }
 
 // --- Guardar Consulta Cabecera ---
@@ -858,6 +861,7 @@ $('#tbl').on('click', 'button[name="btn_detalles"]', function() {
 });
 
 // --- Cargar detalles de la consulta ---
+// --- Cargar detalles de la consulta ---
 function cargarDetallesConsulta(idConsulta) {
   fetch(`/api/v1/consultas/${idConsulta}/detalles`)
     .then(r => r.json())
@@ -875,7 +879,20 @@ function cargarDetallesConsulta(idConsulta) {
               <td>${det.tratamiento}</td>
               <td>${det.procedimiento || '-'}</td>
               <td>
-                <button class="btn btn-danger btn-sm" name="btn_eliminar_detalle" data-id="${det.id_consulta_detalle}">
+                <button class="btn btn-info btn-sm" name="btn_editar_detalle" 
+                  data-id="${det.id_consulta_detalle}"
+                  data-id_sintoma="${det.id_sintoma}"
+                  data-descripcion_sintoma="${det.descripcion_sintoma}"
+                  data-pieza_dental="${det.pieza_dental || ''}"
+                  data-diagnostico="${det.diagnostico}"
+                  data-tratamiento="${det.tratamiento}"
+                  data-procedimiento="${det.procedimiento || ''}"
+                  title="Editar">
+                  <i class="fas fa-edit"></i>
+                </button>
+                <button class="btn btn-danger btn-sm" name="btn_eliminar_detalle" 
+                  data-id="${det.id_consulta_detalle}"
+                  title="Eliminar">
                   <i class="fas fa-trash-alt"></i>
                 </button>
               </td>
@@ -900,7 +917,27 @@ function cargarDetallesConsulta(idConsulta) {
     });
 }
 
+// --- Editar Detalle ---
+$('#tblDetalles').on('click', 'button[name="btn_editar_detalle"]', function() {
+  const btn = $(this);
+  
+  detalleEditandoId = btn.data('id');
+  
+  $('#id_sintoma').val(btn.data('id_sintoma'));
+  $('#txtSintoma').val(btn.data('descripcion_sintoma'));
+  $('#pieza_dental').val(btn.data('pieza_dental'));
+  $('#diagnostico').val(btn.data('diagnostico'));
+  $('#tratamiento').val(btn.data('tratamiento'));
+  $('#procedimiento').val(btn.data('procedimiento'));
+  
+  $('#btnAgregarDetalle').text('Actualizar Detalle');
+  
+  $('html, body').animate({
+    scrollTop: $('#txtSintoma').offset().top - 100
+  }, 500);
+});
 
+// --- Agregar Detalle ---
 // --- Agregar Detalle ---
 $('#btnAgregarDetalle').on('click', () => {
   const payload = {
@@ -922,8 +959,15 @@ $('#btnAgregarDetalle').on('click', () => {
 
   if (!valido) return;
 
-  fetch('/api/v1/consultas-detalle', {
-    method: 'POST',
+  // ⬇️ ESTA PARTE ES NUEVA
+  const url = detalleEditandoId 
+    ? `/api/v1/consultas-detalle/${detalleEditandoId}` 
+    : '/api/v1/consultas-detalle';
+  const method = detalleEditandoId ? 'PUT' : 'POST';
+  const mensajeExito = detalleEditandoId ? 'actualizado' : 'agregado';
+
+  fetch(url, {
+    method: method,
     headers: { 'Content-Type': 'application/json', 'X-CSRFToken': CSRFToken },
     body: JSON.stringify(payload)
   })
@@ -932,9 +976,9 @@ $('#btnAgregarDetalle').on('click', () => {
     if (d.success) {
       limpiarModalDetalle();
       cargarDetallesConsulta(consultaActualId);
-      Swal.fire('Éxito', 'Detalle agregado correctamente', 'success');
+      Swal.fire('Éxito', `Detalle ${mensajeExito} correctamente`, 'success');
     } else {
-      Swal.fire('Error', d.error || 'No se pudo agregar el detalle', 'error');
+      Swal.fire('Error', d.error || `No se pudo ${mensajeExito.slice(0,-2)}ar el detalle`, 'error');
     }
   })
   .catch(err => {
