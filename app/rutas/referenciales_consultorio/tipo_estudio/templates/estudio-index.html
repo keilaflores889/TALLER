@@ -1,12 +1,12 @@
 {% extends 'base.html' %}
 
 {% block titulo %}
-Procedimientos
+Estudios
 {% endblock %}
 
 {% block contenido %}
 <div class="container mt-4">
-    <h3>Listar Procedimientos</h3>
+    <h3>Listar Estudios</h3>
 
     <!-- tarjeta -->
     <div class="card">
@@ -17,7 +17,7 @@ Procedimientos
         <table class="table table-striped" id="tbl">
           <thead class="table-info">
             <tr>
-              <th>Procedimiento</th>
+              <th>Estudio</th>
               <th>Acciones</th>
             </tr>
           </thead>
@@ -39,9 +39,9 @@ Procedimientos
 
           <div class="modal-body">
             <div class="form-group">
-              <input type="hidden" id="txtIdProcedimiento">
-              <label for="txtDescripcion">Procedimiento:</label>
-              <textarea type="text" class="form-control" placeholder="Ingrese un tipo de procedimiento" id="txtDescripcion"></textarea>
+              <input type="hidden" id="txtIdEstudio">
+              <label for="txtDescripcion">Estudio:</label>
+              <textarea type="text" class="form-control" placeholder="Ingrese un tipo de estudio" id="txtDescripcion"></textarea>
             </div>
           </div>
 
@@ -61,7 +61,6 @@ Procedimientos
 <script>
   const CSRFToken = "{{ csrf_token() }}" || null;
 
-  // Validación: letras, números, espacios, acentos y "/"
   function descripcionValida(descripcion) {
     const regex = /^[A-Za-z0-9ÁÉÍÓÚÑáéíóúñ\s/]+$/;
     return regex.test(descripcion.trim());
@@ -72,13 +71,13 @@ Procedimientos
       language: {
         url: "{{ url_for('static', filename='vendor/datatables/es-ES.json') }}",
       },
-      ajax:'/api/v1/procedimientos',
+      ajax:'/api/v1/estudios',
       columns: [
-        { data: 'descripcion_procedimiento' },
+        { data: 'descripcion_estudio' },
         {
           data: function(row) {
-            return `<button type="button" name="btn_editar" class="btn btn-info" data-id_procedimiento="${row.id_tipo_procedimiento}" title="Editar"><i class="fas fa-edit"></i></button>
-                    <button type="button" name="btn_eliminar" class="btn btn-danger" data-id_procedimiento="${row.id_tipo_procedimiento}" title="Eliminar"><i class="fas fa-trash-alt"></i></button>`;
+            return `<button type="button" name="btn_editar" class="btn btn-info" data-id_estudio="${row.id_tipo_estudio}" title="Editar"><i class="fas fa-edit"></i></button>
+                    <button type="button" name="btn_eliminar" class="btn btn-danger" data-id_estudio="${row.id_tipo_estudio}" title="Eliminar"><i class="fas fa-trash-alt"></i></button>`;
           }
         }
       ],
@@ -94,8 +93,8 @@ Procedimientos
 
   const agregar = () => {
     $('#btnAgregar').on('click', function(){
-      $('#modalTitle').text("Agregar un Procedimiento");
-      $('#txtIdProcedimiento').val("");
+      $('#modalTitle').text("Agregar un Estudio");
+      $('#txtIdEstudio').val("");
       $('#txtDescripcion').val("");
       $('#modalFormulario').modal();
     });
@@ -103,7 +102,7 @@ Procedimientos
 
   const guardar = () => {
     $('#btnGuardar').on('click', function() {
-      const id_procedimiento = $('#txtIdProcedimiento').val();
+      const id_estudio = $('#txtIdEstudio').val();
       const descripcion = $('#txtDescripcion').val().trim();
       const tabla = $('#tbl').DataTable();
 
@@ -113,8 +112,8 @@ Procedimientos
       }
 
       const payload = { descripcion };
-      const url = id_procedimiento ? `/api/v1/procedimientos/${id_procedimiento}` : `/api/v1/procedimientos`;
-      const method = id_procedimiento ? 'PUT' : 'POST';
+      const url = id_estudio ? `/api/v1/estudios/${id_estudio}` : `/api/v1/estudios`;
+      const method = id_estudio ? 'PUT' : 'POST';
 
       fetch(url, {
         method: method,
@@ -130,11 +129,11 @@ Procedimientos
           tabla.ajax.reload();
           Swal.fire(
             "Éxito",
-            id_procedimiento ? "El procedimiento fue actualizado correctamente." : "El procedimiento fue agregado correctamente.",
+            id_estudio ? "El estudio fue actualizado correctamente." : "El estudio fue agregado correctamente.",
             "success"
           );
         } else if (data.error && data.error.includes("ya existe")) {
-          Swal.fire("Atención", "Este procedimiento ya está registrado, no es necesario volver a cargarlo.", "warning");
+          Swal.fire("Atención", "Este estudio ya está registrado.", "warning");
         } else {
           Swal.fire("Error", data.error || "No se pudo guardar.", "error");
         }
@@ -158,14 +157,14 @@ Procedimientos
         cancelButtonText: "No"
       }).then((result) => {
         if (result.isConfirmed) {
-          $('#modalTitle').text("Editar un Procedimiento");
-          const id_procedimiento = $(this).data('id_procedimiento');
-          $('#txtIdProcedimiento').val(id_procedimiento);
+          $('#modalTitle').text("Editar un Estudio");
+          const id_estudio = $(this).data('id_estudio');
+          $('#txtIdEstudio').val(id_estudio);
 
-          fetch(`/api/v1/procedimientos/${id_procedimiento}`)
+          fetch(`/api/v1/estudios/${id_estudio}`)
           .then(resp => resp.json())
           .then(data => {
-            $('#txtDescripcion').val(data.data.descripcion_procedimiento);
+            $('#txtDescripcion').val(data.data.descripcion_estudio);
             $('#modalFormulario').modal();
           });
         }
@@ -175,7 +174,7 @@ Procedimientos
 
   const eliminar = () => {
     $('#tbl').on('click', 'button[name="btn_eliminar"]', function() {
-      const id_procedimiento = $(this).data('id_procedimiento');
+      const id_estudio = $(this).data('id_estudio');
 
       Swal.fire({
         title: "¿Deseas eliminar este registro?",
@@ -184,7 +183,7 @@ Procedimientos
         cancelButtonText: "No"
       }).then((result) => {
         if (result.isConfirmed) {
-          fetch(`/api/v1/procedimientos/${id_procedimiento}`, {
+          fetch(`/api/v1/estudios/${id_estudio}`, {
             method: 'DELETE',
             headers: {
               'Content-Type': 'application/json',

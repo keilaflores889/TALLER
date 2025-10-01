@@ -65,7 +65,7 @@
             <!-- Nav Item - Agendamiento -->
 <li class="nav-item">
     <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseAgendamiento"
-        aria-expanded="true" aria-controls="collapseAgendamiento">
+        aria-expanded="false" aria-controls="collapseAgendamiento">
         <i class="fas fa-calendar-alt"></i>
         <span class="text-wrap">Agendamiento</span>
     </a>
@@ -84,6 +84,7 @@
     </div>
 </li>
 
+<!-- Nav Item - Referenciales Agendamiento -->
 <!-- Nav Item - Referenciales Agendamiento -->
 <li class="nav-item">
     <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseRefAgendamiento"
@@ -114,30 +115,30 @@
     </a>
     <div id="collapseRefConsultorio" class="collapse" aria-labelledby="headingRefConsultorio" data-parent="#accordionSidebar">
         <div class="bg-white py-2 collapse-inner rounded">
-            <a class="collapse-item" href="{{ url_for('diagnostico.diagnosticoIndex') }}">Tipo diagnostico</a>
+            <a class="collapse-item" href="{{ url_for('diagnostico.diagnosticoIndex') }}">Tipo diagnóstico</a>
             <a class="collapse-item" href="{{ url_for('medicamento.medicamentoIndex') }}">Medicamentos</a>
-            <a class="collapse-item" href="{{ url_for('sintoma.sintomaIndex') }}">Sintomas</a>
-            <a class="collapse-item" href="{{ url_for('analisis.analisisIndex') }}">Tipo de analisis</a>
+            <a class="collapse-item" href="{{ url_for('sintoma.sintomaIndex') }}">Síntomas</a>
+            <a class="collapse-item" href="{{ url_for('analisis.analisisIndex') }}">Tipo de análisis</a>
             <a class="collapse-item" href="{{ url_for('estudio.estudioIndex') }}">Tipo de estudios</a>
-             <a class="collapse-item" href="{{ url_for('procedimiento.procedimientoIndex') }}">Tipo de procedimiento</a>
+            <a class="collapse-item" href="{{ url_for('procedimiento.procedimientoIndex') }}">Tipo de procedimiento</a>
         </div>
     </div>
 </li>
 
-<!-- Nav Item - Modulo Consultorio -->
+<!-- Nav Item - Módulo Consultorio -->
 <li class="nav-item">
-    <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseRefConsultorio"
-        aria-expanded="true" aria-controls="collapseRefConsultorio">
+    <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseModuloConsultorio"
+        aria-expanded="true" aria-controls="collapseModuloConsultorio">
         <i class="far fa-file"></i>
-        <span>Modulo Consultorio</span>
+        <span>Módulo Consultorio</span>
     </a>
-    <div id="collapseRefConsultorio" class="collapse" aria-labelledby="headingRefConsultorio" data-parent="#accordionSidebar">
+    <div id="collapseModuloConsultorio" class="collapse" aria-labelledby="headingModuloConsultorio" data-parent="#accordionSidebar">
         <div class="bg-white py-2 collapse-inner rounded">
             <a class="collapse-item" href="{{ url_for('consultas.consultaIndex') }}">Registrar Consultas</a>
-            
         </div>
     </div>
 </li>
+
 
 <br>
             <br>
