@@ -1,9 +1,21 @@
 from flask import Blueprint, request, jsonify, current_app as app
+import re
 from app.dao.referenciales.cargo.CargoDao import CargoDao
 
 cargoapi = Blueprint('cargoapi', __name__)
 
+# -------------------------
+# Función auxiliar para validar descripción
+# -------------------------
+def validar_ciudad(nombre):
+    # Permite letras (incluye ñ y acentos) y espacios
+    patron = r'^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$'
+    return re.match(patron, nombre) is not None
+
+
+# -------------------------
 # Trae todos los cargos
+# -------------------------
 @cargoapi.route('/cargos', methods=['GET'])
 def getCargos():
     cargodao = CargoDao()
@@ -21,7 +33,10 @@ def getCargos():
             'error': 'Ocurrió un error interno. Consulte con el administrador.'
         }), 500
 
+
+# -------------------------
 # Trae un cargo por ID
+# -------------------------
 @cargoapi.route('/cargos/<int:cargo_id>', methods=['GET'])
 def getCargo(cargo_id):
     cargodao = CargoDao()
@@ -35,7 +50,10 @@ def getCargo(cargo_id):
         app.logger.error(f"Error al obtener cargo: {str(e)}")
         return jsonify({'success': False, 'error': 'Ocurrió un error interno. Consulte con el administrador.'}), 500
 
+
+# -------------------------
 # Agrega un nuevo cargo
+# -------------------------
 @cargoapi.route('/cargos', methods=['POST'])
 def addCargo():
     data = request.get_json()
@@ -46,6 +64,10 @@ def addCargo():
         return jsonify({'success': False, 'error': 'El campo descripcion es obligatorio y no puede estar vacío.'}), 400
 
     descripcion = data['descripcion'].strip().upper()
+
+    # ✅ Validar caracteres permitidos
+    if not validar_ciudad(descripcion):
+        return jsonify({'success': False, 'error': 'La descripción solo puede contener letras y espacios, sin números ni caracteres especiales.'}), 400
 
     try:
         # Verificar duplicado
@@ -61,7 +83,10 @@ def addCargo():
         app.logger.error(f"Error al agregar cargo: {str(e)}")
         return jsonify({'success': False, 'error': 'Ocurrió un error interno. Consulte con el administrador.'}), 500
 
+
+# -------------------------
 # Actualiza un cargo
+# -------------------------
 @cargoapi.route('/cargos/<int:cargo_id>', methods=['PUT'])
 def updateCargo(cargo_id):
     data = request.get_json()
@@ -71,6 +96,10 @@ def updateCargo(cargo_id):
         return jsonify({'success': False, 'error': 'El campo descripcion es obligatorio y no puede estar vacío.'}), 400
 
     descripcion = data['descripcion'].strip().upper()
+
+    # ✅ Validar caracteres permitidos
+    if not validar_ciudad(descripcion):
+        return jsonify({'success': False, 'error': 'La descripción solo puede contener letras y espacios, sin números ni caracteres especiales.'}), 400
 
     try:
         # Verificar duplicado antes de actualizar
@@ -85,7 +114,10 @@ def updateCargo(cargo_id):
         app.logger.error(f"Error al actualizar cargo: {str(e)}")
         return jsonify({'success': False, 'error': 'Ocurrió un error interno. Consulte con el administrador.'}), 500
 
+
+# -------------------------
 # Elimina un cargo
+# -------------------------
 @cargoapi.route('/cargos/<int:cargo_id>', methods=['DELETE'])
 def deleteCargo(cargo_id):
     cargodao = CargoDao()
