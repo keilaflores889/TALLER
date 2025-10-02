@@ -10,8 +10,20 @@ Avisos Recordatorios
 
   <!-- Card principal -->
   <div class="card">
-    <div class="card-header">
-      <button type="button" class="btn btn-outline-info" id="btnAgregar">Agregar</button>
+    <div class="card-header d-flex justify-content-between align-items-center">
+      <div>
+        <button type="button" class="btn btn-outline-info" id="btnAgregar">
+          <i class="fas fa-plus"></i> Agregar
+        </button>
+        <button type="button" class="btn btn-success" id="btnEnviarWhatsApp">
+          <i class="fab fa-whatsapp"></i> Enviar Avisos WhatsApp
+        </button>
+      </div>
+      <div>
+        <button type="button" class="btn btn-outline-secondary" id="btnEstadisticas">
+          <i class="fas fa-chart-bar"></i> Estadísticas
+        </button>
+      </div>
     </div>
     <div class="card-body">
 
@@ -27,7 +39,7 @@ Avisos Recordatorios
             <th>Hora Recordatorio</th>
             <th>Forma Envío</th>
             <th>Mensaje</th>
-             <th>Estado</th> 
+            <th>Estado</th> 
             <th>Acciones</th>
           </tr>
         </thead>
@@ -114,8 +126,8 @@ Avisos Recordatorios
 
           <!-- Mensaje -->
           <div class="mb-3">
-            <label for="mensaje_modal">Mensaje</label>
-            <textarea id="mensaje_modal" class="form-control" rows="3"></textarea>
+            <label for="mensaje_modal">Mensaje (Opcional - se genera automático si está vacío)</label>
+            <textarea id="mensaje_modal" class="form-control" rows="3" placeholder="Deje vacío para usar mensaje automático"></textarea>
           </div>
 
           <!-- Footer -->
@@ -128,8 +140,46 @@ Avisos Recordatorios
 
     </div>
   </div>
+</div>
 
-
+  <!-- Modal Estadísticas -->
+  <div class="modal fade" id="modalEstadisticas" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header bg-info text-white">
+          <h5 class="modal-title">Estadísticas de Avisos</h5>
+          <button type="button" class="close text-white" data-dismiss="modal">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div class="row">
+            <div class="col-md-6">
+              <div class="card border-primary mb-3">
+                <div class="card-header bg-primary text-white">Por Estado</div>
+                <div class="card-body">
+                  <p><strong>Pendientes:</strong> <span id="statPendientes" class="badge badge-warning">0</span></p>
+                  <p><strong>Enviados:</strong> <span id="statEnviados" class="badge badge-success">0</span></p>
+                  <p><strong>Errores:</strong> <span id="statErrores" class="badge badge-danger">0</span></p>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="card border-info mb-3">
+                <div class="card-header bg-info text-white">Por Forma de Envío</div>
+                <div class="card-body">
+                  <p><strong>WhatsApp:</strong> <span id="statWhatsApp" class="badge badge-success">0</span></p>
+                  <p><strong>Gmail:</strong> <span id="statGmail" class="badge badge-info">0</span></p>
+                  <p><strong>SMS:</strong> <span id="statSMS" class="badge badge-secondary">0</span></p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="alert alert-info">
+            <strong>Total de Avisos:</strong> <span id="statTotal">0</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <!-- ========================= -->
   <!-- Modales Selección Paciente, Personal, Consultorio -->
@@ -211,9 +261,9 @@ Avisos Recordatorios
 </div>
 
 <!-- Librerías necesarias -->
- 
 <link rel="stylesheet" href="https://cdn.datatables.net/1.10.21/css/dataTables.bootstrap4.min.css">
 <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -234,6 +284,16 @@ function formatDateForInput(fecha) {
   return `${year}-${month}-${day}`;
 }
 
+function formatDateForDisplay(fecha) {
+  if (!fecha) return '';
+  const d = new Date(fecha);
+  if (isNaN(d)) return '';
+  const day = String(d.getUTCDate()).padStart(2, '0');
+  const month = String(d.getUTCMonth() + 1).padStart(2, '0');
+  const year = d.getUTCFullYear();
+  return `${day}/${month}/${year}`;
+}
+
 // --- Tabla principal Avisos ---
 const initDatatableAvisos = () => {
   $('#tblAvisos').DataTable({
@@ -244,26 +304,178 @@ const initDatatableAvisos = () => {
       { data: 'paciente' },
       { data: 'personal' },
       { data: 'nombre_consultorio' },
-      { data: 'fecha_cita', render: data => data ? formatDateForInput(data) : '' },
+      { data: 'fecha_cita', render: data => formatDateForDisplay(data) },
       { data: 'hora_cita' },
       { data: 'hora_recordatorio', render: data => data || '' },
-      { data: 'forma_envio' },
-      { data: 'mensaje' },
-      { data: 'estado_envio', render: data => `<span class="badge ${data === 'Pendiente' ? 'bg-warning' : 'bg-success'}">${data}</span>` },
+      { 
+        data: 'forma_envio',
+        render: function(data) {
+          const icons = {
+            'WhatsApp': '<i class="fab fa-whatsapp text-success"></i>',
+            'Gmail': '<i class="fas fa-envelope text-primary"></i>',
+            'SMS': '<i class="fas fa-sms text-info"></i>'
+          };
+          return (icons[data] || '') + ' ' + data;
+        }
+      },
+      { 
+        data: 'mensaje',
+        render: function(data) {
+          if (!data || data.length < 50) return data;
+          return data.substring(0, 50) + '...';
+        }
+      },
+      { 
+        data: 'estado_envio', 
+        render: function(data) {
+          const badges = {
+            'Pendiente': 'badge-warning',
+            'Enviado': 'badge-success',
+            'Error': 'badge-danger'
+          };
+          return `<span class="badge ${badges[data] || 'badge-secondary'}">${data}</span>`;
+        }
+      },
       {
         data: function(row) {
-          return `
-            <button type="button" name="btn_editar" class="btn btn-info btn-sm" data-id_aviso="${row.id_aviso}">
+          let buttons = `
+            <button type="button" name="btn_editar" class="btn btn-info btn-sm" data-id_aviso="${row.id_aviso}" title="Editar">
               <i class="fas fa-edit"></i>
             </button>
-            <button type="button" name="btn_eliminar" class="btn btn-danger btn-sm" data-id_aviso="${row.id_aviso}">
+            <button type="button" name="btn_eliminar" class="btn btn-danger btn-sm" data-id_aviso="${row.id_aviso}" title="Eliminar">
               <i class="fas fa-trash-alt"></i>
             </button>`;
+          
+          // Botón de envío individual solo para WhatsApp pendientes
+          if (row.forma_envio === 'WhatsApp' && row.estado_envio === 'Pendiente') {
+            buttons += `
+            <button type="button" name="btn_enviar_individual" class="btn btn-success btn-sm" data-id_aviso="${row.id_aviso}" title="Enviar ahora">
+              <i class="fab fa-whatsapp"></i>
+            </button>`;
+          }
+          
+          return buttons;
         }
       }
     ]
   });
 };
+
+// --- Enviar todos los avisos WhatsApp pendientes ---
+$('#btnEnviarWhatsApp').on('click', function() {
+  Swal.fire({
+    title: '¿Enviar avisos por WhatsApp?',
+    text: 'Se enviarán todos los avisos pendientes de WhatsApp',
+    icon: 'question',
+    showCancelButton: true,
+    confirmButtonText: 'Sí, enviar',
+    cancelButtonText: 'Cancelar',
+    confirmButtonColor: '#25D366',
+    showLoaderOnConfirm: true,
+    preConfirm: () => {
+      return fetch('/api/v1/avisos/enviar-whatsapp', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': CSRFToken
+        }
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (!data.success) {
+          throw new Error(data.error || 'Error al enviar');
+        }
+        return data;
+      })
+      .catch(error => {
+        Swal.showValidationMessage(`Error: ${error}`);
+      });
+    },
+    allowOutsideClick: () => !Swal.isLoading()
+  }).then((result) => {
+    if (result.isConfirmed) {
+      $('#tblAvisos').DataTable().ajax.reload();
+      Swal.fire({
+        icon: 'success',
+        title: 'Proceso completado',
+        text: 'Los avisos han sido procesados. Revisa la columna de estado.',
+        confirmButtonColor: '#25D366'
+      });
+    }
+  });
+});
+
+// --- Enviar aviso individual ---
+// --- Enviar aviso individual ---
+$('#tblAvisos').on('click', 'button[name="btn_enviar_individual"]', function() {
+  const id = $(this).data('id_aviso');
+  
+  Swal.fire({
+    title: '¿Enviar este aviso?',
+    text: 'Se abrirá WhatsApp Web en una nueva ventana',
+    icon: 'question',
+    showCancelButton: true,
+    confirmButtonText: 'Sí, enviar',
+    cancelButtonText: 'Cancelar',
+    confirmButtonColor: '#25D366'
+  }).then((result) => {
+    if(result.isConfirmed) {
+      fetch(`/api/v1/avisos/${id}/enviar-whatsapp`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': CSRFToken
+        }
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          Swal.fire({
+            icon: 'info',
+            title: 'Proceso iniciado',
+            html: `
+              Se abrió WhatsApp Web.<br><br>
+              <strong>Pasos:</strong><br>
+              1. Escanea el código QR<br>
+              2. Espera a que envíe el mensaje<br>
+              3. Recarga la página para ver el estado actualizado
+            `,
+            confirmButtonColor: '#25D366',
+            confirmButtonText: 'Entendido'
+          }).then(() => {
+            // Recargar después de 10 segundos para ver el estado
+            setTimeout(() => {
+              $('#tblAvisos').DataTable().ajax.reload();
+            }, 20000);
+          });
+        } else {
+          Swal.fire('Error', data.error, 'error');
+        }
+      })
+      .catch(error => {
+        Swal.fire('Error', 'Error de conexión: ' + error, 'error');
+      });
+    }
+  });
+});
+// --- Ver estadísticas ---
+$('#btnEstadisticas').on('click', function() {
+  fetch('/api/v1/avisos/estadisticas')
+    .then(resp => resp.json())
+    .then(result => {
+      if (result.success) {
+        const data = result.data;
+        $('#statTotal').text(data.total);
+        $('#statPendientes').text(data.por_estado.pendientes);
+        $('#statEnviados').text(data.por_estado.enviados);
+        $('#statErrores').text(data.por_estado.errores);
+        $('#statWhatsApp').text(data.por_forma_envio.whatsapp);
+        $('#statGmail').text(data.por_forma_envio.gmail);
+        $('#statSMS').text(data.por_forma_envio.sms);
+        $('#modalEstadisticas').modal('show');
+      }
+    });
+});
 
 // --- Modales de selección Paciente ---
 const initDatatablePaciente = () => {
@@ -384,7 +596,6 @@ $('#formAvisoModal').on('submit', async function(e) {
 });
 
 // --- Editar Aviso ---
-// --- Editar Aviso ---
 $('#tblAvisos').on('click', 'button[name="btn_editar"]', function() {
   const id = $(this).data('id_aviso');
   fetch(`/api/v1/avisos/${id}`)
@@ -398,8 +609,8 @@ $('#tblAvisos').on('click', 'button[name="btn_editar"]', function() {
       $('#id_paciente').val(d.id_paciente);
       $('#txtPersonal').val(d.personal_nombre);
       $('#id_personal_modal').val(d.id_personal);
-      $('#txtConsultorio').val(d.nombre_consultorio); // CORREGIDO
-      $('#codigo').val(d.codigo); // CORREGIDO
+      $('#txtConsultorio').val(d.nombre_consultorio);
+      $('#codigo').val(d.codigo);
       $('#fecha_cita_modal').val(formatDateForInput(d.fecha_cita));
       $('#hora_cita_modal').val(d.hora_cita);
       $('#hora_recordatorio_modal').val(d.hora_recordatorio || '');
@@ -410,7 +621,6 @@ $('#tblAvisos').on('click', 'button[name="btn_editar"]', function() {
       $('#modalAviso').modal('show');
     });
 });
-
 
 // --- Eliminar Aviso ---
 $('#tblAvisos').on('click', 'button[name="btn_eliminar"]', function() {
@@ -450,4 +660,3 @@ $(function() {
 
 </script>
 {% endblock %}
-
