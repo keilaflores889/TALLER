@@ -3,8 +3,6 @@ from app.dao.ModuloConsultorio.RegisConsulta.ConsultasDao import ConsultasDao
 
 consultasapi = Blueprint('consultasapi', __name__)
 
-
-
 # ============================
 # CONSULTAS CABECERA - Obtener todas
 # ============================
@@ -34,7 +32,7 @@ def getConsultaCabecera(id_consulta_cab):
         return jsonify(success=False, error="Error interno al consultar consulta."), 500
 
 # ============================
-# CONSULTAS CABECERA - Obtener consulta completa (cabecera + detalles)
+# CONSULTAS CABECERA - Obtener consulta completa (cabecera + detalles + diagnósticos)
 # ============================
 @consultasapi.route('/consultas/<int:id_consulta_cab>/completa', methods=['GET'])
 def getConsultaCompleta(id_consulta_cab):
@@ -47,58 +45,6 @@ def getConsultaCompleta(id_consulta_cab):
     except Exception as e:
         app.logger.error(f"Error al obtener consulta completa {id_consulta_cab}: {str(e)}")
         return jsonify(success=False, error="Error interno al consultar consulta completa."), 500
-
-# ============================
-# CONSULTAS CABECERA - Obtener por paciente
-# ============================
-@consultasapi.route('/consultas/paciente/<int:id_paciente>', methods=['GET'])
-def getConsultasByPaciente(id_paciente):
-    dao = ConsultasDao()
-    try:
-        consultas = dao.getConsultasByPaciente(id_paciente)
-        return jsonify(success=True, data=consultas, error=None), 200
-    except Exception as e:
-        app.logger.error(f"Error al obtener consultas del paciente {id_paciente}: {str(e)}")
-        return jsonify(success=False, error="Error interno al consultar consultas por paciente."), 500
-
-# ============================
-# CONSULTAS CABECERA - Obtener por médico
-# ============================
-@consultasapi.route('/consultas/medico/<int:id_medico>', methods=['GET'])
-def getConsultasByMedico(id_medico):
-    dao = ConsultasDao()
-    try:
-        consultas = dao.getConsultasByMedico(id_medico)
-        return jsonify(success=True, data=consultas, error=None), 200
-    except Exception as e:
-        app.logger.error(f"Error al obtener consultas del médico {id_medico}: {str(e)}")
-        return jsonify(success=False, error="Error interno al consultar consultas por médico."), 500
-
-# ============================
-# CONSULTAS CABECERA - Obtener por fecha
-# ============================
-@consultasapi.route('/consultas/fecha/<string:fecha>', methods=['GET'])
-def getConsultasByFecha(fecha):
-    dao = ConsultasDao()
-    try:
-        consultas = dao.getConsultasByFecha(fecha)
-        return jsonify(success=True, data=consultas, error=None), 200
-    except Exception as e:
-        app.logger.error(f"Error al obtener consultas por fecha {fecha}: {str(e)}")
-        return jsonify(success=False, error="Error interno al consultar consultas por fecha."), 500
-
-# ============================
-# CONSULTAS CABECERA - Obtener por estado
-# ============================
-@consultasapi.route('/consultas/estado/<string:estado>', methods=['GET'])
-def getConsultasByEstado(estado):
-    dao = ConsultasDao()
-    try:
-        consultas = dao.getConsultasByEstado(estado)
-        return jsonify(success=True, data=consultas, error=None), 200
-    except Exception as e:
-        app.logger.error(f"Error al obtener consultas por estado {estado}: {str(e)}")
-        return jsonify(success=False, error="Error interno al consultar consultas por estado."), 500
 
 # ============================
 # CONSULTAS CABECERA - Agregar nueva
@@ -115,7 +61,6 @@ def addConsultaCabecera():
         return jsonify(success=False, error=f"Faltan campos: {', '.join(faltantes)}"), 400
 
     try:
-        # Asegurar que los campos opcionales estén presentes con valores por defecto
         if 'estado' not in data or data['estado'] is None:
             data['estado'] = 'programada'
         
@@ -147,7 +92,6 @@ def updateConsultaCabecera(id_consulta_cab):
         return jsonify(success=False, error=f"Faltan campos: {', '.join(faltantes)}"), 400
 
     try:
-        # Asegurar que los campos opcionales estén presentes con valores por defecto
         if 'estado' not in data or data['estado'] is None:
             data['estado'] = 'programada'
         
@@ -163,26 +107,6 @@ def updateConsultaCabecera(id_consulta_cab):
     except Exception as e:
         app.logger.error(f"Error al actualizar consulta {id_consulta_cab}: {str(e)}")
         return jsonify(success=False, error="Error interno al actualizar consulta."), 500
-
-# ============================
-# CONSULTAS CABECERA - Actualizar solo estado
-# ============================
-@consultasapi.route('/consultas/<int:id_consulta_cab>/estado', methods=['PATCH'])
-def updateEstadoConsulta(id_consulta_cab):
-    data = request.get_json() or {}
-    dao = ConsultasDao()
-
-    if 'estado' not in data:
-        return jsonify(success=False, error="Falta el campo 'estado'."), 400
-
-    try:
-        actualizado = dao.updateEstadoConsulta(id_consulta_cab, data['estado'])
-        if actualizado:
-            return jsonify(success=True, data={"id_consulta_cab": id_consulta_cab, "estado": data['estado']}, error=None), 200
-        return jsonify(success=False, error=f"No se encontró consulta con ID {id_consulta_cab}."), 404
-    except Exception as e:
-        app.logger.error(f"Error al actualizar estado de consulta {id_consulta_cab}: {str(e)}")
-        return jsonify(success=False, error="Error interno al actualizar estado."), 500
 
 # ============================
 # CONSULTAS CABECERA - Eliminar
@@ -212,6 +136,19 @@ def getConsultasDetalle():
         return jsonify(success=False, error="Error interno al consultar detalles."), 500
 
 # ============================
+# CONSULTAS DETALLE - Obtener todas con información completa
+# ============================
+@consultasapi.route('/consultas-detalle-info', methods=['GET'])
+def getConsultasDetalleConInfo():
+    dao = ConsultasDao()
+    try:
+        detalles = dao.getConsultasDetalleConInfo()
+        return jsonify(success=True, data=detalles, error=None), 200
+    except Exception as e:
+        app.logger.error(f"Error al obtener consultas detalle con info: {str(e)}")
+        return jsonify(success=False, error="Error interno al consultar detalles."), 500
+
+# ============================
 # CONSULTAS DETALLE - Obtener por ID
 # ============================
 @consultasapi.route('/consultas-detalle/<int:id_consulta_detalle>', methods=['GET'])
@@ -224,6 +161,21 @@ def getConsultaDetalle(id_consulta_detalle):
         return jsonify(success=False, error=f"No se encontró detalle con ID {id_consulta_detalle}."), 404
     except Exception as e:
         app.logger.error(f"Error al obtener detalle {id_consulta_detalle}: {str(e)}")
+        return jsonify(success=False, error="Error interno al consultar detalle."), 500
+
+# ============================
+# CONSULTAS DETALLE - Obtener por ID con información completa
+# ============================
+@consultasapi.route('/consultas-detalle-info/<int:id_consulta_detalle>', methods=['GET'])
+def getConsultaDetalleConInfo(id_consulta_detalle):
+    dao = ConsultasDao()
+    try:
+        detalle = dao.getConsultaDetalleByIdConInfo(id_consulta_detalle)
+        if detalle:
+            return jsonify(success=True, data=detalle, error=None), 200
+        return jsonify(success=False, error=f"No se encontró detalle con ID {id_consulta_detalle}."), 404
+    except Exception as e:
+        app.logger.error(f"Error al obtener detalle con info {id_consulta_detalle}: {str(e)}")
         return jsonify(success=False, error="Error interno al consultar detalle."), 500
 
 # ============================
@@ -253,22 +205,32 @@ def addConsultaDetalle():
         return jsonify(success=False, error=f"Faltan campos: {', '.join(faltantes)}"), 400
 
     try:
-        # Asegurar que los campos opcionales estén presentes
         if 'pieza_dental' in data and data['pieza_dental'] == '':
             data['pieza_dental'] = None
         
         if 'procedimiento' in data and data['procedimiento'] == '':
             data['procedimiento'] = None
+        
+        if 'id_tipo_diagnostico' in data and data['id_tipo_diagnostico'] == '':
+            data['id_tipo_diagnostico'] = None
 
         detalle_id = dao.addConsultaDetalle(data)
+        
         if detalle_id:
-            return jsonify(success=True, data={**data, "id_consulta_detalle": detalle_id}, error=None), 201
+            return jsonify(
+                success=True, 
+                data={**data, "id_consulta_detalle": detalle_id},
+                message="Detalle guardado correctamente",
+                error=None
+            ), 201
+        
         return jsonify(success=False, error="No se pudo guardar el detalle de consulta."), 500
+        
     except ValueError as ve:
         return jsonify(success=False, error=str(ve)), 400
     except Exception as e:
-        app.logger.error(f"Error al agregar detalle: {str(e)}")
-        return jsonify(success=False, error="Error interno al guardar detalle."), 500
+        app.logger.error(f"Error al agregar consulta detalle: {str(e)}")
+        return jsonify(success=False, error="Error interno al guardar consulta detalle."), 500
 
 # ============================
 # CONSULTAS DETALLE - Actualizar
@@ -284,12 +246,14 @@ def updateConsultaDetalle(id_consulta_detalle):
         return jsonify(success=False, error=f"Faltan campos: {', '.join(faltantes)}"), 400
 
     try:
-        # Asegurar que los campos opcionales estén presentes
         if 'pieza_dental' in data and data['pieza_dental'] == '':
             data['pieza_dental'] = None
         
         if 'procedimiento' in data and data['procedimiento'] == '':
             data['procedimiento'] = None
+        
+        if 'id_tipo_diagnostico' in data and data['id_tipo_diagnostico'] == '':
+            data['id_tipo_diagnostico'] = None
 
         actualizado = dao.updateConsultaDetalle(id_consulta_detalle, data)
         if actualizado:
@@ -298,8 +262,8 @@ def updateConsultaDetalle(id_consulta_detalle):
     except ValueError as ve:
         return jsonify(success=False, error=str(ve)), 400
     except Exception as e:
-        app.logger.error(f"Error al actualizar detalle {id_consulta_detalle}: {str(e)}")
-        return jsonify(success=False, error="Error interno al actualizar detalle."), 500
+        app.logger.error(f"Error al actualizar consulta detalle {id_consulta_detalle}: {str(e)}")
+        return jsonify(success=False, error="Error interno al actualizar consulta detalle."), 500
 
 # ============================
 # CONSULTAS DETALLE - Eliminar
@@ -312,5 +276,135 @@ def deleteConsultaDetalle(id_consulta_detalle):
             return jsonify(success=True, data=f"Detalle {id_consulta_detalle} eliminado.", error=None), 200
         return jsonify(success=False, error=f"No se encontró detalle con ID {id_consulta_detalle}."), 404
     except Exception as e:
-        app.logger.error(f"Error al eliminar detalle {id_consulta_detalle}: {str(e)}")
-        return jsonify(success=False, error="Error interno al eliminar detalle."), 500
+        app.logger.error(f"Error al eliminar consulta detalle {id_consulta_detalle}: {str(e)}")
+        return jsonify(success=False, error="Error interno al eliminar consulta detalle."), 500
+
+# ============================
+# DIAGNÓSTICOS - Obtener todos los diagnósticos de una consulta detalle
+# ============================
+@consultasapi.route('/consultas-detalle/<int:id_consulta_detalle>/diagnosticos', methods=['GET'])
+def getDiagnosticosByConsultaDetalle(id_consulta_detalle):
+    dao = ConsultasDao()
+    try:
+        diagnosticos = dao.getDiagnosticosByConsultaDetalle(id_consulta_detalle)
+        return jsonify(success=True, data=diagnosticos, error=None), 200
+    except Exception as e:
+        app.logger.error(f"Error al obtener diagnósticos de consulta detalle {id_consulta_detalle}: {str(e)}")
+        return jsonify(success=False, error="Error interno al consultar diagnósticos."), 500
+
+# ============================
+# DIAGNÓSTICOS - Agregar diagnóstico adicional
+# ============================
+@consultasapi.route('/diagnosticos', methods=['POST'])
+def addDiagnostico():
+    data = request.get_json() or {}
+    dao = ConsultasDao()
+
+    campos_requeridos = ['id_consulta_detalle', 'descripcion_diagnostico']
+    faltantes = [c for c in campos_requeridos if not data.get(c)]
+    if faltantes:
+        return jsonify(success=False, error=f"Faltan campos: {', '.join(faltantes)}"), 400
+
+    try:
+        diagnostico_id = dao.addDiagnostico(data)
+        if diagnostico_id:
+            return jsonify(
+                success=True, 
+                data={**data, "id_diagnostico": diagnostico_id},
+                message="Diagnóstico agregado correctamente",
+                error=None
+            ), 201
+        return jsonify(success=False, error="No se pudo guardar el diagnóstico."), 500
+    except ValueError as ve:
+        return jsonify(success=False, error=str(ve)), 400
+    except Exception as e:
+        app.logger.error(f"Error al agregar diagnóstico: {str(e)}")
+        return jsonify(success=False, error="Error interno al guardar diagnóstico."), 500
+
+# ============================
+# DIAGNÓSTICOS - Actualizar diagnóstico
+# ============================
+@consultasapi.route('/diagnosticos/<int:id_diagnostico>', methods=['PUT'])
+def updateDiagnostico(id_diagnostico):
+    data = request.get_json() or {}
+    dao = ConsultasDao()
+
+    try:
+        actualizado = dao.updateDiagnostico(id_diagnostico, data)
+        if actualizado:
+            return jsonify(
+                success=True, 
+                data={**data, "id_diagnostico": id_diagnostico},
+                message="Diagnóstico actualizado correctamente",
+                error=None
+            ), 200
+        return jsonify(success=False, error=f"No se encontró diagnóstico con ID {id_diagnostico}."), 404
+    except ValueError as ve:
+        return jsonify(success=False, error=str(ve)), 400
+    except Exception as e:
+        app.logger.error(f"Error al actualizar diagnóstico {id_diagnostico}: {str(e)}")
+        return jsonify(success=False, error="Error interno al actualizar diagnóstico."), 500
+
+# ============================
+# DIAGNÓSTICOS - Eliminar diagnóstico
+# ============================
+@consultasapi.route('/diagnosticos/<int:id_diagnostico>', methods=['DELETE'])
+def deleteDiagnostico(id_diagnostico):
+    dao = ConsultasDao()
+    try:
+        if dao.deleteDiagnostico(id_diagnostico):
+            return jsonify(success=True, data=f"Diagnóstico {id_diagnostico} eliminado.", error=None), 200
+        return jsonify(success=False, error=f"No se encontró diagnóstico con ID {id_diagnostico}."), 404
+    except Exception as e:
+        app.logger.error(f"Error al eliminar diagnóstico {id_diagnostico}: {str(e)}")
+        return jsonify(success=False, error="Error interno al eliminar diagnóstico."), 500
+
+# ============================
+# ACTUALIZAR DIAGNÓSTICO PRINCIPAL (consultas_detalle)
+# ============================
+@consultasapi.route('/consultas-detalle/<int:id_consulta_detalle>/diagnostico-principal', methods=['PUT'])
+def updateDiagnosticoPrincipal(id_consulta_detalle):
+    data = request.get_json() or {}
+    dao = ConsultasDao()
+
+    if not data.get('diagnostico'):
+        return jsonify(success=False, error="El campo 'diagnostico' es obligatorio"), 400
+
+    try:
+        actualizado = dao.updateDiagnosticoPrincipal(id_consulta_detalle, data)
+        if actualizado:
+            return jsonify(
+                success=True,
+                data=data,
+                message="Diagnóstico principal actualizado correctamente",
+                error=None
+            ), 200
+        return jsonify(success=False, error=f"No se encontró consulta detalle con ID {id_consulta_detalle}."), 404
+    except Exception as e:
+        app.logger.error(f"Error al actualizar diagnóstico principal: {str(e)}")
+        return jsonify(success=False, error="Error interno al actualizar diagnóstico principal."), 500
+
+# ============================
+# ACTUALIZAR TRATAMIENTO PRINCIPAL (consultas_detalle)
+# ============================
+@consultasapi.route('/consultas-detalle/<int:id_consulta_detalle>/tratamiento-principal', methods=['PUT'])
+def updateTratamientoPrincipal(id_consulta_detalle):
+    data = request.get_json() or {}
+    dao = ConsultasDao()
+
+    if not data.get('tratamiento'):
+        return jsonify(success=False, error="El campo 'tratamiento' es obligatorio"), 400
+
+    try:
+        actualizado = dao.updateTratamientoPrincipal(id_consulta_detalle, data)
+        if actualizado:
+            return jsonify(
+                success=True,
+                data=data,
+                message="Tratamiento principal actualizado correctamente",
+                error=None
+            ), 200
+        return jsonify(success=False, error=f"No se encontró consulta detalle con ID {id_consulta_detalle}."), 404
+    except Exception as e:
+        app.logger.error(f"Error al actualizar tratamiento principal: {str(e)}")
+        return jsonify(success=False, error="Error interno al actualizar tratamiento principal."), 500
