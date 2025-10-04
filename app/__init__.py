@@ -63,7 +63,7 @@ from app.rutas.referenciales_consultorio.tipo_diagnostico.tipo_diagnostico_route
 
 #movimientos modulo consultorio
 from app.rutas.ModuloConsultorio.RegisConsulta.consulta_routes import consultamod
-
+from app.rutas.ModuloConsultorio.RegisDiagnostico.diagnostico_routes import regisdiagnosticomod
 
 # registrar referenciales
 modulo0 = '/referenciales' 
@@ -97,7 +97,7 @@ app.register_blueprint(diagnosticomod, url_prefix=f'{modulo0}/diagnostico')
 # registrar movimientos consultorios
 modulo0 = '/Moduloconsultorios'
 app.register_blueprint(consultamod, url_prefix=f'{modulo0}/consultorios')
-
+app.register_blueprint(regisdiagnosticomod, url_prefix=f'{modulo0}/Diagnosticos')
 
 # registrar agendamientos
 modulo0 = '/agendamientos'
@@ -167,7 +167,7 @@ from app.rutas.referenciales_consultorio.tipo_diagnostico.tipo_diagnostico_api i
 
 #movimientos modulo consultorio
 from app.rutas.ModuloConsultorio.RegisConsulta.consulta_api import consultasapi
-
+from app.rutas.ModuloConsultorio.RegisDiagnostico.diagnostico_api import Rdiagnosticoapi
 
 
 # APIS v1
@@ -269,6 +269,9 @@ app.register_blueprint(diagnosticoapi, url_prefix=version1)
 #movimientos modulo consultorio
 version1 = '/api/v1'
 app.register_blueprint(consultasapi, url_prefix=version1)
+
+version1 = '/api/v1'
+app.register_blueprint(Rdiagnosticoapi, url_prefix=version1)
 
 @app.route('/login')
 def login():
