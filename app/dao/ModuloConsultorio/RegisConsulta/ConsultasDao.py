@@ -622,3 +622,147 @@ class ConsultasDao:
         except Exception as e:
             app.logger.error(f"Error al obtener consulta completa: {str(e)}")
             return None
+        
+ # ============================
+    # TRATAMIENTOS
+    # ============================
+    def _validar_datos_tratamiento(self, data):
+        campos_obligatorios = ["id_consulta_detalle", "id_medico", "id_paciente", "descripcion_tratamiento"]
+        
+        for campo in campos_obligatorios:
+            valor = data.get(campo)
+            if valor is None or (isinstance(valor, str) and valor.strip() == ""):
+                raise ValueError(f"El campo '{campo}' es obligatorio y no puede estar vacío")
+
+    def getTratamientosByConsultaDetalle(self, id_consulta_detalle):
+        """Obtiene todos los tratamientos de una consulta detalle específica"""
+        try:
+            cursor = self.conn.cursor()
+            cursor.execute("""
+                SELECT 
+                    t.id_tratamiento,
+                    t.id_consulta_detalle,
+                    t.id_medico,
+                    t.id_paciente,
+                    t.descripcion_tratamiento,
+                    TO_CHAR(t.fecha_tratamiento, 'YYYY-MM-DD') AS fecha_tratamiento,
+                    t.duracion_estimada,
+                    t.costo_estimado,
+                    t.estado,
+                    m.nombre || ' ' || m.apellido AS nombre_medico,
+                    p.nombre || ' ' || p.apellido AS nombre_paciente
+                FROM tratamientos t
+                INNER JOIN medico m ON t.id_medico = m.id_medico
+                INNER JOIN paciente p ON t.id_paciente = p.id_paciente
+                WHERE t.id_consulta_detalle = %s
+                ORDER BY t.fecha_tratamiento DESC, t.id_tratamiento DESC
+            """, (id_consulta_detalle,))
+            rows = cursor.fetchall()
+            columnas = [desc[0] for desc in cursor.description]
+            tratamientos = [dict(zip(columnas, row)) for row in rows]
+            cursor.close()
+            return tratamientos
+        except Exception as e:
+            app.logger.error(f"Error al obtener tratamientos: {str(e)}")
+            return []
+
+    def addTratamiento(self, data):
+        """Agrega un nuevo tratamiento con la fecha de la consulta"""
+        try:
+            self._validar_datos_tratamiento(data)
+            cursor = self.conn.cursor()
+            
+            # Obtener la fecha_cita de la consulta
+            cursor.execute("""
+                SELECT cc.fecha_cita
+                FROM consultas_detalle cd
+                INNER JOIN consultas_cabecera cc ON cd.id_consulta_cab = cc.id_consulta_cab
+                WHERE cd.id_consulta_detalle = %s
+            """, (data.get("id_consulta_detalle"),))
+            
+            result = cursor.fetchone()
+            fecha_consulta = result[0] if result else None
+            
+            cursor.execute("""
+                INSERT INTO tratamientos(
+                    id_consulta_detalle,
+                    id_medico,
+                    id_paciente,
+                    descripcion_tratamiento,
+                    fecha_tratamiento,
+                    duracion_estimada,
+                    costo_estimado,
+                    estado
+                )
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+                RETURNING id_tratamiento
+            """, (
+                data.get("id_consulta_detalle"),
+                data.get("id_medico"),
+                data.get("id_paciente"),
+                data.get("descripcion_tratamiento"),
+                fecha_consulta,
+                data.get("duracion_estimada"),
+                data.get("costo_estimado"),
+                data.get("estado", "pendiente")
+            ))
+            id_tratamiento = cursor.fetchone()[0]
+            self.conn.commit()
+            cursor.close()
+            return id_tratamiento
+        except Exception as e:
+            self.conn.rollback()
+            app.logger.error(f"Error al insertar tratamiento: {str(e)}")
+            return None
+
+    def updateTratamiento(self, id_tratamiento, data):
+        """Actualiza un tratamiento específico"""
+        try:
+            cursor = self.conn.cursor()
+            
+            campos_actualizar = []
+            valores = []
+            
+            if "descripcion_tratamiento" in data:
+                campos_actualizar.append("descripcion_tratamiento = %s")
+                valores.append(data.get("descripcion_tratamiento"))
+            
+            if "duracion_estimada" in data:
+                campos_actualizar.append("duracion_estimada = %s")
+                valores.append(data.get("duracion_estimada"))
+            
+            if "costo_estimado" in data:
+                campos_actualizar.append("costo_estimado = %s")
+                valores.append(data.get("costo_estimado"))
+            
+            if "estado" in data:
+                campos_actualizar.append("estado = %s")
+                valores.append(data.get("estado"))
+            
+            if not campos_actualizar:
+                return False
+            
+            valores.append(id_tratamiento)
+            query = f"UPDATE tratamientos SET {', '.join(campos_actualizar)} WHERE id_tratamiento = %s"
+            
+            cursor.execute(query, valores)
+            self.conn.commit()
+            cursor.close()
+            return True
+        except Exception as e:
+            self.conn.rollback()
+            app.logger.error(f"Error al actualizar tratamiento: {str(e)}")
+            return False
+
+    def deleteTratamiento(self, id_tratamiento):
+        """Elimina un tratamiento específico"""
+        try:
+            cursor = self.conn.cursor()
+            cursor.execute("DELETE FROM tratamientos WHERE id_tratamiento = %s", (id_tratamiento,))
+            self.conn.commit()
+            cursor.close()
+            return True
+        except Exception as e:
+            self.conn.rollback()
+            app.logger.error(f"Error al eliminar tratamiento: {str(e)}")
+            return False

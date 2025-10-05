@@ -1390,6 +1390,13 @@ $('#btnGuardarDiagnosticoPrincipal').on('click', function() {
     return;
   }
   
+  // Obtener la fecha de la consulta desde el modal
+  const fechaConsulta = $('#diag_consulta_fecha').text().split(' - ')[0]; // "03/10/2025"
+  
+  // Convertir DD/MM/YYYY a YYYY-MM-DD
+  const partes = fechaConsulta.split('/');
+  const fechaFormateada = `${partes[2]}-${partes[1]}-${partes[0]}`;
+  
   fetch(`/api/v1/consultas-detalle/${consultaDetalleActualId}`)
     .then(r => r.json())
     .then(d => {
@@ -1420,8 +1427,9 @@ $('#btnGuardarDiagnosticoPrincipal').on('click', function() {
             id_consulta_detalle: consultaDetalleActualId,
             id_medico: idMedicoActual,
             id_paciente: idPacienteActual,
-            id_tipo_diagnostico: idTipoDiagnostico ? parseInt(idTipoDiagnostico) : null, // ✅ AGREGADO
+            id_tipo_diagnostico: idTipoDiagnostico ? parseInt(idTipoDiagnostico) : null,
             descripcion_diagnostico: diagnostico,
+            fecha_diagnostico: fechaFormateada,  // ✅ AGREGADO
             observaciones: 'Diagnóstico principal'
           })
         });
@@ -1436,6 +1444,10 @@ $('#btnGuardarDiagnosticoPrincipal').on('click', function() {
       } else {
         Swal.fire('Error', d.error, 'error');
       }
+    })
+    .catch(err => {
+      console.error('Error:', err);
+      Swal.fire('Error', 'Error al guardar', 'error');
     });
 });
 // ========================================
@@ -1473,6 +1485,7 @@ $('#btnRegistrarTratamientos').on('click', function() {
     });
 });
 
+
 // --- Guardar tratamiento principal ---
 $('#btnGuardarTratamientoPrincipal').on('click', function() {
   const tratamiento = $('#tratamiento_principal').val();
@@ -1482,12 +1495,20 @@ $('#btnGuardarTratamientoPrincipal').on('click', function() {
     return;
   }
   
-  // Necesitas obtener el detalle completo primero para no perder datos
+  // Obtener la fecha actual de la consulta desde el modal que YA tienes cargado
+  const fechaConsulta = $('#trat_consulta_fecha').text().split(' - ')[0]; // "03/10/2025"
+  
+  // Convertir DD/MM/YYYY a YYYY-MM-DD
+  const partes = fechaConsulta.split('/');
+  const fechaFormateada = `${partes[2]}-${partes[1]}-${partes[0]}`;
+  
+  // 1. Actualizar consultas_detalle
   fetch(`/api/v1/consultas-detalle/${consultaDetalleActualId}`)
     .then(r => r.json())
     .then(d => {
       if (d.success) {
         const detalle = d.data;
+        
         return fetch(`/api/v1/consultas-detalle/${consultaDetalleActualId}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json', 'X-CSRFToken': CSRFToken },
@@ -1505,17 +1526,35 @@ $('#btnGuardarTratamientoPrincipal').on('click', function() {
     .then(r => r.json())
     .then(d => {
       if (d.success) {
-        Swal.fire('Éxito', 'Tratamiento principal actualizado correctamente', 'success');
+        // 2. Insertar en tratamientos
+        return fetch('/api/v1/Tratamiento', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'X-CSRFToken': CSRFToken },
+          body: JSON.stringify({
+            id_consulta_detalle: consultaDetalleActualId,
+            id_medico: idMedicoActual,
+            id_paciente: idPacienteActual,
+            descripcion_tratamiento: tratamiento,
+            fecha_tratamiento: fechaFormateada,
+            estado: 'pendiente'
+          })
+        });
+      }
+    })
+    .then(r => r.json())
+    .then(d => {
+      if (d.success) {
+        Swal.fire('Éxito', 'Tratamiento guardado correctamente', 'success');
         cargarDetallesConsulta(consultaActualId);
       } else {
-        Swal.fire('Error', d.error || 'No se pudo actualizar el tratamiento', 'error');
+        Swal.fire('Error', d.error, 'error');
       }
     })
     .catch(err => {
-      Swal.fire('Error', 'Error de conexión con el servidor', 'error');
+      console.error('Error:', err);
+      Swal.fire('Error', 'Error al guardar', 'error');
     });
 });
-
 // --- Inicializar todo ---
 $(document).ready(() => {
   initDatatable();

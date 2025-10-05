@@ -408,3 +408,84 @@ def updateTratamientoPrincipal(id_consulta_detalle):
     except Exception as e:
         app.logger.error(f"Error al actualizar tratamiento principal: {str(e)}")
         return jsonify(success=False, error="Error interno al actualizar tratamiento principal."), 500
+    
+
+# ============================
+# TRATAMIENTOS - Obtener todos los tratamientos de una consulta detalle
+# ============================
+@consultasapi.route('/consultas-detalle/<int:id_consulta_detalle>/Tratamiento', methods=['GET'])
+def getTratamientosByConsultaDetalle(id_consulta_detalle):
+    dao = ConsultasDao()
+    try:
+        tratamientos = dao.getTratamientosByConsultaDetalle(id_consulta_detalle)
+        return jsonify(success=True, data=tratamientos, error=None), 200
+    except Exception as e:
+        app.logger.error(f"Error al obtener tratamientos de consulta detalle {id_consulta_detalle}: {str(e)}")
+        return jsonify(success=False, error="Error interno al consultar tratamientos."), 500
+
+# ============================
+# TRATAMIENTOS - Agregar tratamiento adicional
+# ============================
+@consultasapi.route('/Tratamiento', methods=['POST'])
+def addTratamiento():
+    data = request.get_json() or {}
+    dao = ConsultasDao()
+
+    campos_requeridos = ['id_consulta_detalle', 'id_medico', 'id_paciente', 'descripcion_tratamiento']
+    faltantes = [c for c in campos_requeridos if not data.get(c)]
+    if faltantes:
+        return jsonify(success=False, error=f"Faltan campos: {', '.join(faltantes)}"), 400
+
+    try:
+        tratamiento_id = dao.addTratamiento(data)
+        if tratamiento_id:
+            return jsonify(
+                success=True, 
+                data={**data, "id_tratamiento": tratamiento_id},
+                message="Tratamiento agregado correctamente",
+                error=None
+            ), 201
+        return jsonify(success=False, error="No se pudo guardar el tratamiento."), 500
+    except ValueError as ve:
+        return jsonify(success=False, error=str(ve)), 400
+    except Exception as e:
+        app.logger.error(f"Error al agregar tratamiento: {str(e)}")
+        return jsonify(success=False, error="Error interno al guardar tratamiento."), 500
+
+# ============================
+# TRATAMIENTOS - Actualizar tratamiento
+# ============================
+@consultasapi.route('/Tratamiento/<int:id_tratamiento>', methods=['PUT'])
+def updateTratamiento(id_tratamiento):
+    data = request.get_json() or {}
+    dao = ConsultasDao()
+
+    try:
+        actualizado = dao.updateTratamiento(id_tratamiento, data)
+        if actualizado:
+            return jsonify(
+                success=True, 
+                data={**data, "id_tratamiento": id_tratamiento},
+                message="Tratamiento actualizado correctamente",
+                error=None
+            ), 200
+        return jsonify(success=False, error=f"No se encontró tratamiento con ID {id_tratamiento}."), 404
+    except ValueError as ve:
+        return jsonify(success=False, error=str(ve)), 400
+    except Exception as e:
+        app.logger.error(f"Error al actualizar tratamiento {id_tratamiento}: {str(e)}")
+        return jsonify(success=False, error="Error interno al actualizar tratamiento."), 500
+
+# ============================
+# TRATAMIENTOS - Eliminar tratamiento
+# ============================
+@consultasapi.route('/Tratamiento/<int:id_tratamiento>', methods=['DELETE'])
+def deleteTratamiento(id_tratamiento):
+    dao = ConsultasDao()
+    try:
+        if dao.deleteTratamiento(id_tratamiento):
+            return jsonify(success=True, data=f"Tratamiento {id_tratamiento} eliminado.", error=None), 200
+        return jsonify(success=False, error=f"No se encontró tratamiento con ID {id_tratamiento}."), 404
+    except Exception as e:
+        app.logger.error(f"Error al eliminar tratamiento {id_tratamiento}: {str(e)}")
+        return jsonify(success=False, error="Error interno al eliminar tratamiento."), 500
