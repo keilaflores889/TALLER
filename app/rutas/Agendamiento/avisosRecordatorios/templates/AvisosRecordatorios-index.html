@@ -5,142 +5,162 @@ Avisos Recordatorios
 {% endblock %}
 
 {% block contenido %}
-<div class="container mt-4">
-  <h3>Listar Avisos Recordatorios</h3>
-
+<div class="container-fluid mt-4">
   <!-- Card principal -->
-  <div class="card">
-    <div class="card-header d-flex justify-content-between align-items-center">
-      <div>
-        <button type="button" class="btn btn-outline-info" id="btnAgregar">
-          <i class="fas fa-plus"></i> Agregar
-        </button>
-        <button type="button" class="btn btn-success" id="btnEnviarWhatsApp">
-          <i class="fab fa-whatsapp"></i> Enviar Avisos WhatsApp
-        </button>
-      </div>
-      <div>
-        <button type="button" class="btn btn-outline-secondary" id="btnEstadisticas">
-          <i class="fas fa-chart-bar"></i> Estadísticas
-        </button>
-      </div>
-    </div>
-    <div class="card-body">
+  <div class="card shadow-sm border-0 rounded-lg">
 
-     <div style="overflow-x: auto; white-space: nowrap;">
-      <table id="tblAvisos" class="table table-striped">
-        <thead class="table-info">
-          <tr>
-            <th>Paciente</th>
-            <th>Personal</th>
-            <th>Consultorio</th>
-            <th>Fecha Cita</th>
-            <th>Hora Cita</th>
-            <th>Hora Recordatorio</th>
-            <th>Forma Envío</th>
-            <th>Mensaje</th>
-            <th>Estado</th> 
-            <th>Acciones</th>
-          </tr>
-        </thead>
-      </table>
+    <!-- Header -->
+    <div class="card-header bg-info text-white d-flex justify-content-between align-items-center">
+      <div class="d-flex gap-2">
+        <button type="button" class="btn btn-light btn-sm" id="btnAgregar">
+          <i class="fas fa-plus-circle mr-1"></i> Agregar
+        </button>
+        <button type="button" class="btn btn-success btn-sm" id="btnEnviarWhatsApp">
+          <i class="fab fa-whatsapp mr-1"></i> Enviar WhatsApp
+        </button>
+      </div>
+      <h5 class="mb-0 font-weight-bold">
+        <i class="fas fa-bell mr-2"></i> Avisos Recordatorios
+      </h5>
+      <button type="button" class="btn btn-outline-light btn-sm" id="btnEstadisticas">
+        <i class="fas fa-chart-bar mr-1"></i> Estadísticas
+      </button>
+    </div>
+
+    <!-- Body -->
+    <div class="card-body p-2">
+      <div class="table-responsive shadow-sm rounded">
+        <table id="tblAvisos" class="table table-hover table-bordered align-middle text-center">
+          <thead class="bg-info text-white">
+            <tr>
+              <th>Paciente</th>
+              <th>Personal</th>
+              <th>Consultorio</th>
+              <th>Fecha Cita</th>
+              <th>Hora Cita</th>
+              <th>Hora Recordatorio</th>
+              <th>Forma Envío</th>
+              <th>Mensaje</th>
+              <th>Estado</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
     </div>
   </div>
 
-  <!-- modal de aviso -->
+  <!-- =========================== -->
   <!-- Modal Aviso -->
-<div class="modal fade" id="modalAviso" tabindex="-1" role="dialog">
-  <div class="modal-dialog modal-lg modal-dialog-scrollable" role="document">
-    <div class="modal-content">
+  <!-- =========================== -->
+  <div class="modal fade" id="modalAviso" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable" role="document">
+      <div class="modal-content shadow-lg border-0 rounded-lg">
 
-      <!-- Header -->
-      <div class="modal-header table-info">
-        <h5 id="modalTitle" class="modal-title">Agregar Aviso</h5>
-        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <!-- Header -->
+        <div class="modal-header bg-info text-white d-flex justify-content-between align-items-center">
+          <h5 id="modalTitle" class="modal-title font-weight-bold">
+            <i class="fas fa-bell mr-2"></i> Nuevo Aviso Recordatorio
+          </h5>
+          <button type="button" class="close text-white ml-2" data-dismiss="modal">&times;</button>
+        </div>
+
+        <!-- Body -->
+        <div class="modal-body">
+          <form id="formAvisoModal">
+            <input type="hidden" id="id_aviso_modal">
+
+            <div class="row">
+              <!-- Paciente -->
+              <div class="col-md-6 mb-3">
+                <label class="font-weight-bold">Paciente</label>
+                <div class="input-group">
+                  <input type="text" id="txtpaciente" class="form-control" placeholder="Click para seleccionar paciente" readonly>
+                  <button type="button" class="btn btn-outline-info" onclick="$('#modalBuscarPaciente').modal('show')">
+                    <i class="fas fa-search"></i>
+                  </button>
+                </div>
+                <input type="hidden" id="id_paciente">
+              </div>
+
+              <!-- Personal -->
+              <div class="col-md-6 mb-3">
+                <label class="font-weight-bold">Personal</label>
+                <div class="input-group">
+                  <input type="text" id="txtPersonal" class="form-control" placeholder="Click para seleccionar personal" readonly>
+                  <button type="button" class="btn btn-outline-info" onclick="$('#modalBuscarPersonal').modal('show')">
+                    <i class="fas fa-search"></i>
+                  </button>
+                </div>
+                <input type="hidden" id="id_personal_modal">
+              </div>
+
+              <!-- Consultorio -->
+              <div class="col-md-6 mb-3">
+                <label class="font-weight-bold">Consultorio</label>
+                <div class="input-group">
+                  <input type="text" id="txtConsultorio" class="form-control" placeholder="Click para seleccionar consultorio" readonly>
+                  <button type="button" class="btn btn-outline-info" onclick="$('#modalBuscarConsultorio').modal('show')">
+                    <i class="fas fa-search"></i>
+                  </button>
+                </div>
+                <input type="hidden" id="codigo">
+                <input type="hidden" id="id_consultorio_modal">
+              </div>
+
+              <!-- Fecha y hora de cita -->
+              <div class="col-md-3 mb-3">
+                <label class="font-weight-bold">Fecha Cita</label>
+                <input type="date" id="fecha_cita_modal" class="form-control text-center">
+              </div>
+              <div class="col-md-3 mb-3">
+                <label class="font-weight-bold">Hora Cita</label>
+                <input type="time" id="hora_cita_modal" class="form-control text-center">
+              </div>
+
+              <!-- Hora recordatorio -->
+              <div class="col-md-3 mb-3">
+                <label class="font-weight-bold">Hora Recordatorio</label>
+                <input type="time" id="hora_recordatorio_modal" class="form-control text-center">
+              </div>
+
+              <!-- Forma de envío -->
+              <div class="col-md-3 mb-3">
+                <label class="font-weight-bold">Forma de Envío</label>
+                <select id="forma_envio_modal" class="form-control">
+                  <option value="" disabled selected>Seleccione</option>
+                  <option value="Gmail">Gmail</option>
+                  <option value="SMS">SMS</option>
+                  <option value="WhatsApp">WhatsApp</option>
+                </select>
+              </div>
+
+              <!-- Mensaje -->
+              <div class="col-12 mb-3">
+                <label class="font-weight-bold">Mensaje</label>
+                <textarea id="mensaje_modal" class="form-control" rows="4"
+                  placeholder="Deje vacío para usar mensaje automático"></textarea>
+              </div>
+            </div>
+          </form>
+        </div>
+
+        <!-- Footer -->
+        <div class="modal-footer bg-light">
+          <button type="submit" class="btn btn-info" form="formAvisoModal">
+            <i class="fas fa-save mr-1"></i> Guardar
+          </button>
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">
+            <i class="fas fa-times mr-1"></i> Cerrar
+          </button>
+        </div>
+
       </div>
-
-      <!-- Body -->
-      <div class="modal-body">
-        <form id="formAvisoModal">
-          <input type="hidden" id="id_aviso_modal">
-
-          <!-- Paciente -->
-          <div class="mb-3">
-            <label for="txtpaciente">Paciente</label>
-            <div class="input-group">
-              <input type="text" id="txtpaciente" class="form-control" placeholder="Click para seleccionar paciente" readonly>
-              <button type="button" class="btn btn-outline-secondary" onclick="$('#modalBuscarPaciente').modal('show')">Buscar</button>
-            </div>
-            <input type="hidden" id="id_paciente">
-          </div>
-
-          <!-- Personal -->
-          <div class="mb-3">
-            <label for="txtPersonal">Personal</label>
-            <div class="input-group">
-              <input type="text" id="txtPersonal" class="form-control" placeholder="Click para seleccionar personal" readonly>
-              <button type="button" class="btn btn-outline-secondary" onclick="$('#modalBuscarPersonal').modal('show')">Buscar</button>
-            </div>
-            <input type="hidden" id="id_personal_modal">
-          </div>
-
-          <!-- Consultorio -->
-          <div class="mb-3">
-            <label for="txtConsultorio">Consultorio</label>
-            <div class="input-group">
-              <input type="text" id="txtConsultorio" class="form-control" placeholder="Click para seleccionar consultorio" readonly>
-              <button type="button" class="btn btn-outline-secondary" onclick="$('#modalBuscarConsultorio').modal('show')">Buscar</button>
-            </div>
-            <input type="hidden" id="codigo">
-            <input type="hidden" id="id_consultorio_modal">
-          </div>
-
-          <!-- Fecha y Hora -->
-          <div class="row">
-            <div class="col-md-6 mb-3">
-              <label for="fecha_cita_modal">Fecha Cita</label>
-              <input type="date" id="fecha_cita_modal" class="form-control">
-            </div>
-            <div class="col-md-6 mb-3">
-              <label for="hora_cita_modal">Hora Cita</label>
-              <input type="time" id="hora_cita_modal" class="form-control text-center">
-            </div>
-          </div>
-
-          <!-- Hora recordatorio -->
-          <div class="mb-3">
-            <label for="hora_recordatorio_modal">Hora Recordatorio</label>
-            <input type="time" id="hora_recordatorio_modal" class="form-control text-center">
-          </div>
-
-          <!-- Forma de Envío -->
-          <div class="mb-3">
-            <label for="forma_envio_modal">Forma de Envío</label>
-            <select id="forma_envio_modal" class="form-control">
-              <option value="" disabled selected>Seleccione la forma de envío</option>
-              <option value="Gmail">Gmail</option>
-              <option value="SMS">SMS</option>
-              <option value="WhatsApp">WhatsApp</option>
-            </select>
-          </div>
-
-          <!-- Mensaje -->
-          <div class="mb-3">
-            <label for="mensaje_modal">Mensaje (Opcional - se genera automático si está vacío)</label>
-            <textarea id="mensaje_modal" class="form-control" rows="3" placeholder="Deje vacío para usar mensaje automático"></textarea>
-          </div>
-
-          <!-- Footer -->
-          <div class="modal-footer">
-            <button type="submit" class="btn btn-primary">Guardar</button>
-            <button type="button" class="btn btn-danger" data-dismiss="modal">Cerrar</button>
-          </div>
-        </form>
-      </div>
-
     </div>
   </div>
-</div>
+
+
 
   <!-- Modal Estadísticas -->
   <div class="modal fade" id="modalEstadisticas" tabindex="-1">

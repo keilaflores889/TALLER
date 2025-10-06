@@ -5,20 +5,26 @@ Diagnósticos
 {% endblock %}
 
 {% block contenido %}
-<div class="container mt-4">
-  <h3>Listar Diagnósticos</h3>
+<div class="container-fluid mt-4">
+  <h3>Registros de Diagnósticos</h3>
 
-  <!-- Tarjeta -->
-  <div class="card">
-    <div class="card-header">
-      <button type="button" class="btn btn-outline-info" id="btnAgregar">Agregar</button>
+  <!-- Card principal -->
+  <div class="card shadow-sm border-0 rounded-lg">
+    <!-- Header: Botón Agregar y Título -->
+    <div class="card-header bg-info text-white d-flex justify-content-between align-items-center">
+      <button type="button" class="btn btn-light btn-sm" id="btnAgregar">
+        <i class="fas fa-plus-circle mr-1"></i> Agregar
+      </button>
+      <h5 class="mb-0 font-weight-bold">
+        <i class="fas fa-notes-medical mr-2"></i> Diagnósticos
+      </h5>
     </div>
-    <div class="card-body">
 
-      <!-- Contenedor con scroll horizontal -->
-      <div style="overflow-x: auto; white-space: nowrap;">
-        <table class="table table-striped" id="tbl">
-          <thead class="table-info">
+    <!-- Body: Tabla de diagnósticos -->
+    <div class="card-body">
+      <div class="table-responsive shadow-sm rounded">
+        <table class="table table-hover table-bordered align-middle text-center" id="tbl">
+          <thead class="bg-info text-white">
             <tr>
               <th>ID Consulta</th>
               <th>Médico</th>
@@ -33,96 +39,93 @@ Diagnósticos
           <tbody></tbody>
         </table>
       </div>
-      
     </div>
   </div>
 
+  <!-- =========================== -->
   <!-- Modal Formulario Diagnóstico -->
+  <!-- =========================== -->
   <div class="modal fade" id="modalFormulario" tabindex="-1" role="dialog">
     <div class="modal-dialog modal-xl modal-dialog-scrollable" role="document">
-      <div class="modal-content">
-        
+      <div class="modal-content shadow-lg border-0 rounded-lg">
+
         <!-- Header -->
-        <div class="modal-header table-info d-flex justify-content-between align-items-center">
-          <h4 class="modal-title" id="modalTitle">Nuevo Diagnóstico</h4>
-          <button type="button" class="close ml-2" data-dismiss="modal">&times;</button>
+        <div class="modal-header bg-info text-white rounded-top">
+          <h5 class="modal-title font-weight-bold">
+            <i class="fas fa-notes-medical mr-2"></i>
+            <span id="modalTitle">Nuevo Diagnóstico</span>
+          </h5>
+          <button type="button" class="close text-white" data-dismiss="modal">&times;</button>
         </div>
 
-        <!-- Cuerpo del modal -->
+        <!-- Body -->
         <div class="modal-body">
           <input type="hidden" id="txtIdDiagnostico">
 
           <div class="row">
-            <!-- ID Consulta Detalle -->
-            <div class="col-md-6">
-              <div class="form-group">
-                <label>ID Consulta Detalle: <span class="text-danger">*</span></label>
-                <input type="number" id="id_consulta_detalle" class="form-control" placeholder="Ingrese ID de consulta">
-              </div>
+
+            <!-- ID Consulta -->
+            <div class="col-md-6 mb-3">
+              <label class="font-weight-bold">ID Consulta Detalle <span class="text-danger">*</span></label>
+              <input type="number" id="id_consulta_detalle" class="form-control" placeholder="Ingrese ID de consulta">
             </div>
 
             <!-- Médico -->
-            <div class="col-md-6">
-              <div class="form-group">
-                <input type="hidden" id="id_medico">
-                <label>Médico: <span class="text-danger">*</span></label>
-                <input type="text" id="txtMedico" class="form-control" placeholder="Click para seleccionar Médico" readonly>
-              </div>
+            <div class="col-md-6 mb-3">
+              <input type="hidden" id="id_medico">
+              <label class="font-weight-bold">Médico <span class="text-danger">*</span></label>
+              <input type="text" id="txtMedico" class="form-control" placeholder="Click para seleccionar Médico" readonly>
             </div>
 
             <!-- Paciente -->
-            <div class="col-md-6">
-              <div class="form-group">
-                <input type="hidden" id="id_paciente">
-                <label>Paciente: <span class="text-danger">*</span></label>
-                <input type="text" id="txtPaciente" class="form-control" placeholder="Click para seleccionar Paciente" readonly>
-              </div>
+            <div class="col-md-6 mb-3">
+              <input type="hidden" id="id_paciente">
+              <label class="font-weight-bold">Paciente <span class="text-danger">*</span></label>
+              <input type="text" id="txtPaciente" class="form-control" placeholder="Click para seleccionar Paciente" readonly>
             </div>
 
             <!-- Tipo Diagnóstico -->
-            <div class="col-md-6">
-              <div class="form-group">
-                <input type="hidden" id="id_tipo_diagnostico">
-                <label>Tipo Diagnóstico:</label>
-                <input type="text" id="txtTipoDiagnostico" class="form-control" placeholder="Click para seleccionar Tipo" readonly>
-              </div>
+            <div class="col-md-6 mb-3">
+              <input type="hidden" id="id_tipo_diagnostico">
+              <label class="font-weight-bold">Tipo Diagnóstico</label>
+              <input type="text" id="txtTipoDiagnostico" class="form-control" placeholder="Click para seleccionar Tipo" readonly>
             </div>
 
-            <!-- Descripción Diagnóstico -->
-            <div class="col-md-12">
-              <div class="form-group">
-                <label>Descripción Diagnóstico: <span class="text-danger">*</span></label>
-                <textarea id="descripcion_diagnostico" class="form-control" rows="3" placeholder="Ingrese descripción del diagnóstico"></textarea>
-              </div>
+            <!-- Descripción -->
+            <div class="col-md-12 mb-3">
+              <label class="font-weight-bold">Descripción Diagnóstico <span class="text-danger">*</span></label>
+              <textarea id="descripcion_diagnostico" class="form-control" rows="3" placeholder="Ingrese descripción del diagnóstico"></textarea>
             </div>
 
-            <!-- Fecha Diagnóstico -->
-            <div class="col-md-6">
-              <div class="form-group">
-                <label>Fecha Diagnóstico:</label>
-                <input type="date" id="fecha_diagnostico" class="form-control">
-              </div>
+            <!-- Fecha -->
+            <div class="col-md-6 mb-3">
+              <label class="font-weight-bold">Fecha Diagnóstico</label>
+              <input type="date" id="fecha_diagnostico" class="form-control">
             </div>
 
             <!-- Observaciones -->
-            <div class="col-md-12">
-              <div class="form-group">
-                <label>Observaciones:</label>
-                <textarea id="observaciones" class="form-control" rows="3" placeholder="Observaciones adicionales (opcional)"></textarea>
-              </div>
+            <div class="col-md-12 mb-3">
+              <label class="font-weight-bold">Observaciones</label>
+              <textarea id="observaciones" class="form-control" rows="3" placeholder="Observaciones adicionales (opcional)"></textarea>
             </div>
+
           </div>
         </div>
 
-        <!-- Footer fijo -->
-        <div class="modal-footer">
-          <button type="button" class="btn btn-primary" id="btnGuardar">Guardar</button>
-          <button type="button" class="btn btn-danger" data-dismiss="modal">Cerrar</button>
+        <!-- Footer -->
+        <div class="modal-footer bg-light">
+          <button type="button" class="btn btn-info" id="btnGuardar">
+            <i class="fas fa-save mr-1"></i> Guardar
+          </button>
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">
+            <i class="fas fa-times mr-1"></i> Cerrar
+          </button>
         </div>
 
       </div>
     </div>
   </div>
+
 
   <!-- Modal Médico -->
   <div class="modal fade" id="modalBuscarMedico" tabindex="-1" role="dialog">
@@ -165,7 +168,6 @@ Diagnósticos
                 <tr>
                   <th>Nombre</th>
                   <th>Apellido</th>
-                  <th>Documento</th>
                   <th>Acciones</th>
                 </tr>
               </thead>

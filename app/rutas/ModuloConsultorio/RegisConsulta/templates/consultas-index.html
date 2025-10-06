@@ -83,31 +83,32 @@ Consultas Médicas
     </div>
   </div>
 
-<!-- Tabla de Consultas -->
-<div class="card">
-  <div class="card-header">
-    <button type="button" class="btn btn-outline-info" id="btnAgregar">
-      <i class="fas fa-plus"></i> Agregar Consulta
-    </button>
-  </div>
-  <div class="card-body">
-    <div style="overflow-x: auto; white-space: nowrap;">
-      <table class="table table-striped" id="tbl">
-        <thead class="table-info">
-          <tr>
-            <th>Personal</th>
-            <th>Consultorio</th>
-            <th>Fecha Cita</th>
-            <th>Hora Cita</th>
-            <th>Paciente</th>
-            <th>Médico</th>
-            <th>Duración (min)</th>
-            <th>Estado</th>
-            <th>Acciones</th>
-          </tr>
-        </thead>
-        <tbody></tbody>
-      </table>
+  <!-- Tabla de Consultas -->
+  <div class="card">
+    <div class="card-header">
+      <button type="button" class="btn btn-outline-info" id="btnAgregar">
+        <i class="fas fa-plus"></i> Agregar Consulta
+      </button>
+    </div>
+    <div class="card-body">
+      <div style="overflow-x: auto; white-space: nowrap;">
+        <table class="table table-striped" id="tbl">
+          <thead class="table-info">
+            <tr>
+              <th>Personal</th>
+              <th>Consultorio</th>
+              <th>Fecha Cita</th>
+              <th>Hora Cita</th>
+              <th>Paciente</th>
+              <th>Médico</th>
+              <th>Duración (min)</th>
+              <th>Estado</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
     </div>
   </div>
 </div>
@@ -234,15 +235,15 @@ Consultas Médicas
         <!-- BOTONES PRINCIPALES -->
         <div class="mb-3">
           <button type="button" class="btn btn-outline-primary btn-sm" id="btnGestionarDiagnosticos">
-            <i class="fas fa-stethoscope"></i> 2.2 Gestionar Diagnósticos
+            <i class="fas fa-stethoscope"></i> Registrar Diagnósticos
           </button>
           <button type="button" class="btn btn-outline-success btn-sm" id="btnRegistrarTratamientos">
-            <i class="fas fa-notes-medical"></i> 2.7 Registrar Tratamientos
+            <i class="fas fa-notes-medical"></i> Registrar Tratamientos
           </button>
         </div>
 
         <hr>
-        <h5>Agregar Detalle Clínico Rápido</h5>
+        <h5>Agregar Detalle Clínico</h5>
         
         <div class="row">
           <!-- Síntoma -->
@@ -266,28 +267,26 @@ Consultas Médicas
           <!-- Diagnóstico -->
           <div class="col-md-12">
             <div class="form-group">
-              <label>Diagnóstico Resumen: <span style="color:red">*</span></label>
+              <label>Diagnóstico: <span style="color:red">*</span></label>
               <textarea id="diagnostico" class="form-control" rows="2" placeholder="Diagnóstico general..." required></textarea>
               <div class="text-danger small" id="error_diagnostico" style="display:none;">Campo obligatorio</div>
             </div>
           </div>
-<!-- Tipo de Diagnóstico -->
-<div class="col-md-6">
-  <div class="form-group">
-    <label>Tipo de Diagnóstico:</label>
-    <input type="hidden" id="id_tipo_diagnostico">
-    <input type="text" id="txtTipoDiagnostico" class="form-control" 
-           placeholder="Click para seleccionar Tipo de Diagnóstico" 
-           readonly 
-           style="cursor: pointer;">
-    <div class="text-danger small" id="error_tipo_diagnostico" style="display:none;">Campo obligatorio</div>
-  </div>
-</div>
+
+          <!-- Tipo de Diagnóstico -->
+          <div class="col-md-12">
+            <div class="form-group">
+              <label>Tipo de Diagnóstico:</label>
+              <input type="hidden" id="id_tipo_diagnostico">
+              <input type="text" id="txtTipoDiagnostico" class="form-control" placeholder="Click para seleccionar Tipo de Diagnóstico" readonly style="cursor: pointer;">
+              <div class="text-danger small" id="error_tipo_diagnostico" style="display:none;">Campo obligatorio</div>
+            </div>
+          </div>
 
           <!-- Tratamiento -->
           <div class="col-md-12">
             <div class="form-group">
-              <label>Tratamiento Resumen: <span style="color:red">*</span></label>
+              <label>Tratamiento: <span style="color:red">*</span></label>
               <textarea id="tratamiento" class="form-control" rows="2" placeholder="Tratamiento general..." required></textarea>
               <div class="text-danger small" id="error_tratamiento" style="display:none;">Campo obligatorio</div>
             </div>
@@ -339,11 +338,13 @@ Consultas Médicas
     <div class="modal-content">
       <div class="modal-header" style="background-color: #E3F2FD;">
         <h4 class="modal-title">
-          <i class="fas fa-stethoscope"></i> 2.2 Gestionar Diagnósticos
+          <i class="fas fa-stethoscope"></i> Registrar Diagnósticos
         </h4>
         <button type="button" class="close" data-dismiss="modal">&times;</button>
       </div>
       <div class="modal-body">
+        <input type="hidden" id="id_tipo_diagnostico_principal">
+        
         <!-- Información del paciente y médico -->
         <div class="card mb-3" style="background-color: #E3F2FD;">
           <div class="card-body">
@@ -370,7 +371,7 @@ Consultas Médicas
         <!-- Diagnóstico Principal -->
         <div class="card mb-3">
           <div class="card-header bg-primary text-white">
-            <h5 class="mb-0">Diagnóstico Principal (Resumen)</h5>
+            <h5 class="mb-0">Diagnóstico Principal </h5>
           </div>
           <div class="card-body">
             <div class="form-group">
@@ -381,57 +382,11 @@ Consultas Médicas
               <i class="fas fa-save"></i> Guardar Diagnóstico Principal
             </button>
           </div>
+          <!-- Mensaje informativo -->
+        <div class="alert alert-info">
+          <i class="fas fa-info-circle"></i> 
+          Los diagnosticos detallados se implementarán en la siguiente fase del sistema.
         </div>
-
-        <!-- Diagnósticos Detallados -->
-        <div class="card">
-          <div class="card-header bg-success text-white">
-            <h5 class="mb-0">Diagnósticos Detallados por Pieza</h5>
-          </div>
-          <div class="card-body">
-            <!-- Formulario agregar -->
-            <div class="row mb-3">
-              <div class="col-md-2">
-                <input type="text" id="nuevo_diag_pieza" class="form-control" placeholder="Pieza">
-              </div>
-              <div class="col-md-4">
-                <input type="text" id="nuevo_diag_descripcion" class="form-control" placeholder="Descripción diagnóstico">
-              </div>
-              <div class="col-md-2">
-                <select id="nuevo_diag_gravedad" class="form-control">
-                  <option value="">Gravedad</option>
-                  <option value="leve">Leve</option>
-                  <option value="moderado">Moderado</option>
-                  <option value="grave">Grave</option>
-                </select>
-              </div>
-              <div class="col-md-3">
-                <input type="text" id="nuevo_diag_observaciones" class="form-control" placeholder="Observaciones">
-              </div>
-              <div class="col-md-1">
-                <button type="button" class="btn btn-success" id="btnAgregarDiagnostico">
-                  <i class="fas fa-plus"></i>
-                </button>
-              </div>
-            </div>
-
-            <!-- Tabla diagnósticos -->
-            <div class="table-responsive">
-              <table class="table table-sm table-bordered" id="tblDiagnosticos">
-                <thead class="thead-light">
-                  <tr>
-                    <th>Pieza</th>
-                    <th>Descripción</th>
-                    <th>Gravedad</th>
-                    <th>Estado</th>
-                    <th>Fecha</th>
-                    <th>Acciones</th>
-                  </tr>
-                </thead>
-                <tbody></tbody>
-              </table>
-            </div>
-          </div>
         </div>
       </div>
       <div class="modal-footer">
@@ -447,7 +402,7 @@ Consultas Médicas
     <div class="modal-content">
       <div class="modal-header" style="background-color: #FFF3E0;">
         <h4 class="modal-title">
-          <i class="fas fa-notes-medical"></i> 2.7 Registrar Tratamientos
+          <i class="fas fa-notes-medical"></i> Registrar Tratamientos
         </h4>
         <button type="button" class="close" data-dismiss="modal">&times;</button>
       </div>
@@ -503,136 +458,136 @@ Consultas Médicas
     </div>
   </div>
 </div>
-  <!-- Modales de selección (MISMO CÓDIGO ANTERIOR) -->
-  <!-- Modal Personal -->
-  <div class="modal fade" id="modalBuscarPersonal" tabindex="-1" role="dialog">
-    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h4 class="modal-title">Seleccionar Personal</h4>
-          <button type="button" class="close" data-dismiss="modal">&times;</button>
-        </div>
-        <div class="modal-body">
-          <div class="table-responsive">
-            <table class="table table-striped table-bordered w-100" id="tblPersonal">
-              <thead>
-                <tr>
-                  <th>Nombre</th>
-                  <th>Apellido</th>
-                  <th>Acciones</th>
-                </tr>
-              </thead>
-              <tbody></tbody>
-            </table>
-          </div>
+
+<!-- Modales de selección (MISMO CÓDIGO ANTERIOR) -->
+<!-- Modal Personal -->
+<div class="modal fade" id="modalBuscarPersonal" tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">Seleccionar Personal</h4>
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="table-responsive">
+          <table class="table table-striped table-bordered w-100" id="tblPersonal">
+            <thead>
+              <tr>
+                <th>Nombre</th>
+                <th>Apellido</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
         </div>
       </div>
     </div>
   </div>
+</div>
 
-  <!-- Modal Consultorio -->
-  <div class="modal fade" id="modalBuscarConsultorio" tabindex="-1" role="dialog">
-    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h4 class="modal-title">Seleccionar Consultorio</h4>
-          <button type="button" class="close" data-dismiss="modal">&times;</button>
-        </div>
-        <div class="modal-body">
-          <div class="table-responsive">
-            <table class="table table-striped table-bordered w-100" id="tblConsultorio">
-              <thead>
-                <tr>
-                  <th>Nombre</th>
-                  <th>Acciones</th>
-                </tr>
-              </thead>
-              <tbody></tbody>
-            </table>
-          </div>
+<!-- Modal Consultorio -->
+<div class="modal fade" id="modalBuscarConsultorio" tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">Seleccionar Consultorio</h4>
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="table-responsive">
+          <table class="table table-striped table-bordered w-100" id="tblConsultorio">
+            <thead>
+              <tr>
+                <th>Nombre</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
         </div>
       </div>
     </div>
   </div>
+</div>
 
-  <!-- Modal Médico -->
-  <div class="modal fade" id="modalBuscarMedico" tabindex="-1" role="dialog">
-    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h4 class="modal-title">Seleccionar Médico</h4>
-          <button type="button" class="close" data-dismiss="modal">&times;</button>
-        </div>
-        <div class="modal-body">
-          <div class="table-responsive">
-            <table class="table table-striped table-bordered w-100" id="tblMedico">
-              <thead>
-                <tr>
-                  <th>Nombre</th>
-                  <th>Apellido</th>
-                  <th>Acciones</th>
-                </tr>
-              </thead>
-              <tbody></tbody>
-            </table>
-          </div>
+<!-- Modal Médico -->
+<div class="modal fade" id="modalBuscarMedico" tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">Seleccionar Médico</h4>
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="table-responsive">
+          <table class="table table-striped table-bordered w-100" id="tblMedico">
+            <thead>
+              <tr>
+                <th>Nombre</th>
+                <th>Apellido</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
         </div>
       </div>
     </div>
   </div>
+</div>
 
-  <!-- Modal Paciente -->
-  <div class="modal fade" id="modalBuscarPaciente" tabindex="-1" role="dialog">
-    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h4 class="modal-title">Seleccionar Paciente</h4>
-          <button type="button" class="close" data-dismiss="modal">&times;</button>
-        </div>
-        <div class="modal-body">
-          <div class="table-responsive">
-            <table class="table table-striped table-bordered w-100" id="tblPaciente">
-              <thead>
-                <tr>
-                  <th>Nombre</th>
-                  <th>Apellido</th>
-                  <th>Cédula</th>
-                  <th>Acciones</th>
-                </tr>
-              </thead>
-              <tbody></tbody>
-            </table>
-          </div>
+<!-- Modal Paciente -->
+<div class="modal fade" id="modalBuscarPaciente" tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">Seleccionar Paciente</h4>
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="table-responsive">
+          <table class="table table-striped table-bordered w-100" id="tblPaciente">
+            <thead>
+              <tr>
+                <th>Nombre</th>
+                <th>Apellido</th>
+                <th>Cédula</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
         </div>
       </div>
     </div>
   </div>
+</div>
 
-  <!-- Modal Síntoma -->
-  <div class="modal fade" id="modalBuscarSintoma" tabindex="-1" role="dialog">
-    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h4 class="modal-title">Seleccionar Síntoma</h4>
-          <button type="button" class="close" data-dismiss="modal">&times;</button>
-        </div>
-        <div class="modal-body">
-          <div class="table-responsive">
-            <table class="table table-striped table-bordered w-100" id="tblSintoma">
-              <thead>
-                <tr>
-                  <th>Descripción</th>
-                  <th>Acciones</th>
-                </tr>
-              </thead>
-              <tbody></tbody>
-            </table>
-          </div>
+<!-- Modal Síntoma -->
+<div class="modal fade" id="modalBuscarSintoma" tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">Seleccionar Síntoma</h4>
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="table-responsive">
+          <table class="table table-striped table-bordered w-100" id="tblSintoma">
+            <thead>
+              <tr>
+                <th>Descripción</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
         </div>
       </div>
     </div>
   </div>
-
+</div>
 
 <!-- Modal Tipo Diagnóstico -->
 <div class="modal fade" id="modalBuscarTipoDiagnostico" tabindex="-1" role="dialog">
@@ -658,6 +613,8 @@ Consultas Médicas
     </div>
   </div>
 </div>
+
+
 
 <!-- Librerías -->
 <link rel="stylesheet" href="https://cdn.datatables.net/1.10.21/css/dataTables.bootstrap4.min.css">
@@ -1152,7 +1109,11 @@ function cargarDetallesConsulta(idConsulta) {
 // --- Editar Detalle ---
 $('#tblDetalles').on('click', 'button[name="btn_editar_detalle"]', function() {
   const btn = $(this);
-  
+   // 🔍 LÍNEA TEMPORAL DE DEBUG
+  console.log('Datos del botón:', {
+    id_tipo_diagnostico: btn.data('id_tipo_diagnostico'),
+    descripcion_tipo_diagnostico: btn.data('descripcion_tipo_diagnostico')
+  });
   detalleEditandoId = btn.data('id');
   
   // Cargar datos básicos
@@ -1164,9 +1125,8 @@ $('#tblDetalles').on('click', 'button[name="btn_editar_detalle"]', function() {
   $('#procedimiento').val(btn.data('procedimiento'));
   
   // Cargar tipo de diagnóstico
-  $('#id_tipo_diagnostico').val(btn.data('id_tipo_diagnostico'));
-  $('#txtTipoDiagnostico').val(btn.data('descripcion_tipo_diagnostico'));
-  
+ $('#id_tipo_diagnostico').val(btn.data('id_tipo_diagnostico') || '');
+  $('#txtTipoDiagnostico').val(btn.data('descripcion_tipo_diagnostico') || '');
   $('#btnAgregarDetalle').html('<i class="fas fa-save"></i> Actualizar Detalle');
   
   $('html, body').animate({
@@ -1175,7 +1135,11 @@ $('#tblDetalles').on('click', 'button[name="btn_editar_detalle"]', function() {
 });
 
 // --- Agregar/Actualizar Detalle ---
+// --- Agregar/Actualizar Detalle ---
 $('#btnAgregarDetalle').on('click', () => {
+  // Obtener el valor del id_tipo_diagnostico
+  const idTipoDiagnostico = $('#id_tipo_diagnostico').val();
+  
   const payload = {
     id_consulta_cab: consultaActualId,
     id_sintoma: parseInt($('#id_sintoma').val()),
@@ -1183,7 +1147,8 @@ $('#btnAgregarDetalle').on('click', () => {
     diagnostico: $('#diagnostico').val(),
     tratamiento: $('#tratamiento').val(),
     procedimiento: $('#procedimiento').val() || null,
-    id_tipo_diagnostico: parseInt($('#id_tipo_diagnostico').val()) || null  // Permitir null
+    // ✅ CORRECCIÓN: Solo enviar si hay un valor válido
+    id_tipo_diagnostico: (idTipoDiagnostico && idTipoDiagnostico !== '') ? parseInt(idTipoDiagnostico) : null
   };
 
   let valido = true;
@@ -1194,6 +1159,9 @@ $('#btnAgregarDetalle').on('click', () => {
   if (!payload.tratamiento) { $('#error_tratamiento').show(); valido = false; }
 
   if (!valido) return;
+
+  // 🔍 DEBUG: Ver qué se está enviando
+  console.log('Payload a enviar:', payload);
 
   const url = detalleEditandoId 
     ? `/api/v1/consultas-detalle/${detalleEditandoId}` 
@@ -1272,83 +1240,106 @@ $('#btnGestionarDiagnosticos').on('click', function() {
           
           $('#diagnostico_principal').val(detalle.diagnostico || '');
           
-          cargarDiagnosticosDetallados(consultaDetalleActualId);
+          // DEBUG: Ver qué se está intentando guardar
+          console.log('Guardando id_tipo_diagnostico_principal:', detalle.id_tipo_diagnostico);
+
+          // Guardar el id_tipo_diagnostico si existe
+          if (detalle.id_tipo_diagnostico) {
+            $('#id_tipo_diagnostico_principal').val(detalle.id_tipo_diagnostico);
+          }
+       
           
           $('#modalGestionarDiagnosticos').modal('show');
         } else {
           Swal.fire('Advertencia', 'Primero debe agregar un detalle clínico en esta consulta', 'warning');
         }
       }
+    })
+    .catch(err => {
+      console.error('Error:', err);
+      Swal.fire('Error', 'Error al cargar información', 'error');
     });
 });
 
-// --- Cargar diagnósticos detallados (CORREGIDO) ---
-function cargarDiagnosticosDetallados(idConsultaDetalle) {
-  fetch(`/api/v1/consultas-detalle/${idConsultaDetalle}/diagnosticos`)
-    .then(r => r.json())
-    .then(d => {
-      const tbody = $('#tblDiagnosticos tbody');
-      tbody.empty();
-      
-      if (d.success && d.data.length > 0) {
-        d.data.forEach(diag => {
-          tbody.append(`
-            <tr>
-              <td>${diag.pieza_dental || '-'}</td>
-              <td>${diag.descripcion_diagnostico}</td>
-              <td>${diag.gravedad || '-'}</td>
-              <td><span class="badge badge-info">${diag.estado || 'activo'}</span></td>
-              <td>${diag.fecha_diagnostico ? formatDateForDisplay(diag.fecha_diagnostico) : '-'}</td>
-              <td>
-                <button class="btn btn-danger btn-sm" name="btn_eliminar_diagnostico" 
-                  data-id="${diag.id_diagnostico}">
-                  <i class="fas fa-trash"></i>
-                </button>
-              </td>
-            </tr>
-          `);
-        });
-      } else {
-        tbody.append('<tr><td colspan="6" class="text-center text-muted">No hay diagnósticos detallados</td></tr>');
-      }
-    })
-    .catch(err => {
-      console.error('Error al cargar diagnósticos:', err);
-      $('#tblDiagnosticos tbody').html('<tr><td colspan="6" class="text-center text-danger">Error al cargar diagnósticos</td></tr>');
-    });
-}
-
+// --- Agregar diagnóstico detallado (CORREGIDO) ---
 // --- Agregar diagnóstico detallado (CORREGIDO) ---
 $('#btnAgregarDiagnostico').on('click', function() {
-  const payload = {
-    id_consulta_detalle: consultaDetalleActualId,
-    pieza_dental: $('#nuevo_diag_pieza').val() || null,
-    descripcion_diagnostico: $('#nuevo_diag_descripcion').val(),
-    gravedad: $('#nuevo_diag_gravedad').val() || null,
-    observaciones: $('#nuevo_diag_observaciones').val() || null
-  };
+  // Primero validamos que los campos requeridos existan
+  if (!consultaDetalleActualId || !idMedicoActual || !idPacienteActual) {
+    Swal.fire('Error', 'Faltan datos necesarios para agregar el diagnóstico', 'error');
+    return;
+  }
+
+  const descripcion = $('#nuevo_diag_descripcion').val();
   
-  if (!payload.descripcion_diagnostico.trim()) {
+  if (!descripcion || !descripcion.trim()) {
     Swal.fire('Advertencia', 'Debe ingresar una descripción', 'warning');
     return;
   }
-  
-  fetch('/api/v1/Diagnostico', {  // ✅ CORRECTO
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'X-CSRFToken': CSRFToken },
-    body: JSON.stringify(payload)
-  })
-  .then(r => r.json())
-  .then(d => {
-    if (d.success) {
-      $('#nuevo_diag_pieza, #nuevo_diag_descripcion, #nuevo_diag_observaciones').val('');
-      $('#nuevo_diag_gravedad').val('');
-      cargarDiagnosticosDetallados(consultaDetalleActualId);
-      Swal.fire('Éxito', 'Diagnóstico agregado', 'success');
-    } else {
-      Swal.fire('Error', d.error, 'error');
-    }
-  });
+
+  // Obtenemos el detalle de la consulta para obtener el id_tipo_diagnostico
+  fetch(`/api/v1/consultas-detalle/${consultaDetalleActualId}`)
+    .then(r => r.json())
+    .then(detalleData => {
+      if (detalleData.success) {
+        const payload = {
+          id_consulta_detalle: consultaDetalleActualId,
+          id_medico: idMedicoActual,
+          id_paciente: idPacienteActual,
+          id_tipo_diagnostico: detalleData.data.id_tipo_diagnostico || null,
+          pieza_dental: $('#nuevo_diag_pieza').val() || null,
+          descripcion_diagnostico: descripcion.trim(),
+          gravedad: $('#nuevo_diag_gravedad').val() || null,
+          observaciones: $('#nuevo_diag_observaciones').val() || null
+        };
+        
+        console.log('Enviando payload:', payload); // 🔍 Para debug
+        
+        // ✅ IMPORTANTE: Usar POST para crear un nuevo diagnóstico
+        fetch('/api/v1/Diagnostico', {
+          method: 'POST',
+          headers: { 
+            'Content-Type': 'application/json', 
+            'X-CSRFToken': CSRFToken 
+          },
+          body: JSON.stringify(payload)
+        })
+        .then(r => {
+          if (!r.ok) {
+            // Si la respuesta no es OK, lanzamos un error con el status
+            throw new Error(`HTTP error! status: ${r.status}`);
+          }
+          return r.json();
+        })
+        .then(d => {
+          console.log('Respuesta del servidor:', d); // 🔍 Para debug
+          if (d.success) {
+            // Limpiar campos
+            $('#nuevo_diag_pieza').val('');
+            $('#nuevo_diag_descripcion').val('');
+            $('#nuevo_diag_observaciones').val('');
+            $('#nuevo_diag_gravedad').val('');
+          
+            Swal.fire('Éxito', 'Diagnóstico agregado correctamente', 'success');
+            
+            // Opcional: Recargar la lista de diagnósticos si tienes una función para eso
+            // cargarDiagnosticos(consultaDetalleActualId);
+          } else {
+            Swal.fire('Error', d.error || 'Error al guardar el diagnóstico', 'error');
+          }
+        })
+        .catch(err => {
+          console.error('Error en la petición:', err);
+          Swal.fire('Error', `Error al guardar el diagnóstico: ${err.message}`, 'error');
+        });
+      } else {
+        Swal.fire('Error', detalleData.error || 'No se pudo obtener información del detalle', 'error');
+      }
+    })
+    .catch(err => {
+      console.error('Error al obtener detalle:', err);
+      Swal.fire('Error', 'No se pudo obtener información del detalle', 'error');
+    });
 });
 
 // --- Eliminar diagnóstico (CORREGIDO) ---
@@ -1370,7 +1361,7 @@ $('#tblDiagnosticos').on('click', 'button[name="btn_eliminar_diagnostico"]', fun
       .then(r => r.json())
       .then(d => {
         if (d.success) {
-          cargarDiagnosticosDetallados(consultaDetalleActualId);
+          
           Swal.fire('Eliminado', 'Diagnóstico eliminado', 'success');
         } else {
           Swal.fire('Error', d.error, 'error');
@@ -1390,10 +1381,7 @@ $('#btnGuardarDiagnosticoPrincipal').on('click', function() {
     return;
   }
   
-  // Obtener la fecha de la consulta desde el modal
-  const fechaConsulta = $('#diag_consulta_fecha').text().split(' - ')[0]; // "03/10/2025"
-  
-  // Convertir DD/MM/YYYY a YYYY-MM-DD
+  const fechaConsulta = $('#diag_consulta_fecha').text().split(' - ')[0];
   const partes = fechaConsulta.split('/');
   const fechaFormateada = `${partes[2]}-${partes[1]}-${partes[0]}`;
   
@@ -1412,7 +1400,8 @@ $('#btnGuardarDiagnosticoPrincipal').on('click', function() {
             pieza_dental: detalle.pieza_dental,
             diagnostico: diagnostico,
             tratamiento: detalle.tratamiento,
-            procedimiento: detalle.procedimiento
+            procedimiento: detalle.procedimiento,
+            id_tipo_diagnostico: idTipoDiagnostico || detalle.id_tipo_diagnostico // ✅ Mantener el existente si no se selecciona uno nuevo
           })
         });
       }
@@ -1429,7 +1418,7 @@ $('#btnGuardarDiagnosticoPrincipal').on('click', function() {
             id_paciente: idPacienteActual,
             id_tipo_diagnostico: idTipoDiagnostico ? parseInt(idTipoDiagnostico) : null,
             descripcion_diagnostico: diagnostico,
-            fecha_diagnostico: fechaFormateada,  // ✅ AGREGADO
+            fecha_diagnostico: fechaFormateada,
             observaciones: 'Diagnóstico principal'
           })
         });
@@ -1440,7 +1429,7 @@ $('#btnGuardarDiagnosticoPrincipal').on('click', function() {
       if (d.success) {
         Swal.fire('Éxito', 'Diagnóstico guardado correctamente', 'success');
         cargarDetallesConsulta(consultaActualId);
-        cargarDiagnosticosDetallados(consultaDetalleActualId);
+
       } else {
         Swal.fire('Error', d.error, 'error');
       }
@@ -1518,6 +1507,7 @@ $('#btnGuardarTratamientoPrincipal').on('click', function() {
             pieza_dental: detalle.pieza_dental,
             diagnostico: detalle.diagnostico,
             tratamiento: tratamiento,
+            id_tipo_diagnostico: detalle.id_tipo_diagnostico,
             procedimiento: detalle.procedimiento
           })
         });
