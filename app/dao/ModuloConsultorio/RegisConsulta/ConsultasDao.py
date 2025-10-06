@@ -300,6 +300,7 @@ class ConsultasDao:
                     cd.diagnostico, 
                     cd.tratamiento, 
                     cd.procedimiento,
+                    cd.id_tipo_diagnostico,
                     s.descripcion_sintoma AS descripcion_sintoma,
                     cc.id_medico,
                     cc.id_paciente,
@@ -307,13 +308,15 @@ class ConsultasDao:
                     TO_CHAR(cc.hora_cita, 'HH24:MI:SS') AS hora_cita,
                     m.nombre || ' ' || m.apellido AS nombre_medico,
                     p.nombre || ' ' || p.apellido AS nombre_paciente,
-                    con.nombre_consultorio AS nombre_consultorio
+                    con.nombre_consultorio AS nombre_consultorio,
+                    COALESCE(td.tipo_diagnostico, 'Sin tipo') AS descripcion_tipo_diagnostico
                 FROM consultas_detalle cd
                 INNER JOIN sintoma s ON cd.id_sintoma = s.id_sintoma
                 INNER JOIN consultas_cabecera cc ON cd.id_consulta_cab = cc.id_consulta_cab
                 INNER JOIN medico m ON cc.id_medico = m.id_medico
                 INNER JOIN paciente p ON cc.id_paciente = p.id_paciente
                 LEFT JOIN consultorio con ON cc.id_consultorio = con.codigo
+                LEFT JOIN tipo_diagnostico td ON cd.id_tipo_diagnostico = td.id_tipo_diagnostico
                 ORDER BY cd.id_consulta_detalle DESC
             """)
             rows = cursor.fetchall()
@@ -482,13 +485,10 @@ class ConsultasDao:
                     d.id_diagnostico,
                     d.id_consulta_detalle,
                     d.id_tipo_diagnostico,
-                    d.pieza_dental,
                     d.descripcion_diagnostico,
-                    d.gravedad,
-                    d.estado,
                     TO_CHAR(d.fecha_diagnostico, 'YYYY-MM-DD') AS fecha_diagnostico,
                     d.observaciones,
-                    COALESCE(td.descripcion, 'Sin tipo') AS tipo_diagnostico_descripcion
+                    COALESCE(td.tipo_diagnostico, 'Sin tipo') AS tipo_diagnostico_descripcion
                 FROM diagnosticos d
                 LEFT JOIN tipo_diagnostico td ON d.id_tipo_diagnostico = td.id_tipo_diagnostico
                 WHERE d.id_consulta_detalle = %s
@@ -502,7 +502,6 @@ class ConsultasDao:
         except Exception as e:
             app.logger.error(f"Error al obtener diagnósticos: {str(e)}")
             return []
-
     def addDiagnostico(self, data):
         """Agrega un nuevo diagnóstico detallado"""
         try:
