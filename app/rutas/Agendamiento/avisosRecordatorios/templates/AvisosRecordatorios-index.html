@@ -22,9 +22,6 @@ Avisos Recordatorios
       <h5 class="mb-0 font-weight-bold">
         <i class="fas fa-bell mr-2"></i> Avisos Recordatorios
       </h5>
-      <button type="button" class="btn btn-outline-light btn-sm" id="btnEstadisticas">
-        <i class="fas fa-chart-bar mr-1"></i> Estadísticas
-      </button>
     </div>
 
     <!-- Body -->
@@ -59,11 +56,11 @@ Avisos Recordatorios
       <div class="modal-content shadow-lg border-0 rounded-lg">
 
         <!-- Header -->
-        <div class="modal-header bg-info text-white d-flex justify-content-between align-items-center">
-          <h5 id="modalTitle" class="modal-title font-weight-bold">
-            <i class="fas fa-bell mr-2"></i> Nuevo Aviso Recordatorio
+        <div class="modal-header bg-info text-white rounded-top d-flex justify-content-between align-items-center">
+          <h5 class="modal-title font-weight-bold">
+            <i class="fas fa-bell mr-2"></i> <span id="modalTitle">Nuevo Aviso Recordatorio</span>
           </h5>
-          <button type="button" class="close text-white ml-2" data-dismiss="modal">&times;</button>
+          <button type="button" class="close text-white" data-dismiss="modal">&times;</button>
         </div>
 
         <!-- Body -->
@@ -77,7 +74,7 @@ Avisos Recordatorios
                 <label class="font-weight-bold">Paciente</label>
                 <div class="input-group">
                   <input type="text" id="txtpaciente" class="form-control" placeholder="Click para seleccionar paciente" readonly>
-                  <button type="button" class="btn btn-outline-info" onclick="$('#modalBuscarPaciente').modal('show')">
+                  <button type="button" class="btn btn-info" onclick="$('#modalBuscarPaciente').modal('show')">
                     <i class="fas fa-search"></i>
                   </button>
                 </div>
@@ -89,7 +86,7 @@ Avisos Recordatorios
                 <label class="font-weight-bold">Personal</label>
                 <div class="input-group">
                   <input type="text" id="txtPersonal" class="form-control" placeholder="Click para seleccionar personal" readonly>
-                  <button type="button" class="btn btn-outline-info" onclick="$('#modalBuscarPersonal').modal('show')">
+                  <button type="button" class="btn btn-info" onclick="$('#modalBuscarPersonal').modal('show')">
                     <i class="fas fa-search"></i>
                   </button>
                 </div>
@@ -101,7 +98,7 @@ Avisos Recordatorios
                 <label class="font-weight-bold">Consultorio</label>
                 <div class="input-group">
                   <input type="text" id="txtConsultorio" class="form-control" placeholder="Click para seleccionar consultorio" readonly>
-                  <button type="button" class="btn btn-outline-info" onclick="$('#modalBuscarConsultorio').modal('show')">
+                  <button type="button" class="btn btn-info" onclick="$('#modalBuscarConsultorio').modal('show')">
                     <i class="fas fa-search"></i>
                   </button>
                 </div>
@@ -151,7 +148,7 @@ Avisos Recordatorios
           <button type="submit" class="btn btn-info" form="formAvisoModal">
             <i class="fas fa-save mr-1"></i> Guardar
           </button>
-          <button type="button" class="btn btn-secondary" data-dismiss="modal">
+          <button type="button" class="btn btn-danger" data-dismiss="modal">
             <i class="fas fa-times mr-1"></i> Cerrar
           </button>
         </div>
