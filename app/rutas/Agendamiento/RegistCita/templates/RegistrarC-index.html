@@ -5,25 +5,33 @@ Registrar Cita
 {% endblock %}
 
 {% block contenido %}
-<div class="container mt-4">
-    <h3>Registro de Citas</h3>
-  
-    <!-- Tarjeta -->
-    <div class="card">
-      <div class="card-header">
-        <button type="button" class="btn btn-outline-info" id="btnAgregar">Agregar Cita</button>
-      </div>
-      <div class="card-body">
-        <table class="table table-striped" id="tbl">
-          <thead class="table-info">
+<div class="container-fluid mt-4">
+  <!-- Card principal -->
+  <div class="card shadow-sm border-0 rounded-lg">
+
+    <!-- Header -->
+    <div class="card-header bg-info text-white d-flex justify-content-between align-items-center">
+      <button type="button" class="btn btn-light btn-sm" id="btnAgregar">
+        <i class="fas fa-plus-circle mr-1"></i> Agregar Cita
+      </button>
+      <h5 class="mb-0 font-weight-bold">
+        <i class="fas fa-notes-medical mr-2"></i> Registro de Citas
+      </h5>
+    </div>
+
+    <!-- Body -->
+    <div class="card-body">
+      <div class="table-responsive shadow-sm rounded">
+        <table class="table table-hover table-bordered align-middle text-center" id="tbl">
+          <thead class="bg-info text-white">
             <tr>
-              <th>Fecha/Cita</th>
+              <th>Fecha / Cita</th>
               <th>Médico</th>
               <th>Especialidad</th>
               <th>Paciente</th>
               <th>Turno</th>
-              <th>Hora/Cita</th>
-              <th>Motivo consulta</th>
+              <th>Hora / Cita</th>
+              <th>Motivo Consulta</th>
               <th>Estado</th>
               <th>Acciones</th>
             </tr>
@@ -32,126 +40,111 @@ Registrar Cita
         </table>
       </div>
     </div>
-    <!-- /Tarjeta -->
-  
-    <!-- Modal -->
-<!-- Modal Registro/Edición Cita -->
-<div class="modal fade" id="modalFormulario" tabindex="-1" role="dialog">
-  <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
-    <div class="modal-content shadow-lg rounded-3">
-      
-      <!-- Header -->
-      <div class="modal-header bg-info text-white">
-        <h5 class="modal-title fw-bold" id="modalTitle">Nueva Cita</h5>
-        <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
+  </div>
 
-      <!-- Body -->
-      <div class="modal-body">
-        <input type="hidden" id="txtIdCita">
-        <input type="hidden" id="id_agenda_medica" value="{{ id_agenda_medica }}">
+  <!-- =========================== -->
+  <!-- Modal Formulario Cita -->
+  <!-- =========================== -->
+  <div class="modal fade" id="modalFormulario" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable" role="document">
+      <div class="modal-content shadow-lg border-0 rounded-lg">
 
-        <!-- Agenda Médica ocupa todo el ancho -->
-        <div class="form-group">
-          <label class="fw-semibold">Agenda Médica</label>
-          <input type="text" id="txtagenda" class="form-control" 
-                 placeholder="Click para seleccionar agenda" readonly>
+        <!-- Header -->
+        <div class="modal-header bg-info text-white d-flex justify-content-between align-items-center">
+          <h5 class="modal-title font-weight-bold">
+            <i class="fas fa-calendar-check mr-2"></i> <span id="modalTitle">Nueva Cita</span>
+          </h5>
+
+          <!-- Estado en el encabezado -->
+          <div class="form-group mb-0 d-flex align-items-center">
+            <label for="txtestado" class="mr-2 mb-0 text-white">Estado:</label>
+            <input type="hidden" id="id_estado">
+            <input type="text" id="txtestado" class="form-control form-control-sm" 
+                   placeholder="Click para seleccionar estado" readonly>
+          </div>
+
+          <button type="button" class="close text-white ml-2" data-dismiss="modal">&times;</button>
         </div>
 
-        <!-- Resto de campos en dos columnas -->
-        <div class="row g-3">
-          
-          <!-- Columna Izquierda -->
-          <div class="col-md-6">
-            
-            <!-- Fecha -->
-            <div class="form-group">
-              <label class="fw-semibold">Fecha de la Cita</label>
+        <!-- Body -->
+        <div class="modal-body">
+          <input type="hidden" id="txtIdCita">
+          <input type="hidden" id="id_agenda_medica" value="{{ id_agenda_medica }}">
+
+          <!-- Agenda Médica -->
+          <div class="mb-3">
+            <label class="font-weight-bold">Agenda Médica:</label>
+            <input type="text" id="txtagenda" class="form-control" 
+                   placeholder="Click para seleccionar agenda" readonly>
+          </div>
+
+          <!-- Campos en dos columnas -->
+          <div class="row">
+            <!-- Columna izquierda -->
+            <div class="col-md-6 mb-3">
+              <label class="font-weight-bold">Fecha de la Cita:</label>
               <input type="date" id="fecha" class="form-control">
             </div>
 
-            <!-- Médico -->
-            <div class="form-group">
-              <label class="fw-semibold">Médico</label>
-              <input type="hidden" id="id_medico">
-              <input type="text" id="txtmedico" class="form-control" 
-                     placeholder="Click para seleccionar médico" readonly>
-            </div>
-
-            <!-- Especialidad -->
-            <div class="form-group">
-              <label class="fw-semibold">Especialidad</label>
-              <input type="hidden" id="id_especialidad">
-              <input type="text" id="txtespecialidad" class="form-control" 
-                     placeholder="Click para seleccionar especialidad" readonly>
-            </div>
-
-            <!-- Paciente -->
-            <div class="form-group">
-              <label class="fw-semibold">Paciente</label>
-              <input type="hidden" id="id_paciente">
-              <input type="text" id="txtpaciente" class="form-control" 
-                     placeholder="Click para seleccionar paciente" readonly>
-            </div>
-          </div>
-
-          <!-- Columna Derecha -->
-          <div class="col-md-6">
-
-            <!-- Turno -->
-            <div class="form-group">
-              <label class="fw-semibold">Turno</label>
-              <input type="hidden" id="id_turno">
-              <input type="text" id="txtturno" class="form-control" 
-                     placeholder="Click para seleccionar turno" readonly>
-            </div>
-
-            <!-- Hora -->
-            <div class="form-group">
-              <label class="fw-semibold">Hora de la Cita</label>
+            <div class="col-md-6 mb-3">
+              <label class="font-weight-bold">Hora de la Cita:</label>
               <input type="time" id="hora" class="form-control">
             </div>
 
-            <!-- Motivo -->
-            <div class="form-group">
-              <label class="fw-semibold">Motivo de la Consulta</label>
-              <textarea id="txtmotivo" class="form-control" rows="3" 
-                        placeholder="Describa el motivo de la consulta"></textarea>
+            <div class="col-md-6 mb-3">
+              <input type="hidden" id="id_medico">
+              <label class="font-weight-bold">Médico:</label>
+              <input type="text" id="txtmedico" class="form-control" placeholder="Click para seleccionar médico" readonly>
             </div>
 
-            <!-- Estado -->
-            <div class="form-group">
-              <label class="fw-semibold">Estado de la Cita</label>
-              <input type="hidden" id="id_estado">
-              <input type="text" id="txtestado" class="form-control" 
-                     placeholder="Click para seleccionar estado" readonly>
+            <div class="col-md-6 mb-3">
+              <input type="hidden" id="id_especialidad">
+              <label class="font-weight-bold">Especialidad:</label>
+              <input type="text" id="txtespecialidad" class="form-control" placeholder="Click para seleccionar especialidad" readonly>
+            </div>
+
+            <div class="col-md-6 mb-3">
+              <input type="hidden" id="id_paciente">
+              <label class="font-weight-bold">Paciente:</label>
+              <input type="text" id="txtpaciente" class="form-control" placeholder="Click para seleccionar paciente" readonly>
+            </div>
+
+            <div class="col-md-6 mb-3">
+              <input type="hidden" id="id_turno">
+              <label class="font-weight-bold">Turno:</label>
+              <input type="text" id="txtturno" class="form-control" placeholder="Click para seleccionar turno" readonly>
+            </div>
+
+            <div class="col-12 mb-3">
+              <label class="font-weight-bold">Motivo de la Consulta:</label>
+              <textarea id="txtmotivo" class="form-control" rows="3" placeholder="Describa el motivo de la consulta"></textarea>
             </div>
           </div>
         </div>
-      </div>
 
-      <!-- Footer (igual que antes) -->
-      <div class="modal-footer">
-        <button type="button" class="btn btn-primary" id="btnGuardarCita">Guardar</button>
-        <button type="button" class="btn btn-danger" data-dismiss="modal">Cerrar</button>
+        <!-- Footer -->
+        <div class="modal-footer bg-light">
+          <button type="button" class="btn btn-info" id="btnGuardarCita">
+            <i class="fas fa-save mr-1"></i> Guardar
+          </button>
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">
+            <i class="fas fa-times mr-1"></i> Cerrar
+          </button>
+        </div>
       </div>
     </div>
   </div>
-</div>
-
   
 <!-- Modal Buscar Agenda -->
-<div class="modal fade" id="modalBuscarAgenda" tabindex="-1">
-  <div class="modal-dialog modal-lg">
+<div class="modal fade" id="modalBuscarAgenda" tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title">Buscar Agenda</h5>
         <button type="button" class="close" data-dismiss="modal">&times;</button>
       </div>
       <div class="modal-body">
-        <table id="tblAgenda" class="table table-bordered table-striped">
+        <table id="tblAgenda" class="table table-striped table-bordered w-100">
           <thead>
             <tr>
               <th>Médico</th>

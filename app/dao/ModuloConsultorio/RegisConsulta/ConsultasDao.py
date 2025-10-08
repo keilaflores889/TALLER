@@ -43,6 +43,17 @@ class ConsultasDao:
                 raise ValueError(f"El campo '{campo}' es obligatorio y no puede estar vacío")
 
     # ============================
+    # Validación de datos DIAGNÓSTICO
+    # ============================
+    def _validar_datos_diagnostico(self, data):
+        campos_obligatorios = ["id_consulta_detalle", "descripcion_diagnostico"]
+        
+        for campo in campos_obligatorios:
+            valor = data.get(campo)
+            if valor is None or (isinstance(valor, str) and valor.strip() == ""):
+                raise ValueError(f"El campo '{campo}' es obligatorio y no puede estar vacío")
+
+    # ============================
     # CONSULTAS CABECERA
     # ============================
     def getConsultasCabecera(self):
@@ -196,9 +207,14 @@ class ConsultasDao:
                 SELECT 
                     cd.id_consulta_detalle, cd.id_consulta_cab, cd.id_sintoma,
                     cd.pieza_dental, cd.diagnostico, cd.tratamiento, cd.procedimiento,
-                    s.descripcion_sintoma AS descripcion_sintoma
+                    cd.id_tipo_diagnostico, cd.id_tipo_procedimiento,
+                    td.tipo_diagnostico AS tipo_diagnostico,
+                    tp.procedimiento AS tipo_procedimiento,
+                    s.descripcion_sintoma
                 FROM consultas_detalle cd
                 INNER JOIN sintoma s ON cd.id_sintoma = s.id_sintoma
+                LEFT JOIN tipo_diagnostico td ON cd.id_tipo_diagnostico = td.id_tipo_diagnostico
+                LEFT JOIN tipo_procedimiento_medico tp ON cd.id_tipo_procedimiento = tp.id_tipo_procedimiento
                 ORDER BY cd.id_consulta_detalle DESC
             """)
             rows = cursor.fetchall()
@@ -210,17 +226,59 @@ class ConsultasDao:
             app.logger.error(f"Error al obtener consultas detalle: {str(e)}")
             return []
 
+    def getConsultaDetalleByIdConInfo(self, id_consulta_detalle):
+        """Obtiene un detalle específico con información completa de médico y paciente"""
+        try:
+            cursor = self.conn.cursor()
+            cursor.execute("""
+                SELECT 
+                    cd.id_consulta_detalle, 
+                    cd.id_consulta_cab, 
+                    cd.id_sintoma,
+                    cd.pieza_dental, 
+                    cd.diagnostico, 
+                    cd.tratamiento, 
+                    cd.procedimiento,
+                    cd.id_tipo_diagnostico,
+                    cd.id_tipo_procedimiento,
+                    s.descripcion_sintoma AS descripcion_sintoma,
+                    cc.id_medico,
+                    cc.id_paciente,
+                    TO_CHAR(cc.fecha_cita, 'YYYY-MM-DD') AS fecha_cita,
+                    TO_CHAR(cc.hora_cita, 'HH24:MI:SS') AS hora_cita,
+                    cc.estado AS estado_consulta,
+                    m.nombre || ' ' || m.apellido AS nombre_medico,
+                    p.nombre || ' ' || p.apellido AS nombre_paciente,
+                    con.nombre_consultorio AS nombre_consultorio
+                FROM consultas_detalle cd
+                INNER JOIN sintoma s ON cd.id_sintoma = s.id_sintoma
+                INNER JOIN consultas_cabecera cc ON cd.id_consulta_cab = cc.id_consulta_cab
+                INNER JOIN medico m ON cc.id_medico = m.id_medico
+                INNER JOIN paciente p ON cc.id_paciente = p.id_paciente
+                LEFT JOIN consultorio con ON cc.id_consultorio = con.codigo
+                WHERE cd.id_consulta_detalle = %s
+            """, (id_consulta_detalle,))
+            row = cursor.fetchone()
+            if not row:
+                return None
+            columnas = [desc[0] for desc in cursor.description]
+            detalle = dict(zip(columnas, row))
+            cursor.close()
+            return detalle
+        except Exception as e:
+            app.logger.error(f"Error al obtener consulta detalle con info: {str(e)}")
+            return None
+
     def getConsultaDetalleById(self, id_consulta_detalle):
         try:
             cursor = self.conn.cursor()
             cursor.execute("""
                 SELECT 
-                    cd.id_consulta_detalle, cd.id_consulta_cab, cd.id_sintoma,
-                    cd.pieza_dental, cd.diagnostico, cd.tratamiento, cd.procedimiento,
-                    s.descripcion_sintoma AS descripcion_sintoma
-                FROM consultas_detalle cd
-                INNER JOIN sintoma s ON cd.id_sintoma = s.id_sintoma
-                WHERE cd.id_consulta_detalle = %s
+                    id_consulta_detalle, id_consulta_cab, id_sintoma,
+                    pieza_dental, diagnostico, tratamiento, procedimiento,
+                    id_tipo_diagnostico, id_tipo_procedimiento
+                FROM consultas_detalle
+                WHERE id_consulta_detalle = %s
             """, (id_consulta_detalle,))
             row = cursor.fetchone()
             if not row:
@@ -233,16 +291,71 @@ class ConsultasDao:
             app.logger.error(f"Error al obtener consulta detalle: {str(e)}")
             return None
 
+    def getConsultasDetalleConInfo(self):
+        """Obtiene todos los detalles de consulta con información de médico y paciente"""
+        try:
+            cursor = self.conn.cursor()
+            cursor.execute("""
+                SELECT 
+                    cd.id_consulta_detalle, 
+                    cd.id_consulta_cab, 
+                    cd.id_sintoma,
+                    cd.pieza_dental, 
+                    cd.diagnostico, 
+                    cd.tratamiento, 
+                    cd.procedimiento,
+                    cd.id_tipo_diagnostico,
+                    cd.id_tipo_procedimiento,
+                    s.descripcion_sintoma AS descripcion_sintoma,
+                    cc.id_medico,
+                    cc.id_paciente,
+                    TO_CHAR(cc.fecha_cita, 'YYYY-MM-DD') AS fecha_cita,
+                    TO_CHAR(cc.hora_cita, 'HH24:MI:SS') AS hora_cita,
+                    m.nombre || ' ' || m.apellido AS nombre_medico,
+                    p.nombre || ' ' || p.apellido AS nombre_paciente,
+                    con.nombre_consultorio AS nombre_consultorio,
+                    COALESCE(td.tipo_diagnostico, 'Sin tipo') AS descripcion_tipo_diagnostico,
+                    COALESCE(tp.procedimiento, 'Sin tipo') AS descripcion_tipo_procedimiento
+                FROM consultas_detalle cd
+                INNER JOIN sintoma s ON cd.id_sintoma = s.id_sintoma
+                INNER JOIN consultas_cabecera cc ON cd.id_consulta_cab = cc.id_consulta_cab
+                INNER JOIN medico m ON cc.id_medico = m.id_medico
+                INNER JOIN paciente p ON cc.id_paciente = p.id_paciente
+                LEFT JOIN consultorio con ON cc.id_consultorio = con.codigo
+                LEFT JOIN tipo_diagnostico td ON cd.id_tipo_diagnostico = td.id_tipo_diagnostico
+                LEFT JOIN tipo_procedimiento_medico tp ON cd.id_tipo_procedimiento = tp.id_tipo_procedimiento
+                ORDER BY cd.id_consulta_detalle DESC
+            """)
+            rows = cursor.fetchall()
+            columnas = [desc[0] for desc in cursor.description]
+            detalles = [dict(zip(columnas, row)) for row in rows]
+            cursor.close()
+            return detalles
+        except Exception as e:
+            app.logger.error(f"Error al obtener consultas detalle con info: {str(e)}")
+            return []
+
     def getDetallesByConsultaCab(self, id_consulta_cab):
         try:
             cursor = self.conn.cursor()
             cursor.execute("""
                 SELECT 
-                    cd.id_consulta_detalle, cd.id_consulta_cab, cd.id_sintoma,
-                    cd.pieza_dental, cd.diagnostico, cd.tratamiento, cd.procedimiento,
-                    s.descripcion_sintoma AS descripcion_sintoma
+                    cd.id_consulta_detalle, 
+                    cd.id_consulta_cab, 
+                    cd.id_sintoma,
+                    cd.pieza_dental, 
+                    cd.diagnostico, 
+                    cd.tratamiento, 
+                    cd.procedimiento,
+                    cd.id_tipo_diagnostico,
+                    cd.id_tipo_procedimiento,
+                    s.descripcion_sintoma AS descripcion_sintoma,
+                    COALESCE(td.tipo_diagnostico, 'Sin tipo') AS descripcion_tipo_diagnostico,
+                    COALESCE(tp.procedimiento, 'Sin tipo') AS descripcion_tipo_procedimiento
                 FROM consultas_detalle cd
                 INNER JOIN sintoma s ON cd.id_sintoma = s.id_sintoma
+                LEFT JOIN tipo_diagnostico td ON cd.id_tipo_diagnostico = td.id_tipo_diagnostico
+                LEFT JOIN tipo_procedimiento_medico tp ON cd.id_tipo_procedimiento = tp.id_tipo_procedimiento
                 WHERE cd.id_consulta_cab = %s
                 ORDER BY cd.id_consulta_detalle
             """, (id_consulta_cab,))
@@ -262,17 +375,20 @@ class ConsultasDao:
             cursor.execute("""
                 INSERT INTO consultas_detalle(
                     id_consulta_cab, id_sintoma, pieza_dental,
-                    diagnostico, tratamiento, procedimiento
+                    diagnostico, tratamiento, procedimiento, 
+                    id_tipo_diagnostico, id_tipo_procedimiento
                 )
-                VALUES (%s, %s, %s, %s, %s, %s)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
                 RETURNING id_consulta_detalle
             """, (
-                data.get("id_consulta_cab"),
-                data.get("id_sintoma"),
-                data.get("pieza_dental") if data.get("pieza_dental") else None,
-                data.get("diagnostico"),
-                data.get("tratamiento"),
-                data.get("procedimiento") if data.get("procedimiento") else None
+                data["id_consulta_cab"],
+                data["id_sintoma"],
+                data.get("pieza_dental"),
+                data["diagnostico"],
+                data["tratamiento"],
+                data.get("procedimiento"),
+                data.get("id_tipo_diagnostico"),
+                data.get("id_tipo_procedimiento")
             ))
             id_consulta_detalle = cursor.fetchone()[0]
             self.conn.commit()
@@ -294,15 +410,19 @@ class ConsultasDao:
                     pieza_dental = %s,
                     diagnostico = %s,
                     tratamiento = %s,
-                    procedimiento = %s
+                    procedimiento = %s,
+                    id_tipo_diagnostico = %s,
+                    id_tipo_procedimiento = %s
                 WHERE id_consulta_detalle = %s
             """, (
                 data.get("id_consulta_cab"),
                 data.get("id_sintoma"),
-                data.get("pieza_dental") if data.get("pieza_dental") else None,
+                data.get("pieza_dental"),
                 data.get("diagnostico"),
                 data.get("tratamiento"),
-                data.get("procedimiento") if data.get("procedimiento") else None,
+                data.get("procedimiento"),
+                data.get("id_tipo_diagnostico"),
+                data.get("id_tipo_procedimiento"),
                 id_consulta_detalle
             ))
             self.conn.commit()
@@ -311,6 +431,48 @@ class ConsultasDao:
         except Exception as e:
             self.conn.rollback()
             app.logger.error(f"Error al actualizar consulta detalle: {str(e)}")
+            return False
+
+    def updateDiagnosticoPrincipal(self, id_consulta_detalle, data):
+        """Actualiza solo el diagnóstico principal en consultas_detalle"""
+        try:
+            cursor = self.conn.cursor()
+            cursor.execute("""
+                UPDATE consultas_detalle SET
+                    diagnostico = %s,
+                    id_tipo_diagnostico = %s
+                WHERE id_consulta_detalle = %s
+            """, (
+                data.get("diagnostico"),
+                data.get("id_tipo_diagnostico"),
+                id_consulta_detalle
+            ))
+            self.conn.commit()
+            cursor.close()
+            return True
+        except Exception as e:
+            self.conn.rollback()
+            app.logger.error(f"Error al actualizar diagnóstico principal: {str(e)}")
+            return False
+
+    def updateTratamientoPrincipal(self, id_consulta_detalle, data):
+        """Actualiza solo el tratamiento principal en consultas_detalle"""
+        try:
+            cursor = self.conn.cursor()
+            cursor.execute("""
+                UPDATE consultas_detalle SET
+                    tratamiento = %s
+                WHERE id_consulta_detalle = %s
+            """, (
+                data.get("tratamiento"),
+                id_consulta_detalle
+            ))
+            self.conn.commit()
+            cursor.close()
+            return True
+        except Exception as e:
+            self.conn.rollback()
+            app.logger.error(f"Error al actualizar tratamiento principal: {str(e)}")
             return False
 
     def deleteConsultaDetalle(self, id_consulta_detalle):
@@ -326,16 +488,297 @@ class ConsultasDao:
             return False
 
     # ============================
-    # CONSULTA COMPLETA (cabecera + detalles)
+    # DIAGNÓSTICOS
+    # ============================
+    def getDiagnosticosByConsultaDetalle(self, id_consulta_detalle):
+        """Obtiene todos los diagnósticos de una consulta detalle específica"""
+        try:
+            cursor = self.conn.cursor()
+            cursor.execute("""
+                SELECT 
+                    d.id_diagnostico,
+                    d.id_consulta_detalle,
+                    d.id_tipo_diagnostico,
+                    d.descripcion_diagnostico,
+                    TO_CHAR(d.fecha_diagnostico, 'YYYY-MM-DD') AS fecha_diagnostico,
+                    d.pieza_dental,
+                    COALESCE(td.tipo_diagnostico, 'Sin tipo') AS tipo_diagnostico_descripcion
+                FROM diagnosticos d
+                LEFT JOIN tipo_diagnostico td ON d.id_tipo_diagnostico = td.id_tipo_diagnostico
+                WHERE d.id_consulta_detalle = %s
+                ORDER BY d.fecha_diagnostico DESC, d.id_diagnostico DESC
+            """, (id_consulta_detalle,))
+            rows = cursor.fetchall()
+            columnas = [desc[0] for desc in cursor.description]
+            diagnosticos = [dict(zip(columnas, row)) for row in rows]
+            cursor.close()
+            return diagnosticos
+        except Exception as e:
+            app.logger.error(f"Error al obtener diagnósticos: {str(e)}")
+            return []
+
+    def addDiagnostico(self, data):
+        """Agrega un nuevo diagnóstico detallado con pieza_dental de consulta_detalle si no se proporciona"""
+        try:
+            self._validar_datos_diagnostico(data)
+            cursor = self.conn.cursor()
+            
+            # Si no se proporciona pieza_dental, obtenerla de consultas_detalle
+            pieza_dental = data.get("pieza_dental")
+            if not pieza_dental:
+                cursor.execute("""
+                    SELECT pieza_dental 
+                    FROM consultas_detalle 
+                    WHERE id_consulta_detalle = %s
+                """, (data.get("id_consulta_detalle"),))
+                result = cursor.fetchone()
+                pieza_dental = result[0] if result else None
+            
+            cursor.execute("""
+                INSERT INTO diagnosticos(
+                    id_consulta_detalle,
+                    id_medico,
+                    id_paciente,
+                    id_tipo_diagnostico,
+                    descripcion_diagnostico,
+                    fecha_diagnostico,
+                    pieza_dental
+                )
+                VALUES (%s, %s, %s, %s, %s, COALESCE(%s, CURRENT_DATE), %s)
+                RETURNING id_diagnostico
+            """, (
+                data.get("id_consulta_detalle"),
+                data.get("id_medico"),
+                data.get("id_paciente"),
+                data.get("id_tipo_diagnostico"),
+                data.get("descripcion_diagnostico"),
+                data.get("fecha_diagnostico"),
+                pieza_dental
+            ))
+            id_diagnostico = cursor.fetchone()[0]
+            self.conn.commit()
+            cursor.close()
+            return id_diagnostico
+        except Exception as e:
+            self.conn.rollback()
+            app.logger.error(f"Error al insertar diagnóstico: {str(e)}")
+            return None
+
+    def updateDiagnostico(self, id_diagnostico, data):
+        """Actualiza un diagnóstico específico"""
+        try:
+            cursor = self.conn.cursor()
+            
+            campos_actualizar = []
+            valores = []
+            
+            if "id_tipo_diagnostico" in data:
+                campos_actualizar.append("id_tipo_diagnostico = %s")
+                valores.append(data.get("id_tipo_diagnostico"))
+            
+            if "pieza_dental" in data:
+                campos_actualizar.append("pieza_dental = %s")
+                valores.append(data.get("pieza_dental"))
+            
+            if "descripcion_diagnostico" in data:
+                campos_actualizar.append("descripcion_diagnostico = %s")
+                valores.append(data.get("descripcion_diagnostico"))
+            
+            if "fecha_diagnostico" in data:
+                campos_actualizar.append("fecha_diagnostico = %s")
+                valores.append(data.get("fecha_diagnostico"))
+            
+            if not campos_actualizar:
+                return False
+            
+            valores.append(id_diagnostico)
+            query = f"UPDATE diagnosticos SET {', '.join(campos_actualizar)} WHERE id_diagnostico = %s"
+            
+            cursor.execute(query, valores)
+            self.conn.commit()
+            cursor.close()
+            return True
+        except Exception as e:
+            self.conn.rollback()
+            app.logger.error(f"Error al actualizar diagnóstico: {str(e)}")
+            return False
+
+    def deleteDiagnostico(self, id_diagnostico):
+        """Elimina un diagnóstico específico"""
+        try:
+            cursor = self.conn.cursor()
+            cursor.execute("DELETE FROM diagnosticos WHERE id_diagnostico = %s", (id_diagnostico,))
+            self.conn.commit()
+            cursor.close()
+            return True
+        except Exception as e:
+            self.conn.rollback()
+            app.logger.error(f"Error al eliminar diagnóstico: {str(e)}")
+            return False
+
+    # ============================
+    # CONSULTA COMPLETA (cabecera + detalles + diagnósticos)
     # ============================
     def getConsultaCompleta(self, id_consulta_cab):
+        """Obtiene consulta completa con cabecera, detalles y diagnósticos"""
         try:
             cabecera = self.getConsultaCabeceraById(id_consulta_cab)
             if not cabecera:
                 return None
+            
             detalles = self.getDetallesByConsultaCab(id_consulta_cab)
+            
+            for detalle in detalles:
+                detalle["diagnosticos"] = self.getDiagnosticosByConsultaDetalle(
+                    detalle["id_consulta_detalle"]
+                )
+            
             cabecera["detalles"] = detalles
             return cabecera
         except Exception as e:
             app.logger.error(f"Error al obtener consulta completa: {str(e)}")
             return None
+        
+    # ============================
+    # TRATAMIENTOS
+    # ============================
+    def _validar_datos_tratamiento(self, data):
+        campos_obligatorios = ["id_consulta_detalle", "id_medico", "id_paciente", "descripcion_tratamiento"]
+        
+        for campo in campos_obligatorios:
+            valor = data.get(campo)
+            if valor is None or (isinstance(valor, str) and valor.strip() == ""):
+                raise ValueError(f"El campo '{campo}' es obligatorio y no puede estar vacío")
+
+    def getTratamientosByConsultaDetalle(self, id_consulta_detalle):
+        """Obtiene todos los tratamientos de una consulta detalle específica"""
+        try:
+            cursor = self.conn.cursor()
+            cursor.execute("""
+                SELECT 
+                    t.id_tratamiento,
+                    t.id_consulta_detalle,
+                    t.id_medico,
+                    t.id_paciente,
+                    t.descripcion_tratamiento,
+                    TO_CHAR(t.fecha_tratamiento, 'YYYY-MM-DD') AS fecha_tratamiento,
+                    t.duracion_estimada,
+                    t.costo_estimado,
+                    t.estado,
+                    m.nombre || ' ' || m.apellido AS nombre_medico,
+                    p.nombre || ' ' || p.apellido AS nombre_paciente
+                FROM tratamientos t
+                INNER JOIN medico m ON t.id_medico = m.id_medico
+                INNER JOIN paciente p ON t.id_paciente = p.id_paciente
+                WHERE t.id_consulta_detalle = %s
+                ORDER BY t.fecha_tratamiento DESC, t.id_tratamiento DESC
+            """, (id_consulta_detalle,))
+            rows = cursor.fetchall()
+            columnas = [desc[0] for desc in cursor.description]
+            tratamientos = [dict(zip(columnas, row)) for row in rows]
+            cursor.close()
+            return tratamientos
+        except Exception as e:
+            app.logger.error(f"Error al obtener tratamientos: {str(e)}")
+            return []
+
+    def addTratamiento(self, data):
+        """Agrega un nuevo tratamiento con la fecha de la consulta"""
+        try:
+            self._validar_datos_tratamiento(data)
+            cursor = self.conn.cursor()
+            
+            # Obtener la fecha_cita de la consulta
+            cursor.execute("""
+                SELECT cc.fecha_cita
+                FROM consultas_detalle cd
+                INNER JOIN consultas_cabecera cc ON cd.id_consulta_cab = cc.id_consulta_cab
+                WHERE cd.id_consulta_detalle = %s
+            """, (data.get("id_consulta_detalle"),))
+            
+            result = cursor.fetchone()
+            fecha_consulta = result[0] if result else None
+            
+            cursor.execute("""
+                INSERT INTO tratamientos(
+                    id_consulta_detalle,
+                    id_medico,
+                    id_paciente,
+                    descripcion_tratamiento,
+                    fecha_tratamiento,
+                    duracion_estimada,
+                    costo_estimado,
+                    estado
+                )
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+                RETURNING id_tratamiento
+            """, (
+                data.get("id_consulta_detalle"),
+                data.get("id_medico"),
+                data.get("id_paciente"),
+                data.get("descripcion_tratamiento"),
+                fecha_consulta,
+                data.get("duracion_estimada"),
+                data.get("costo_estimado"),
+                data.get("estado", "pendiente")
+            ))
+            id_tratamiento = cursor.fetchone()[0]
+            self.conn.commit()
+            cursor.close()
+            return id_tratamiento
+        except Exception as e:
+            self.conn.rollback()
+            app.logger.error(f"Error al insertar tratamiento: {str(e)}")
+            return None
+
+    def updateTratamiento(self, id_tratamiento, data):
+        """Actualiza un tratamiento específico"""
+        try:
+            cursor = self.conn.cursor()
+            
+            campos_actualizar = []
+            valores = []
+            
+            if "descripcion_tratamiento" in data:
+                campos_actualizar.append("descripcion_tratamiento = %s")
+                valores.append(data.get("descripcion_tratamiento"))
+            
+            if "duracion_estimada" in data:
+                campos_actualizar.append("duracion_estimada = %s")
+                valores.append(data.get("duracion_estimada"))
+            
+            if "costo_estimado" in data:
+                campos_actualizar.append("costo_estimado = %s")
+                valores.append(data.get("costo_estimado"))
+            
+            if "estado" in data:
+                campos_actualizar.append("estado = %s")
+                valores.append(data.get("estado"))
+            
+            if not campos_actualizar:
+                return False
+            
+            valores.append(id_tratamiento)
+            query = f"UPDATE tratamientos SET {', '.join(campos_actualizar)} WHERE id_tratamiento = %s"
+            
+            cursor.execute(query, valores)
+            self.conn.commit()
+            cursor.close()
+            return True
+        except Exception as e:
+            self.conn.rollback()
+            app.logger.error(f"Error al actualizar tratamiento: {str(e)}")
+            return False
+
+    def deleteTratamiento(self, id_tratamiento):
+        """Elimina un tratamiento específico"""
+        try:
+            cursor = self.conn.cursor()
+            cursor.execute("DELETE FROM tratamientos WHERE id_tratamiento = %s", (id_tratamiento,))
+            self.conn.commit()
+            cursor.close()
+            return True
+        except Exception as e:
+            self.conn.rollback()
+            app.logger.error(f"Error al eliminar tratamiento: {str(e)}")
+            return False

@@ -5,111 +5,155 @@ Médicos
 {% endblock %}
 
 {% block contenido %}
-<div class="container mt-4">
-  <h3>Listado de Médicos</h3>
+<div class="container-fluid mt-4">
 
-  <!-- Tarjeta -->
-  <div class="card">
-    <div class="card-header">
-      <button type="button" class="btn btn-outline-info" id="btnAgregar">Agregar</button>
+  <!-- Card principal -->
+  <div class="card shadow-sm border-0 rounded-lg">
+    <!-- Header: Botón Agregar y Título -->
+    <div class="card-header bg-info text-white d-flex justify-content-between align-items-center">
+      <button type="button" class="btn btn-light btn-sm" id="btnAgregar">
+        <i class="fas fa-plus-circle mr-1"></i> Agregar
+      </button>
+      <h5 class="mb-0 font-weight-bold">
+        <i class="fas fa-user-md mr-2"></i> Listado de Médicos
+      </h5>
     </div>
-    <div class="card-body">
-      <div class="table-responsive">
-        <table class="table table-striped w-200" id="tbl">
-              <thead class="table-info">
-          <tr>
-            <th>Nombre</th>
-            <th>Apellido</th>
-            <th>N° Cédula</th>
-            <th>Fecha Nacimiento</th>
-            <th>Ciudad</th>
-            <th>Dirección</th>
-            <th>Teléfono</th>
-            <th>Correo</th>
-            <th>Especialidad</th>
-            <th>N° Matricula</th>
-            <th>Fecha Registro</th>
-            <th>Acciones</th>
-          </tr>
-        </thead>
-        <tbody></tbody>
-      </table>
-    </div>
-  </div>
-  <!-- /Tarjeta -->
 
-  <!-- Modal Formulario -->
-  <div class="modal fade" id="modalFormulario" tabindex="-1" role="dialog">
-    <div class="modal-dialog modal-xl" role="document">
-      <div class="modal-content">
-        <form id="formMedico">
-          <div class="modal-header table-info">
-            <h4 class="modal-title" id="modalTitle">Nuevo Médico</h4>
-            <button type="button" class="close" data-dismiss="modal">&times;</button>
-          </div>
-          <div class="modal-body">
-            <input type="hidden" id="txtIdMedico">
-            <div class="row">
-              <div class="col-md-6">
-                <div class="form-group">
-                  <label for="nombre">Nombre:</label>
-                  <input type="text" id="nombre" class="form-control">
-                </div>
-                <div class="form-group">
-                  <label for="apellido">Apellido:</label>
-                  <input type="text" id="apellido" class="form-control">
-                </div>
-                <div class="form-group">
-                  <label for="cedula">Cédula:</label>
-                  <input type="text" id="cedula" class="form-control">
-                </div>
-                <div class="form-group">
-                  <label for="fecha_nacimiento">Fecha Nacimiento:</label>
-                  <input type="date" id="fecha_nacimiento" class="form-control">
-                </div>
-                <div class="form-group">
-                  <input type="hidden" id="id_ciudad">
-                  <label for="txtCiudad">Ciudad:</label>
-                  <input type="text" id="txtCiudad" class="form-control" placeholder="Click para seleccionar ciudad" readonly>
-                </div>
-                <div class="form-group">
-                  <label for="direccion">Dirección:</label>
-                  <input type="text" id="direccion" class="form-control" autocomplete="off">
-                </div>
-              </div>
-              <div class="col-md-6">
-                <div class="form-group">
-                  <label for="telefono">Teléfono:</label>
-                  <input type="text" id="telefono" class="form-control">
-                </div>
-                <div class="form-group">
-                  <label for="correo">Correo:</label>
-                  <input type="email" id="correo" class="form-control" autocomplete="off">
-                </div>
-                <div class="form-group">
-                  <input type="hidden" id="id_especialidad">
-                  <label for="txtEspecialidad">Especialidad:</label>
-                  <input type="text" id="txtEspecialidad" class="form-control" placeholder="Click para seleccionar especialidad" readonly>
-                </div>
-                <div class="form-group">
-                  <label for="txtregistro">N° de Registro:</label>
-                  <input type="text" id="txtregistro" class="form-control">
-                </div>
-                <div class="form-group">
-                  <label for="fecha_registro">Fecha Registro:</label>
-                  <input type="date" id="fecha_registro" class="form-control">
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-primary" id="btnGuardar">Guardar</button>
-            <button type="button" class="btn btn-danger" data-dismiss="modal">Cerrar</button>
-          </div>
-        </form>
+    <!-- Body: Tabla de médicos -->
+    <div class="card-body p-2">
+      <div class="table-responsive shadow-sm rounded">
+        <table class="table table-hover table-bordered align-middle text-center" id="tbl">
+          <thead class="bg-info text-white">
+            <tr>
+              <th>Nombre</th>
+              <th>Apellido</th>
+              <th>N° Cédula</th>
+              <th>Fecha Nacimiento</th>
+              <th>Ciudad</th>
+              <th>Dirección</th>
+              <th>Teléfono</th>
+              <th>Correo</th>
+              <th>Especialidad</th>
+              <th>N° Matrícula</th>
+              <th>Fecha Registro</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
       </div>
     </div>
   </div>
+
+  <!-- =========================== -->
+  <!-- Modal Formulario Médico -->
+  <!-- =========================== -->
+  <div class="modal fade" id="modalFormulario" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable" role="document">
+      <div class="modal-content shadow-lg border-0 rounded-lg">
+
+        <!-- Header -->
+        <div class="modal-header bg-info text-white rounded-top d-flex justify-content-between align-items-center">
+          <h5 class="modal-title font-weight-bold">
+            <i class="fas fa-user-md mr-2"></i> <span id="modalTitle">Nuevo Médico</span>
+          </h5>
+          <button type="button" class="close text-white" data-dismiss="modal">&times;</button>
+        </div>
+
+        <!-- Body -->
+        <div class="modal-body">
+          <form id="formMedico">
+            <input type="hidden" id="txtIdMedico">
+
+            <div class="row">
+
+              <!-- Nombre -->
+              <div class="col-md-6 mb-3">
+                <label class="font-weight-bold">Nombre:</label>
+                <input type="text" id="nombre" class="form-control" placeholder="Ingrese el nombre">
+              </div>
+
+              <!-- Apellido -->
+              <div class="col-md-6 mb-3">
+                <label class="font-weight-bold">Apellido:</label>
+                <input type="text" id="apellido" class="form-control" placeholder="Ingrese el apellido">
+              </div>
+
+              <!-- Cédula -->
+              <div class="col-md-6 mb-3">
+                <label class="font-weight-bold">Cédula:</label>
+                <input type="text" id="cedula" class="form-control" placeholder="Ingrese el número de cédula">
+              </div>
+
+              <!-- Fecha Nacimiento -->
+              <div class="col-md-6 mb-3">
+                <label class="font-weight-bold">Fecha Nacimiento:</label>
+                <input type="date" id="fecha_nacimiento" class="form-control">
+              </div>
+
+              <!-- Ciudad -->
+              <div class="col-md-6 mb-3">
+                <input type="hidden" id="id_ciudad">
+                <label class="font-weight-bold">Ciudad:</label>
+                <input type="text" id="txtCiudad" class="form-control" placeholder="Click para seleccionar ciudad" readonly>
+              </div>
+
+              <!-- Dirección -->
+              <div class="col-md-6 mb-3">
+                <label class="font-weight-bold">Dirección:</label>
+                <input type="text" id="direccion" class="form-control" placeholder="Ingrese la dirección" autocomplete="off">
+              </div>
+
+              <!-- Teléfono -->
+              <div class="col-md-6 mb-3">
+                <label class="font-weight-bold">Teléfono:</label>
+                <input type="text" id="telefono" class="form-control" placeholder="Ingrese el teléfono">
+              </div>
+
+              <!-- Correo -->
+              <div class="col-md-6 mb-3">
+                <label class="font-weight-bold">Correo:</label>
+                <input type="email" id="correo" class="form-control" placeholder="correo@ejemplo.com" autocomplete="off">
+              </div>
+
+              <!-- Especialidad -->
+              <div class="col-md-6 mb-3">
+                <input type="hidden" id="id_especialidad">
+                <label class="font-weight-bold">Especialidad:</label>
+                <input type="text" id="txtEspecialidad" class="form-control" placeholder="Click para seleccionar especialidad" readonly>
+              </div>
+
+              <!-- N° de Registro -->
+              <div class="col-md-6 mb-3">
+                <label class="font-weight-bold">N° de Matrícula:</label>
+                <input type="text" id="txtregistro" class="form-control" placeholder="Ingrese el número de matrícula">
+              </div>
+
+              <!-- Fecha Registro -->
+              <div class="col-md-6 mb-3">
+                <label class="font-weight-bold">Fecha Registro:</label>
+                <input type="date" id="fecha_registro" class="form-control">
+              </div>
+
+            </div>
+          </form>
+        </div>
+
+        <!-- Footer -->
+        <div class="modal-footer bg-light">
+          <button type="button" class="btn btn-info" id="btnGuardar">
+            <i class="fas fa-save mr-1"></i> Guardar
+          </button>
+          <button type="button" class="btn btn-danger" data-dismiss="modal">
+            <i class="fas fa-times mr-1"></i> Cerrar
+          </button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+
 
   <!-- Modal Especialidad -->
   <div class="modal fade" id="modalBuscarEspecialidad" tabindex="-1" role="dialog">

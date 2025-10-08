@@ -1,0 +1,488 @@
+{% extends 'base.html' %}
+
+{% block titulo %}
+Diagnósticos
+{% endblock %}
+
+{% block contenido %}
+<div class="container-fluid mt-4">
+  <h3>Registros de Diagnósticos</h3>
+
+  <!-- Card principal -->
+  <div class="card shadow-sm border-0 rounded-lg">
+    <!-- Header: Botón Agregar y Título -->
+    <div class="card-header bg-info text-white d-flex justify-content-between align-items-center">
+       <!--<button type="button" class="btn btn-light btn-sm" id="btnAgregar">
+        <i class="fas fa-plus-circle mr-1"></i> Agregar
+      </button>-->
+      <h5 class="mb-0 font-weight-bold">
+        <i class="fas fa-notes-medical mr-2"></i> Diagnósticos
+      </h5>
+    </div>
+
+    <!-- Body: Tabla de diagnósticos -->
+    <div class="card-body">
+      <div class="table-responsive shadow-sm rounded">
+        <table class="table table-hover table-bordered align-middle text-center" id="tbl">
+          <thead class="bg-info text-white">
+            <tr>
+              <th>Médico</th>
+              <th>Paciente</th>
+              <th>Diagnóstico</th>
+              <th>Tipo Diagnóstico</th>
+              <th>Pieza dental</th>
+              <th>Fecha</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================== -->
+  <!-- Modal Formulario Diagnóstico -->
+  <!-- =========================== -->
+  <div class="modal fade" id="modalFormulario" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable" role="document">
+      <div class="modal-content shadow-lg border-0 rounded-lg">
+
+        <!-- Header -->
+        <div class="modal-header bg-info text-white rounded-top">
+          <h5 class="modal-title font-weight-bold">
+            <i class="fas fa-notes-medical mr-2"></i>
+            <span id="modalTitle">Nuevo Diagnóstico</span>
+          </h5>
+          <button type="button" class="close text-white" data-dismiss="modal">&times;</button>
+        </div>
+
+        <!-- Body -->
+        <div class="modal-body">
+          <input type="hidden" id="txtIdDiagnostico">
+
+          <div class="row">
+
+            <!-- ID Consulta -->
+            <!--<div class="col-md-6 mb-3">
+              <label class="font-weight-bold">ID Consulta Detalle <span class="text-danger">*</span></label>
+              <input type="number" id="id_consulta_detalle" class="form-control" placeholder="Ingrese ID de consulta">
+            </div> -->
+
+            <!-- Médico -->
+            <div class="col-md-6 mb-3">
+              <input type="hidden" id="id_medico">
+              <label class="font-weight-bold">Médico <span class="text-danger">*</span></label>
+              <input type="text" id="txtMedico" class="form-control" placeholder="Click para seleccionar Médico" readonly>
+            </div>
+
+            <!-- Paciente -->
+            <div class="col-md-6 mb-3">
+              <input type="hidden" id="id_paciente">
+              <label class="font-weight-bold">Paciente <span class="text-danger">*</span></label>
+              <input type="text" id="txtPaciente" class="form-control" placeholder="Click para seleccionar Paciente" readonly>
+            </div>
+
+             <!-- Descripción -->
+            <div class="col-md-12 mb-3">
+              <label class="font-weight-bold">Descripción Diagnóstico <span class="text-danger">*</span></label>
+              <textarea id="descripcion_diagnostico" class="form-control" rows="3" placeholder="Ingrese descripción del diagnóstico"></textarea>
+            </div>
+
+            <!-- Tipo Diagnóstico -->
+            <div class="col-md-6 mb-3">
+              <input type="hidden" id="id_tipo_diagnostico">
+              <label class="font-weight-bold">Tipo Diagnóstico</label>
+              <input type="text" id="txtTipoDiagnostico" class="form-control" placeholder="Click para seleccionar Tipo" readonly>
+            </div>
+
+             <!-- pieza dental -->
+            <div class="col-md-12 mb-3">
+              <label class="font-weight-bold">Pieza dental</label>
+              <textarea id="pieza_dental" class="form-control" rows="3" placeholder="agrega la pieza dental"></textarea>
+            </div>
+
+
+            <!-- Fecha -->
+            <div class="col-md-6 mb-3">
+              <label class="font-weight-bold">Fecha Diagnóstico</label>
+              <input type="date" id="fecha_diagnostico" class="form-control">
+            </div>
+
+          
+          </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="modal-footer bg-light">
+          <button type="button" class="btn btn-info" id="btnGuardar">
+            <i class="fas fa-save mr-1"></i> Guardar
+          </button>
+          <button type="button" class="btn btn-danger" data-dismiss="modal">
+            <i class="fas fa-times mr-1"></i> Cerrar
+          </button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+
+  <!-- Modal Médico -->
+  <div class="modal fade" id="modalBuscarMedico" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title">Seleccionar Médico</h4>
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div class="table-responsive">
+            <table class="table table-striped table-bordered w-100" id="tblMedico">
+              <thead>
+                <tr>
+                  <th>Nombre</th>
+                  <th>Apellido</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Paciente -->
+  <div class="modal fade" id="modalBuscarPaciente" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title">Seleccionar Paciente</h4>
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div class="table-responsive">
+            <table class="table table-striped table-bordered w-100" id="tblPaciente">
+              <thead>
+                <tr>
+                  <th>Nombre</th>
+                  <th>Apellido</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Tipo Diagnóstico -->
+  <div class="modal fade" id="modalBuscarTipoDiagnostico" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title">Seleccionar Tipo Diagnóstico</h4>
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div class="table-responsive">
+            <table class="table table-striped table-bordered w-100" id="tblTipoDiagnostico">
+              <thead>
+                <tr>
+                  <th>Descripción</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Librerías necesarias -->
+<link rel="stylesheet" href="https://cdn.datatables.net/1.10.21/css/dataTables.bootstrap4.min.css">
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+
+{% endblock %}
+
+{% block js %}
+<script>
+const CSRFToken = "{{ csrf_token() }}" || null;
+
+function formatDateForInput(fecha) {
+  if (!fecha) return '';
+  const d = new Date(fecha);
+  if (isNaN(d)) return '';
+  const day = String(d.getUTCDate()).padStart(2, '0');
+  const month = String(d.getUTCMonth() + 1).padStart(2, '0');
+  const year = d.getUTCFullYear();
+  return `${year}-${month}-${day}`;
+}
+
+// --- Tabla principal Diagnósticos ---
+const initDatatable = () => {
+  $('#tbl').DataTable({
+    language: { url: "{{ url_for('static', filename='vendor/datatables/es-ES.json') }}" },
+    ajax: '/api/v1/Diagnostico',
+    columns: [
+      { data: 'medico_nombre' },
+      { data: 'paciente_nombre' },
+      { 
+        data: 'descripcion_diagnostico',
+        render: function(data) {
+          return data && data.length > 50 ? data.substring(0, 50) + '...' : data;
+        }
+      },
+      { data: 'tipo_diagnostico' },
+      { 
+        data: 'pieza_dental',
+        render: function(data) {
+          return data && data.length > 30 ? data.substring(0, 30) + '...' : (data || '');
+        }
+      },
+      {
+        data: 'fecha_diagnostico',
+        render: function(data) {
+          if (!data) return '';
+          const d = new Date(data);
+          if (isNaN(d)) return '';
+          const day = String(d.getUTCDate()).padStart(2, '0');
+          const month = String(d.getUTCMonth() + 1).padStart(2, '0');
+          const year = d.getUTCFullYear();
+          return `${day}/${month}/${year}`;
+        }
+      },
+      {
+        data: function(row) {
+          return `
+          <button type="button" name="btn_editar" class="btn btn-info btn-sm" data-id="${row.id_diagnostico}" title="Editar">
+            <i class="fas fa-edit"></i>
+          </button>
+          <button type="button" name="btn_eliminar" class="btn btn-danger btn-sm" data-id="${row.id_diagnostico}" title="Eliminar">
+            <i class="fas fa-trash-alt"></i>
+          </button>`;
+        }
+      }
+    ]
+  });
+};
+
+// --- Modal Médico ---
+const initDatatableMedico = () => {
+  $('#tblMedico').DataTable({
+    language: { url: "{{ url_for('static', filename='vendor/datatables/es-ES.json') }}" },
+    ajax: '/api/v1/medico',
+    columns: [
+      { data: 'nombre' },
+      { data: 'apellido' },
+      { data: function(row) {
+        return `<button type="button" name="btn_seleccionar_medico" class="btn btn-primary" data-id="${row.id_medico}" data-nombre="${row.nombre}" data-apellido="${row.apellido}">Seleccionar</button>`;
+      }}
+    ]
+  });
+
+  $('#tblMedico').on('click', 'button[name="btn_seleccionar_medico"]', function() {
+    const id = $(this).data('id');
+    const nombre = $(this).data('nombre');
+    const apellido = $(this).data('apellido');
+    $('#id_medico').val(id);
+    $('#txtMedico').val(`${nombre} ${apellido}`);
+    $('#modalBuscarMedico').modal('hide');
+  });
+};
+
+// --- Modal Paciente ---
+const initDatatablePaciente = () => {
+  $('#tblPaciente').DataTable({
+    language: { url: "{{ url_for('static', filename='vendor/datatables/es-ES.json') }}" },
+    ajax: '/api/v1/paciente',
+    columns: [
+      { data: 'nombre' },
+      { data: 'apellido' },
+      { data: function(row) {
+        return `<button type="button" name="btn_seleccionar_paciente" class="btn btn-primary" data-id="${row.id_paciente}" data-nombre="${row.nombre}" data-apellido="${row.apellido}">Seleccionar</button>`;
+      }}
+    ]
+  });
+
+  $('#tblPaciente').on('click', 'button[name="btn_seleccionar_paciente"]', function() {
+    const id = $(this).data('id');
+    const nombre = $(this).data('nombre');
+    const apellido = $(this).data('apellido');
+    $('#id_paciente').val(id);
+    $('#txtPaciente').val(`${nombre} ${apellido}`);
+    $('#modalBuscarPaciente').modal('hide');
+  });
+};
+
+// --- Modal Tipo Diagnóstico ---
+const initDatatableTipoDiagnostico = () => {
+  $('#tblTipoDiagnostico').DataTable({
+    language: { url: "{{ url_for('static', filename='vendor/datatables/es-ES.json') }}" },
+    ajax: '/api/v1/diagnosticos',
+    columns: [
+      { data: 'tipo_diagnostico' },
+      { data: function(row) {
+        return `<button type="button" name="btn_seleccionar_tipo" class="btn btn-primary" data-id="${row.id_tipo_diagnostico}" data-tipo_diagnostico="${row.tipo_diagnostico}">Seleccionar</button>`;
+      }}
+    ]
+  });
+
+  $('#tblTipoDiagnostico').on('click', 'button[name="btn_seleccionar_tipo"]', function() {
+    const id = $(this).data('id');
+    const tipo_diagnostico = $(this).data('tipo_diagnostico');
+    $('#id_tipo_diagnostico').val(id);
+    $('#txtTipoDiagnostico').val(tipo_diagnostico);
+    $('#modalBuscarTipoDiagnostico').modal('hide');
+  });
+};
+
+// --- Apertura de modales ---
+const buscarMedico = () => $('#txtMedico').on('click', () => $('#modalBuscarMedico').modal());
+const buscarPaciente = () => $('#txtPaciente').on('click', () => $('#modalBuscarPaciente').modal());
+const buscarTipoDiagnostico = () => $('#txtTipoDiagnostico').on('click', () => $('#modalBuscarTipoDiagnostico').modal());
+
+// --- Agregar ---
+const agregar = () => {
+  $('#btnAgregar').on('click', () => {
+    $('#modalTitle').text("Agregar Diagnóstico");
+    $('#txtIdDiagnostico, #id_consulta_detalle, #txtMedico, #txtPaciente, #txtTipoDiagnostico, #descripcion_diagnostico, #fecha_diagnostico, #pieza_dental').val("");
+    $('#id_medico, #id_paciente, #id_tipo_diagnostico').val("");
+    $('#modalFormulario').modal();
+  });
+};
+
+// --- Guardar ---
+const guardar = () => $('#btnGuardar').on('click', function() {
+  const idDiagnostico = $('#txtIdDiagnostico').val();
+
+  const payload = {
+    id_consulta_detalle: parseInt($('#id_consulta_detalle').val()),
+    id_medico: parseInt($('#id_medico').val()),
+    id_paciente: parseInt($('#id_paciente').val()),
+    id_tipo_diagnostico: $('#id_tipo_diagnostico').val() ? parseInt($('#id_tipo_diagnostico').val()) : null,
+    descripcion_diagnostico: $('#descripcion_diagnostico').val(),
+    fecha_diagnostico: $('#fecha_diagnostico').val() || null,
+    pieza_dental: $('#pieza_dental').val() || null
+  };
+
+  if (!payload.id_consulta_detalle || !payload.id_medico || !payload.id_paciente || !payload.descripcion_diagnostico) {
+    Swal.fire("Error", "Complete los campos obligatorios (Consulta, Médico, Paciente y Descripción)", "error");
+    return;
+  }
+
+  const tabla = $('#tbl').DataTable();
+  const method = idDiagnostico ? 'PUT' : 'POST';
+  const url = idDiagnostico ? `/api/v1/Diagnostico/${idDiagnostico}` : '/api/v1/Diagnostico';
+
+  fetch(url, {
+    method: method,
+    headers: { 'Content-Type': 'application/json', 'X-CSRFToken': CSRFToken },
+    body: JSON.stringify(payload)
+  })
+  .then(resp => resp.json())
+  .then(data => {
+    if (data.success) {
+      tabla.ajax.reload();
+      Swal.fire(idDiagnostico ? "Actualizado" : "Registrado", "Diagnóstico guardado correctamente.", "success");
+      $('#modalFormulario').modal("hide");
+    } else {
+      Swal.fire("Error", data.error, "error");
+    }
+  })
+  .catch(err => Swal.fire("Error", "Ocurrió un error al guardar el diagnóstico.", "error"));
+});
+
+// --- Editar ---
+const editar = () => {
+  $('#tbl').on('click', 'button[name="btn_editar"]', function() {
+    const idDiagnostico = $(this).data('id');
+
+    fetch(`/api/v1/Diagnostico/${idDiagnostico}`)
+      .then(resp => resp.json())
+      .then(data => {
+        const d = data.data;
+
+        $('#txtIdDiagnostico').val(d.id_diagnostico);
+        $('#id_consulta_detalle').val(d.id_consulta_detalle);
+        $('#id_medico').val(d.id_medico);
+        $('#txtMedico').val(d.medico_nombre);
+        $('#id_paciente').val(d.id_paciente);
+        $('#txtPaciente').val(d.paciente_nombre);
+        $('#id_tipo_diagnostico').val(d.id_tipo_diagnostico || "");
+        $('#txtTipoDiagnostico').val(d.tipo_diagnostico || "");
+        $('#descripcion_diagnostico').val(d.descripcion_diagnostico);
+        $('#fecha_diagnostico').val(formatDateForInput(d.fecha_diagnostico));
+        $('#pieza_dental').val(d.pieza_dental || "");
+
+        $('#modalTitle').text("Editar Diagnóstico");
+        $('#modalFormulario').modal();
+      })
+      .catch(err => Swal.fire("Error", "No se pudo cargar el diagnóstico", "error"));
+  });
+};
+
+// --- Eliminar ---
+const eliminar = () => {
+  $('#tbl').on('click', 'button[name="btn_eliminar"]', function() {
+    const idDiagnostico = $(this).data('id');
+    const fila = $(this).closest('tr');
+
+    Swal.fire({
+      title: "¿Deseas eliminar este diagnóstico?",
+      showCancelButton: true,
+      confirmButtonText: "Si",
+      cancelButtonText: "No"
+    }).then(result => {
+      if (result.isConfirmed) {
+        fetch(`/api/v1/Diagnostico/${idDiagnostico}`, {
+          method: 'DELETE',
+          headers: { 'Content-Type': 'application/json', 'X-CSRFToken': CSRFToken }
+        })
+        .then(resp => resp.json())
+        .then(data => {
+          if (data.success) {
+            $('#tbl').DataTable().row(fila).remove().draw();
+            Swal.fire("Eliminado", "", "success");
+          } else {
+            Swal.fire("Error", data.error, "error");
+          }
+        })
+        .catch(err => Swal.fire("Error", "No se pudo eliminar", "error"));
+      }
+    });
+  });
+};
+
+// --- Inicialización ---
+const addEvents = () => {
+  agregar();
+  guardar();
+  editar();
+  eliminar();
+  buscarMedico();
+  buscarPaciente();
+  buscarTipoDiagnostico();
+};
+
+$(function() {
+  initDatatable();
+  initDatatableMedico();
+  initDatatablePaciente();
+  initDatatableTipoDiagnostico();
+  addEvents();
+});
+</script>
+{% endblock %}

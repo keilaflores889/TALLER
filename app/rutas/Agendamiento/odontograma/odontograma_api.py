@@ -9,7 +9,7 @@ odontogramaapi = Blueprint('odontogramaapi', __name__)
 # ------------------------
 @odontogramaapi.route('/odontograma-index', methods=['GET'])
 def ver_odontograma():
-    return render_template('odontograma/index.html')
+    return render_template('odontograma-index.html')
 
 
 # ------------------------
@@ -22,18 +22,25 @@ def addOdontograma():
     
     odontograma_dao = OdontogramaDao()
     
-    if 'id_ficha_medica' not in data or data['id_ficha_medica'] in (None, "", "null"):
-        return jsonify({'success': False, 'error': 'El campo id_ficha_medica es obligatorio.'}), 400
+    # Validar campos obligatorios
+    if 'id_paciente' not in data or data['id_paciente'] in (None, "", "null"):
+        return jsonify({'success': False, 'error': 'El campo id_paciente es obligatorio.'}), 400
+    
+    if 'id_medico' not in data or data['id_medico'] in (None, "", "null"):
+        return jsonify({'success': False, 'error': 'El campo id_medico es obligatorio.'}), 400
 
     try:
-        # Verificar si ya existe un odontograma para esta ficha médica
-        odontograma_existente = odontograma_dao.getOdontogramaByFicha(data['id_ficha_medica'])
-        if odontograma_existente:
-            return jsonify({'success': False, 'error': 'Ya existe un odontograma para esta ficha médica.'}), 409
+        # Verificar si ya existe un odontograma activo para este paciente
+        if odontograma_dao.existeOdontogramaPaciente(data['id_paciente']):
+            return jsonify({
+                'success': False, 
+                'error': 'El paciente ya tiene un odontograma activo. Puede editarlo o eliminarlo antes de crear uno nuevo.'
+            }), 409
 
         # Crear nuevo odontograma
         odontograma_data = {
-            'id_ficha_medica': data['id_ficha_medica'],
+            'id_paciente': data['id_paciente'],
+            'id_medico': data['id_medico'],
             'fecha_registro': data.get('fecha_registro', str(date.today())),
             'observaciones': data.get('observaciones', ''),
             'estado': data.get('estado', 'Activo')
@@ -44,7 +51,7 @@ def addOdontograma():
         if not id_odontograma:
             return jsonify({'success': False, 'error': 'No se pudo crear el odontograma.'}), 500
 
-        # 👇 Insertar detalles si vienen en la petición
+        # Insertar detalles si vienen en la petición
         detalles_insertados = []
         if 'detalles' in data and isinstance(data['detalles'], list):
             for d in data['detalles']:
@@ -52,8 +59,7 @@ def addOdontograma():
                     'id_odontograma': id_odontograma,
                     'numero_diente': d.get('diente'),
                     'id_estado_dental': d.get('estado'),
-                    'superficie': d.get('superficie', 'Completo')
-                    
+                    'superficie': d.get('superficie', 'C')
                 }
                 id_detalle = odontograma_dao.addDetalleOdontograma(detalle_data)
                 if id_detalle:
@@ -72,7 +78,7 @@ def addOdontograma():
 
     except Exception as e:
         app.logger.error(f"Error al crear odontograma: {str(e)}")
-        return jsonify({'success': False, 'error': 'Ocurrió un error interno al crear el odontograma.'}), 500
+        return jsonify({'success': False, 'error': f'Ocurrió un error interno: {str(e)}'}), 500
 
 
 # ------------------------
@@ -108,6 +114,24 @@ def getOdontograma(id_odontograma):
 
 
 # ------------------------
+# Obtener odontograma por ID de paciente
+# ------------------------
+@odontogramaapi.route('/odontograma/paciente/<int:id_paciente>', methods=['GET'])
+def getOdontogramaPorPaciente(id_paciente):
+    odontograma_dao = OdontogramaDao()
+    try:
+        odontograma = odontograma_dao.getOdontogramaByPaciente(id_paciente)
+        if odontograma:
+            detalles = odontograma_dao.getDetallesOdontograma(odontograma['id_odontograma'])
+            odontograma['detalles'] = detalles
+            return jsonify({'success': True, 'data': odontograma, 'error': None})
+        return jsonify({'success': False, 'error': 'El paciente no tiene odontograma registrado'}), 404
+    except Exception as e:
+        app.logger.error(f"Error al obtener odontograma del paciente {id_paciente}: {str(e)}")
+        return jsonify({'success': False, 'error': 'Error interno'}), 500
+
+
+# ------------------------
 # Actualizar odontograma
 # ------------------------
 @odontogramaapi.route('/odontograma/<int:id_odontograma>', methods=['PUT'])
@@ -121,7 +145,7 @@ def updateOdontograma(id_odontograma):
         if not updated:
             return jsonify({'success': False, 'error': 'Odontograma no encontrado'}), 404
 
-        # 🔹 Manejar los detalles
+        # Manejar los detalles
         if "detalles" in data and isinstance(data["detalles"], list):
             # 1. Borrar detalles anteriores
             odontograma_dao.deleteDetallesByOdontograma(id_odontograma)
@@ -132,7 +156,7 @@ def updateOdontograma(id_odontograma):
                     'id_odontograma': id_odontograma,
                     'numero_diente': d.get('diente'),
                     'id_estado_dental': d.get('estado'),
-                    'superficie': d.get('superficie', 'Completo')
+                    'superficie': d.get('superficie', 'C')
                 }
                 odontograma_dao.addDetalleOdontograma(detalle_data)
 
@@ -174,6 +198,34 @@ def getEstadosDentales():
 
 
 # ------------------------
+# Listar pacientes (para selección)
+# ------------------------
+@odontogramaapi.route('/pacientes', methods=['GET'])
+def getPacientes():
+    odontograma_dao = OdontogramaDao()
+    try:
+        pacientes = odontograma_dao.getPacientes()
+        return jsonify({'success': True, 'data': pacientes, 'error': None})
+    except Exception as e:
+        app.logger.error(f"Error al obtener pacientes: {str(e)}")
+        return jsonify({'success': False, 'error': 'Error al obtener pacientes'}), 500
+
+
+# ------------------------
+# Listar médicos (para selección)
+# ------------------------
+@odontogramaapi.route('/medicos', methods=['GET'])
+def getMedicos():
+    odontograma_dao = OdontogramaDao()
+    try:
+        medicos = odontograma_dao.getMedicos()
+        return jsonify({'success': True, 'data': medicos, 'error': None})
+    except Exception as e:
+        app.logger.error(f"Error al obtener médicos: {str(e)}")
+        return jsonify({'success': False, 'error': 'Error al obtener médicos'}), 500
+
+
+# ------------------------
 # Obtener detalles de un odontograma
 # ------------------------
 @odontogramaapi.route('/odontograma/<int:id_odontograma>/detalles', methods=['GET'])
@@ -199,8 +251,7 @@ def addDetalle(id_odontograma):
             'id_odontograma': id_odontograma,
             'numero_diente': data.get('diente'),
             'id_estado_dental': data.get('estado'),
-            'superficie': data.get('superficie', 'Completo')
-            
+            'superficie': data.get('superficie', 'C')
         }
         id_detalle = odontograma_dao.addDetalleOdontograma(detalle_data)
         if id_detalle:
@@ -243,3 +294,5 @@ def deleteDetalle(id_detalle):
     except Exception as e:
         app.logger.error(f"Error al eliminar detalle {id_detalle}: {str(e)}")
         return jsonify({'success': False, 'error': 'Error interno'}), 500
+
+    

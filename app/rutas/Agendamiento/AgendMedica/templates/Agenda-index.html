@@ -6,20 +6,26 @@ Agenda Médica
 {% endblock %}
 
 {% block contenido %}
-<div class="container mt-4">
-  <h3>Listar Agenda Médica</h3>
+<div class="container-fluid mt-4">
 
   <!-- Tarjeta -->
-  <div class="card">
-    <div class="card-header">
-      <button type="button" class="btn btn-outline-info" id="btnAgregar">Agregar</button>
+  <!-- Card principal -->
+  <div class="card shadow-sm border-0 rounded-lg">
+    <!-- Header: Botón Agregar y Título -->
+    <div class="card-header bg-info text-white d-flex justify-content-between align-items-center">
+      <button type="button" class="btn btn-light btn-sm" id="btnAgregar">
+        <i class="fas fa-plus-circle mr-1"></i> Agregar
+      </button>
+      <h5 class="mb-0 font-weight-bold">
+        <i class="fas fa-calendar-alt mr-2"></i> Agenda Médica
+      </h5>
     </div>
-    <div class="card-body">
 
-      <!-- Contenedor con scroll horizontal -->
-      <div style="overflow-x: auto; white-space: nowrap;">
-        <table class="table table-striped" id="tbl">
-          <thead class="table-info">
+    <!-- Body: Tabla de agenda -->
+    <div class="card-body p-2">
+      <div class="table-responsive shadow-sm rounded">
+        <table class="table table-hover table-bordered align-middle text-center" id="tbl">
+          <thead class="bg-info text-white">
             <tr>
               <th>Médico</th>
               <th>Día</th>
@@ -37,127 +43,117 @@ Agenda Médica
           <tbody></tbody>
         </table>
       </div>
-      
     </div>
   </div>
 
+  <!-- =========================== -->
   <!-- Modal Formulario Agenda -->
+  <!-- =========================== -->
   <div class="modal fade" id="modalFormulario" tabindex="-1" role="dialog">
     <div class="modal-dialog modal-xl modal-dialog-scrollable" role="document">
-      <div class="modal-content">
-        
-        <!-- Header con Estado -->
-        <div class="modal-header table-info d-flex justify-content-between align-items-center">
-          <h4 class="modal-title" id="modalTitle">Nueva Agenda</h4>
+      <div class="modal-content shadow-lg border-0 rounded-lg">
+
+        <!-- Header -->
+        <div class="modal-header bg-info text-white rounded-top d-flex justify-content-between align-items-center">
+          <h5 class="modal-title font-weight-bold">
+            <i class="fas fa-calendar-alt mr-2"></i> <span id="modalTitle">Nueva Agenda</span>
+          </h5>
           
           <!-- Estado arriba a la derecha -->
           <div class="form-group mb-0 d-flex align-items-center">
-            <label for="estado" class="mr-2 mb-0">Estado:</label>
+            <label for="estado" class="mr-2 mb-0 text-white">Estado:</label>
             <select id="estado" class="form-control form-control-sm">
-            <option value="Activo">Activo</option>
-            <option value="Inactivo">Inactivo</option>
-          </select>
+              <option value="Activo">Activo</option>
+              <option value="Inactivo">Inactivo</option>
+            </select>
           </div>
 
-          <button type="button" class="close ml-2" data-dismiss="modal">&times;</button>
+          <button type="button" class="close text-white ml-2" data-dismiss="modal">&times;</button>
         </div>
 
-        <!-- Cuerpo del modal -->
+        <!-- Body -->
         <div class="modal-body">
           <input type="hidden" id="txtIdAgenda">
 
           <div class="row">
+
             <!-- Médico -->
-            <div class="col-md-6">
-              <div class="form-group">
-                <input type="hidden" id="id_medico">
-                <label>Médico:</label>
-                <input type="text" id="txtmedico" class="form-control" placeholder="Click para seleccionar Médico" readonly>
-              </div>
+            <div class="col-md-6 mb-3">
+              <input type="hidden" id="id_medico">
+              <label class="font-weight-bold">Médico:</label>
+              <input type="text" id="txtmedico" class="form-control" placeholder="Click para seleccionar Médico" readonly>
             </div>
 
             <!-- Día -->
-            <div class="col-md-6">
-              <div class="form-group">
-                <input type="hidden" id="id_dia">
-                <label>Día:</label>
-                <input type="text" id="txtDia" class="form-control" placeholder="Click para seleccionar día" readonly>
-              </div>
+            <div class="col-md-6 mb-3">
+              <input type="hidden" id="id_dia">
+              <label class="font-weight-bold">Día:</label>
+              <input type="text" id="txtDia" class="form-control" placeholder="Click para seleccionar día" readonly>
             </div>
 
             <!-- Turno -->
-            <div class="col-md-6">
-              <div class="form-group">
-                <input type="hidden" id="id_turno">
-                <label>Turno:</label>
-                <input type="text" id="txtTurno" class="form-control" placeholder="Click para seleccionar turno" readonly>
-              </div>
+            <div class="col-md-6 mb-3">
+              <input type="hidden" id="id_turno">
+              <label class="font-weight-bold">Turno:</label>
+              <input type="text" id="txtTurno" class="form-control" placeholder="Click para seleccionar turno" readonly>
             </div>
 
             <!-- Especialidad -->
-            <div class="col-md-6">
-              <div class="form-group">
-                <input type="hidden" id="id_especialidad">
-                <label>Especialidad:</label>
-                <input type="text" id="txtEspecialidad" class="form-control" placeholder="Click para seleccionar Especialidad" readonly>
-              </div>
+            <div class="col-md-6 mb-3">
+              <input type="hidden" id="id_especialidad">
+              <label class="font-weight-bold">Especialidad:</label>
+              <input type="text" id="txtEspecialidad" class="form-control" placeholder="Click para seleccionar Especialidad" readonly>
             </div>
 
             <!-- Consultorio -->
-            <div class="col-md-6">
-              <div class="form-group">
-                <input type="hidden" id="codigo" name="codigo">
-                <label>Consultorio:</label>
-                <input type="text" id="txtConsultorio" class="form-control" placeholder="Click para seleccionar Consultorio" readonly>
-              </div>
+            <div class="col-md-6 mb-3">
+              <input type="hidden" id="codigo" name="codigo">
+              <label class="font-weight-bold">Consultorio:</label>
+              <input type="text" id="txtConsultorio" class="form-control" placeholder="Click para seleccionar Consultorio" readonly>
             </div>
 
             <!-- Personal -->
-            <div class="col-md-6">
-              <div class="form-group">
-                <input type="hidden" id="id_personal">
-                <label>Personal:</label>
-                <input type="text" id="txtPersonal" class="form-control" placeholder="Click para seleccionar Personal" readonly>
-              </div>
+            <div class="col-md-6 mb-3">
+              <input type="hidden" id="id_personal">
+              <label class="font-weight-bold">Personal:</label>
+              <input type="text" id="txtPersonal" class="form-control" placeholder="Click para seleccionar Personal" readonly>
             </div>
 
-<!-- Horario Disponible -->
-<div class="col-md-6">
-  <div class="form-group">
-    <label>Horario Disponible:</label>
-    <select id="selectHorario" class="form-control">
-      <option value="">Seleccione médico y fecha</option>
-    </select>
-  </div>
-</div>
+            <!-- Horario Disponible -->
+            <div class="col-md-6 mb-3">
+              <label class="font-weight-bold">Horario Disponible:</label>
+              <select id="selectHorario" class="form-control">
+                <option value="">Seleccione médico y fecha</option>
+              </select>
+            </div>
 
-<!-- Cupos (solo lectura) -->
-<div class="col-md-6">
-  <div class="form-group">
-    <label>Cupos:</label>
-    <input type="number" id="cupos" class="form-control" min="0" value="0" readonly>
-  </div>
-</div>
-
-<!-- Hidden inputs para guardar valores -->
-<input type="hidden" id="id_disponibilidad">
-<input type="hidden" id="horario_disponible">
-
+            <!-- Cupos -->
+            <div class="col-md-6 mb-3">
+              <label class="font-weight-bold">Cupos:</label>
+              <input type="number" id="cupos" class="form-control" min="0" value="0" readonly>
+            </div>
 
             <!-- Fecha Agenda -->
-            <div class="col-md-6">
-              <div class="form-group">
-                <label>Fecha Agenda:</label>
-                <input type="date" id="fecha_agenda" class="form-control">
-              </div>
+            <div class="col-md-6 mb-3">
+              <label class="font-weight-bold">Fecha Agenda:</label>
+              <input type="date" id="fecha_agenda" class="form-control">
             </div>
+
+            <!-- Hidden inputs -->
+            <input type="hidden" id="id_disponibilidad">
+            <input type="hidden" id="horario_disponible">
+
           </div>
         </div>
 
-        <!-- Footer fijo -->
-        <div class="modal-footer">
-          <button type="button" class="btn btn-primary" id="btnGuardar">Guardar</button>
-          <button type="button" class="btn btn-danger" data-dismiss="modal">Cerrar</button>
+        <!-- Footer -->
+        <div class="modal-footer bg-light">
+          <button type="button" class="btn btn-info" id="btnGuardar">
+            <i class="fas fa-save mr-1"></i> Guardar
+          </button>
+          <button type="button" class="btn btn-danger" data-dismiss="modal">
+            <i class="fas fa-times mr-1"></i> Cerrar
+          </button>
         </div>
 
       </div>
