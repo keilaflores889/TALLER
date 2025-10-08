@@ -9,7 +9,7 @@ odontogramaapi = Blueprint('odontogramaapi', __name__)
 # ------------------------
 @odontogramaapi.route('/odontograma-index', methods=['GET'])
 def ver_odontograma():
-    return render_template('odontograma/index.html')
+    return render_template('odontograma-index.html')
 
 
 # ------------------------
@@ -294,3 +294,5 @@ def deleteDetalle(id_detalle):
     except Exception as e:
         app.logger.error(f"Error al eliminar detalle {id_detalle}: {str(e)}")
         return jsonify({'success': False, 'error': 'Error interno'}), 500
+
+    

@@ -214,6 +214,9 @@ def addConsultaDetalle():
         if 'id_tipo_diagnostico' in data and data['id_tipo_diagnostico'] == '':
             data['id_tipo_diagnostico'] = None
 
+        if 'id_tipo_procedimiento' in data and data['id_tipo_procedimiento'] == '':
+            data['id_tipo_procedimiento'] = None
+
         detalle_id = dao.addConsultaDetalle(data)
         
         if detalle_id:
@@ -254,6 +257,9 @@ def updateConsultaDetalle(id_consulta_detalle):
         
         if 'id_tipo_diagnostico' in data and data['id_tipo_diagnostico'] == '':
             data['id_tipo_diagnostico'] = None
+
+        if 'id_tipo_procedimiento' in data and data['id_tipo_procedimiento'] == '':
+            data['id_tipo_procedimiento'] = None
 
         actualizado = dao.updateConsultaDetalle(id_consulta_detalle, data)
         if actualizado:

@@ -207,12 +207,14 @@ class ConsultasDao:
                 SELECT 
                     cd.id_consulta_detalle, cd.id_consulta_cab, cd.id_sintoma,
                     cd.pieza_dental, cd.diagnostico, cd.tratamiento, cd.procedimiento,
-                    cd.id_tipo_diagnostico, 
-                    td.descripcion AS tipo_diagnostico,
+                    cd.id_tipo_diagnostico, cd.id_tipo_procedimiento,
+                    td.tipo_diagnostico AS tipo_diagnostico,
+                    tp.procedimiento AS tipo_procedimiento,
                     s.descripcion_sintoma
                 FROM consultas_detalle cd
                 INNER JOIN sintoma s ON cd.id_sintoma = s.id_sintoma
                 LEFT JOIN tipo_diagnostico td ON cd.id_tipo_diagnostico = td.id_tipo_diagnostico
+                LEFT JOIN tipo_procedimiento_medico tp ON cd.id_tipo_procedimiento = tp.id_tipo_procedimiento
                 ORDER BY cd.id_consulta_detalle DESC
             """)
             rows = cursor.fetchall()
@@ -237,6 +239,8 @@ class ConsultasDao:
                     cd.diagnostico, 
                     cd.tratamiento, 
                     cd.procedimiento,
+                    cd.id_tipo_diagnostico,
+                    cd.id_tipo_procedimiento,
                     s.descripcion_sintoma AS descripcion_sintoma,
                     cc.id_medico,
                     cc.id_paciente,
@@ -272,7 +276,7 @@ class ConsultasDao:
                 SELECT 
                     id_consulta_detalle, id_consulta_cab, id_sintoma,
                     pieza_dental, diagnostico, tratamiento, procedimiento,
-                    id_tipo_diagnostico
+                    id_tipo_diagnostico, id_tipo_procedimiento
                 FROM consultas_detalle
                 WHERE id_consulta_detalle = %s
             """, (id_consulta_detalle,))
@@ -301,6 +305,7 @@ class ConsultasDao:
                     cd.tratamiento, 
                     cd.procedimiento,
                     cd.id_tipo_diagnostico,
+                    cd.id_tipo_procedimiento,
                     s.descripcion_sintoma AS descripcion_sintoma,
                     cc.id_medico,
                     cc.id_paciente,
@@ -309,7 +314,8 @@ class ConsultasDao:
                     m.nombre || ' ' || m.apellido AS nombre_medico,
                     p.nombre || ' ' || p.apellido AS nombre_paciente,
                     con.nombre_consultorio AS nombre_consultorio,
-                    COALESCE(td.tipo_diagnostico, 'Sin tipo') AS descripcion_tipo_diagnostico
+                    COALESCE(td.tipo_diagnostico, 'Sin tipo') AS descripcion_tipo_diagnostico,
+                    COALESCE(tp.procedimiento, 'Sin tipo') AS descripcion_tipo_procedimiento
                 FROM consultas_detalle cd
                 INNER JOIN sintoma s ON cd.id_sintoma = s.id_sintoma
                 INNER JOIN consultas_cabecera cc ON cd.id_consulta_cab = cc.id_consulta_cab
@@ -317,6 +323,7 @@ class ConsultasDao:
                 INNER JOIN paciente p ON cc.id_paciente = p.id_paciente
                 LEFT JOIN consultorio con ON cc.id_consultorio = con.codigo
                 LEFT JOIN tipo_diagnostico td ON cd.id_tipo_diagnostico = td.id_tipo_diagnostico
+                LEFT JOIN tipo_procedimiento_medico tp ON cd.id_tipo_procedimiento = tp.id_tipo_procedimiento
                 ORDER BY cd.id_consulta_detalle DESC
             """)
             rows = cursor.fetchall()
@@ -341,11 +348,14 @@ class ConsultasDao:
                     cd.tratamiento, 
                     cd.procedimiento,
                     cd.id_tipo_diagnostico,
+                    cd.id_tipo_procedimiento,
                     s.descripcion_sintoma AS descripcion_sintoma,
-                    COALESCE(td.tipo_diagnostico, 'Sin tipo') AS descripcion_tipo_diagnostico
+                    COALESCE(td.tipo_diagnostico, 'Sin tipo') AS descripcion_tipo_diagnostico,
+                    COALESCE(tp.procedimiento, 'Sin tipo') AS descripcion_tipo_procedimiento
                 FROM consultas_detalle cd
                 INNER JOIN sintoma s ON cd.id_sintoma = s.id_sintoma
                 LEFT JOIN tipo_diagnostico td ON cd.id_tipo_diagnostico = td.id_tipo_diagnostico
+                LEFT JOIN tipo_procedimiento_medico tp ON cd.id_tipo_procedimiento = tp.id_tipo_procedimiento
                 WHERE cd.id_consulta_cab = %s
                 ORDER BY cd.id_consulta_detalle
             """, (id_consulta_cab,))
@@ -365,9 +375,10 @@ class ConsultasDao:
             cursor.execute("""
                 INSERT INTO consultas_detalle(
                     id_consulta_cab, id_sintoma, pieza_dental,
-                    diagnostico, tratamiento, procedimiento, id_tipo_diagnostico
+                    diagnostico, tratamiento, procedimiento, 
+                    id_tipo_diagnostico, id_tipo_procedimiento
                 )
-                VALUES (%s, %s, %s, %s, %s, %s, %s)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
                 RETURNING id_consulta_detalle
             """, (
                 data["id_consulta_cab"],
@@ -376,7 +387,8 @@ class ConsultasDao:
                 data["diagnostico"],
                 data["tratamiento"],
                 data.get("procedimiento"),
-                data.get("id_tipo_diagnostico")
+                data.get("id_tipo_diagnostico"),
+                data.get("id_tipo_procedimiento")
             ))
             id_consulta_detalle = cursor.fetchone()[0]
             self.conn.commit()
@@ -399,7 +411,8 @@ class ConsultasDao:
                     diagnostico = %s,
                     tratamiento = %s,
                     procedimiento = %s,
-                    id_tipo_diagnostico = %s
+                    id_tipo_diagnostico = %s,
+                    id_tipo_procedimiento = %s
                 WHERE id_consulta_detalle = %s
             """, (
                 data.get("id_consulta_cab"),
@@ -409,6 +422,7 @@ class ConsultasDao:
                 data.get("tratamiento"),
                 data.get("procedimiento"),
                 data.get("id_tipo_diagnostico"),
+                data.get("id_tipo_procedimiento"),
                 id_consulta_detalle
             ))
             self.conn.commit()
@@ -487,7 +501,7 @@ class ConsultasDao:
                     d.id_tipo_diagnostico,
                     d.descripcion_diagnostico,
                     TO_CHAR(d.fecha_diagnostico, 'YYYY-MM-DD') AS fecha_diagnostico,
-                    d.observaciones,
+                    d.pieza_dental,
                     COALESCE(td.tipo_diagnostico, 'Sin tipo') AS tipo_diagnostico_descripcion
                 FROM diagnosticos d
                 LEFT JOIN tipo_diagnostico td ON d.id_tipo_diagnostico = td.id_tipo_diagnostico
@@ -502,33 +516,44 @@ class ConsultasDao:
         except Exception as e:
             app.logger.error(f"Error al obtener diagnósticos: {str(e)}")
             return []
+
     def addDiagnostico(self, data):
-        """Agrega un nuevo diagnóstico detallado"""
+        """Agrega un nuevo diagnóstico detallado con pieza_dental de consulta_detalle si no se proporciona"""
         try:
             self._validar_datos_diagnostico(data)
             cursor = self.conn.cursor()
+            
+            # Si no se proporciona pieza_dental, obtenerla de consultas_detalle
+            pieza_dental = data.get("pieza_dental")
+            if not pieza_dental:
+                cursor.execute("""
+                    SELECT pieza_dental 
+                    FROM consultas_detalle 
+                    WHERE id_consulta_detalle = %s
+                """, (data.get("id_consulta_detalle"),))
+                result = cursor.fetchone()
+                pieza_dental = result[0] if result else None
+            
             cursor.execute("""
                 INSERT INTO diagnosticos(
                     id_consulta_detalle,
+                    id_medico,
+                    id_paciente,
                     id_tipo_diagnostico,
-                    pieza_dental,
                     descripcion_diagnostico,
-                    gravedad,
-                    estado,
                     fecha_diagnostico,
-                    observaciones
+                    pieza_dental
                 )
-                VALUES (%s, %s, %s, %s, %s, %s, COALESCE(%s, CURRENT_DATE), %s)
+                VALUES (%s, %s, %s, %s, %s, COALESCE(%s, CURRENT_DATE), %s)
                 RETURNING id_diagnostico
             """, (
                 data.get("id_consulta_detalle"),
+                data.get("id_medico"),
+                data.get("id_paciente"),
                 data.get("id_tipo_diagnostico"),
-                data.get("pieza_dental"),
                 data.get("descripcion_diagnostico"),
-                data.get("gravedad"),
-                data.get("estado", "activo"),
                 data.get("fecha_diagnostico"),
-                data.get("observaciones")
+                pieza_dental
             ))
             id_diagnostico = cursor.fetchone()[0]
             self.conn.commit()
@@ -559,17 +584,9 @@ class ConsultasDao:
                 campos_actualizar.append("descripcion_diagnostico = %s")
                 valores.append(data.get("descripcion_diagnostico"))
             
-            if "gravedad" in data:
-                campos_actualizar.append("gravedad = %s")
-                valores.append(data.get("gravedad"))
-            
-            if "estado" in data:
-                campos_actualizar.append("estado = %s")
-                valores.append(data.get("estado"))
-            
-            if "observaciones" in data:
-                campos_actualizar.append("observaciones = %s")
-                valores.append(data.get("observaciones"))
+            if "fecha_diagnostico" in data:
+                campos_actualizar.append("fecha_diagnostico = %s")
+                valores.append(data.get("fecha_diagnostico"))
             
             if not campos_actualizar:
                 return False
@@ -622,7 +639,7 @@ class ConsultasDao:
             app.logger.error(f"Error al obtener consulta completa: {str(e)}")
             return None
         
- # ============================
+    # ============================
     # TRATAMIENTOS
     # ============================
     def _validar_datos_tratamiento(self, data):

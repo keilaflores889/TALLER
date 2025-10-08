@@ -12,9 +12,9 @@ Diagnósticos
   <div class="card shadow-sm border-0 rounded-lg">
     <!-- Header: Botón Agregar y Título -->
     <div class="card-header bg-info text-white d-flex justify-content-between align-items-center">
-      <button type="button" class="btn btn-light btn-sm" id="btnAgregar">
+       <!--<button type="button" class="btn btn-light btn-sm" id="btnAgregar">
         <i class="fas fa-plus-circle mr-1"></i> Agregar
-      </button>
+      </button>-->
       <h5 class="mb-0 font-weight-bold">
         <i class="fas fa-notes-medical mr-2"></i> Diagnósticos
       </h5>
@@ -26,13 +26,12 @@ Diagnósticos
         <table class="table table-hover table-bordered align-middle text-center" id="tbl">
           <thead class="bg-info text-white">
             <tr>
-              <th>ID Consulta</th>
               <th>Médico</th>
               <th>Paciente</th>
+              <th>Diagnóstico</th>
               <th>Tipo Diagnóstico</th>
-              <th>Descripción</th>
+              <th>Pieza dental</th>
               <th>Fecha</th>
-              <th>Observaciones</th>
               <th>Acciones</th>
             </tr>
           </thead>
@@ -65,10 +64,10 @@ Diagnósticos
           <div class="row">
 
             <!-- ID Consulta -->
-            <div class="col-md-6 mb-3">
+            <!--<div class="col-md-6 mb-3">
               <label class="font-weight-bold">ID Consulta Detalle <span class="text-danger">*</span></label>
               <input type="number" id="id_consulta_detalle" class="form-control" placeholder="Ingrese ID de consulta">
-            </div>
+            </div> -->
 
             <!-- Médico -->
             <div class="col-md-6 mb-3">
@@ -84,6 +83,12 @@ Diagnósticos
               <input type="text" id="txtPaciente" class="form-control" placeholder="Click para seleccionar Paciente" readonly>
             </div>
 
+             <!-- Descripción -->
+            <div class="col-md-12 mb-3">
+              <label class="font-weight-bold">Descripción Diagnóstico <span class="text-danger">*</span></label>
+              <textarea id="descripcion_diagnostico" class="form-control" rows="3" placeholder="Ingrese descripción del diagnóstico"></textarea>
+            </div>
+
             <!-- Tipo Diagnóstico -->
             <div class="col-md-6 mb-3">
               <input type="hidden" id="id_tipo_diagnostico">
@@ -91,11 +96,12 @@ Diagnósticos
               <input type="text" id="txtTipoDiagnostico" class="form-control" placeholder="Click para seleccionar Tipo" readonly>
             </div>
 
-            <!-- Descripción -->
+             <!-- pieza dental -->
             <div class="col-md-12 mb-3">
-              <label class="font-weight-bold">Descripción Diagnóstico <span class="text-danger">*</span></label>
-              <textarea id="descripcion_diagnostico" class="form-control" rows="3" placeholder="Ingrese descripción del diagnóstico"></textarea>
+              <label class="font-weight-bold">Pieza dental</label>
+              <textarea id="pieza_dental" class="form-control" rows="3" placeholder="agrega la pieza dental"></textarea>
             </div>
+
 
             <!-- Fecha -->
             <div class="col-md-6 mb-3">
@@ -103,12 +109,7 @@ Diagnósticos
               <input type="date" id="fecha_diagnostico" class="form-control">
             </div>
 
-            <!-- Observaciones -->
-            <div class="col-md-12 mb-3">
-              <label class="font-weight-bold">Observaciones</label>
-              <textarea id="observaciones" class="form-control" rows="3" placeholder="Observaciones adicionales (opcional)"></textarea>
-            </div>
-
+          
           </div>
         </div>
 
@@ -117,7 +118,7 @@ Diagnósticos
           <button type="button" class="btn btn-info" id="btnGuardar">
             <i class="fas fa-save mr-1"></i> Guardar
           </button>
-          <button type="button" class="btn btn-secondary" data-dismiss="modal">
+          <button type="button" class="btn btn-danger" data-dismiss="modal">
             <i class="fas fa-times mr-1"></i> Cerrar
           </button>
         </div>
@@ -236,14 +237,19 @@ const initDatatable = () => {
     language: { url: "{{ url_for('static', filename='vendor/datatables/es-ES.json') }}" },
     ajax: '/api/v1/Diagnostico',
     columns: [
-      { data: 'id_consulta_detalle' },
       { data: 'medico_nombre' },
       { data: 'paciente_nombre' },
-      { data: 'tipo_diagnostico' },
       { 
         data: 'descripcion_diagnostico',
         render: function(data) {
           return data && data.length > 50 ? data.substring(0, 50) + '...' : data;
+        }
+      },
+      { data: 'tipo_diagnostico' },
+      { 
+        data: 'pieza_dental',
+        render: function(data) {
+          return data && data.length > 30 ? data.substring(0, 30) + '...' : (data || '');
         }
       },
       {
@@ -256,12 +262,6 @@ const initDatatable = () => {
           const month = String(d.getUTCMonth() + 1).padStart(2, '0');
           const year = d.getUTCFullYear();
           return `${day}/${month}/${year}`;
-        }
-      },
-      { 
-        data: 'observaciones',
-        render: function(data) {
-          return data && data.length > 30 ? data.substring(0, 30) + '...' : (data || '');
         }
       },
       {
@@ -358,7 +358,7 @@ const buscarTipoDiagnostico = () => $('#txtTipoDiagnostico').on('click', () => $
 const agregar = () => {
   $('#btnAgregar').on('click', () => {
     $('#modalTitle').text("Agregar Diagnóstico");
-    $('#txtIdDiagnostico, #id_consulta_detalle, #txtMedico, #txtPaciente, #txtTipoDiagnostico, #descripcion_diagnostico, #fecha_diagnostico, #observaciones').val("");
+    $('#txtIdDiagnostico, #id_consulta_detalle, #txtMedico, #txtPaciente, #txtTipoDiagnostico, #descripcion_diagnostico, #fecha_diagnostico, #pieza_dental').val("");
     $('#id_medico, #id_paciente, #id_tipo_diagnostico').val("");
     $('#modalFormulario').modal();
   });
@@ -375,7 +375,7 @@ const guardar = () => $('#btnGuardar').on('click', function() {
     id_tipo_diagnostico: $('#id_tipo_diagnostico').val() ? parseInt($('#id_tipo_diagnostico').val()) : null,
     descripcion_diagnostico: $('#descripcion_diagnostico').val(),
     fecha_diagnostico: $('#fecha_diagnostico').val() || null,
-    observaciones: $('#observaciones').val() || null
+    pieza_dental: $('#pieza_dental').val() || null
   };
 
   if (!payload.id_consulta_detalle || !payload.id_medico || !payload.id_paciente || !payload.descripcion_diagnostico) {
@@ -425,7 +425,7 @@ const editar = () => {
         $('#txtTipoDiagnostico').val(d.tipo_diagnostico || "");
         $('#descripcion_diagnostico').val(d.descripcion_diagnostico);
         $('#fecha_diagnostico').val(formatDateForInput(d.fecha_diagnostico));
-        $('#observaciones').val(d.observaciones || "");
+        $('#pieza_dental').val(d.pieza_dental || "");
 
         $('#modalTitle').text("Editar Diagnóstico");
         $('#modalFormulario').modal();

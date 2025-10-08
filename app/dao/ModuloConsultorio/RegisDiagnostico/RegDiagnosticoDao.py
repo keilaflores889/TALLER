@@ -15,7 +15,7 @@ class DiagnosticoDao:
                td.tipo_diagnostico AS tipo_diagnostico,
                d.descripcion_diagnostico,
                d.fecha_diagnostico,
-               d.observaciones,
+               d.pieza_dental,
                m.nombre || ' ' || m.apellido AS medico_nombre,
                p.nombre || ' ' || p.apellido AS paciente_nombre
         FROM diagnosticos d
@@ -50,7 +50,7 @@ class DiagnosticoDao:
                td.tipo_diagnostico AS tipo_diagnostico,
                d.descripcion_diagnostico,
                d.fecha_diagnostico,
-               d.observaciones,
+               d.pieza_dental,
                m.nombre || ' ' || m.apellido AS medico_nombre,
                p.nombre || ' ' || p.apellido AS paciente_nombre
         FROM diagnosticos d
@@ -87,7 +87,7 @@ class DiagnosticoDao:
                td.tipo_diagnostico AS tipo_diagnostico,
                d.descripcion_diagnostico,
                d.fecha_diagnostico,
-               d.observaciones,
+               d.pieza_dental,
                m.nombre || ' ' || m.apellido AS medico_nombre,
                p.nombre || ' ' || p.apellido AS paciente_nombre
         FROM diagnosticos d
@@ -123,7 +123,7 @@ class DiagnosticoDao:
                td.tipo_diagnostico AS tipo_diagnostico,
                d.descripcion_diagnostico,
                d.fecha_diagnostico,
-               d.observaciones,
+               d.pieza_dental,
                m.nombre || ' ' || m.apellido AS medico_nombre
         FROM diagnosticos d
         LEFT JOIN tipo_diagnostico td ON d.id_tipo_diagnostico = td.id_tipo_diagnostico
@@ -157,7 +157,7 @@ class DiagnosticoDao:
                td.tipo_diagnostico AS tipo_diagnostico,
                d.descripcion_diagnostico,
                d.fecha_diagnostico,
-               d.observaciones,
+               d.pieza_dental,
                p.nombre || ' ' || p.apellido AS paciente_nombre
         FROM diagnosticos d
         LEFT JOIN tipo_diagnostico td ON d.id_tipo_diagnostico = td.id_tipo_diagnostico
@@ -190,7 +190,7 @@ class DiagnosticoDao:
             id_tipo_diagnostico,
             descripcion_diagnostico,
             fecha_diagnostico,
-            observaciones
+            pieza_dental
         ) VALUES (%s, %s, %s, %s, %s, %s, %s)
         RETURNING id_diagnostico;
         """
@@ -205,7 +205,7 @@ class DiagnosticoDao:
                 diagnostico.get('id_tipo_diagnostico'),
                 diagnostico['descripcion_diagnostico'],
                 diagnostico.get('fecha_diagnostico'),
-                diagnostico.get('observaciones')
+                diagnostico.get('pieza_dental')
             ))
             id_diagnostico = cur.fetchone()[0]
             con.commit()
@@ -227,7 +227,7 @@ class DiagnosticoDao:
             id_tipo_diagnostico = %s,
             descripcion_diagnostico = %s,
             fecha_diagnostico = %s,
-            observaciones = %s
+            pieza_dental = %s
         WHERE id_diagnostico = %s;
         """
         conexion = Conexion()
@@ -240,7 +240,7 @@ class DiagnosticoDao:
                 diagnostico.get('id_tipo_diagnostico'),
                 diagnostico['descripcion_diagnostico'],
                 diagnostico.get('fecha_diagnostico'),
-                diagnostico.get('observaciones'),
+                diagnostico.get('pieza_dental'),
                 id_diagnostico
             ))
             con.commit()

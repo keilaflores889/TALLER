@@ -25,13 +25,11 @@ class WhatsAppService:
         
         try:
             import os
-            import uuid
         
             options = webdriver.ChromeOptions()
         
-            # Crear una carpeta única para esta sesión
-            session_id = str(uuid.uuid4())[:8]
-            user_data_dir = os.path.join(os.getcwd(), f'whatsapp_session_{session_id}')
+            # Usar SIEMPRE la misma carpeta de sesión (persistente)
+            user_data_dir = os.path.join(os.getcwd(), 'whatsapp_session_persistente')
         
             options.add_argument(f'--user-data-dir={user_data_dir}')
             options.add_argument('--profile-directory=Default')
@@ -40,7 +38,7 @@ class WhatsAppService:
             options.add_experimental_option('useAutomationExtension', False)
             options.add_argument('--start-maximized')
         
-            print(f"Usando sesion: {user_data_dir}")
+            print(f"Usando sesion persistente: {user_data_dir}")
         
             self.driver = webdriver.Chrome(
                 service=Service(ChromeDriverManager().install()),
@@ -48,7 +46,6 @@ class WhatsAppService:
             )
             self.driver.get('https://web.whatsapp.com')
             print("Esperando inicio de sesion en WhatsApp Web...")
-            print("IMPORTANTE: Escanea el codigo QR con tu telefono")
             return True
         except Exception as e:
             print(f"Error al inicializar navegador: {e}")

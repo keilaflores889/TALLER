@@ -756,8 +756,100 @@ $('#tbl').on('click', 'button[name="btn_eliminar"]', function() {
   });
 });
 
+// ========================================
+// INICIALIZACIÓN
+// ========================================
 $(function() {
-  initDatatable();
+  // 1. Inicializar la tabla
+  const tabla = initDatatable();
+  
+  // 2. Detectar parámetros URL
+  const urlParams = new URLSearchParams(window.location.search);
+  const action = urlParams.get('action');
+  const idOdontograma = urlParams.get('id');
+  const idPaciente = urlParams.get('paciente');
+  const idMedico = urlParams.get('medico');
+
+  console.log('🔍 Parámetros detectados:', { action, idOdontograma, idPaciente, idMedico });
+
+  // 3. Manejar acción "ver"
+  if (action === 'ver' && idOdontograma) {
+    console.log('✅ Acción VER detectada para odontograma ID:', idOdontograma);
+    
+    // Esperar a que DataTable cargue los datos
+    $('#tbl').on('init.dt', function() {
+      console.log('✅ DataTable inicializada');
+      
+      setTimeout(() => {
+        const boton = $(`button[name="btn_ver"][data-id="${idOdontograma}"]`);
+        console.log('🔍 Botón encontrado:', boton.length > 0);
+        
+        if (boton.length > 0) {
+          console.log('✅ Haciendo clic en el botón...');
+          boton[0].click();
+          
+          // Limpiar URL después de abrir
+          setTimeout(() => {
+            window.history.replaceState({}, document.title, '/odontograma-index');
+          }, 1000);
+        } else {
+          console.error('❌ No se encontró el botón');
+          Swal.fire('Error', 'No se pudo abrir el odontograma', 'error');
+        }
+      }, 800);
+    });
+  }
+  
+  // 4. Manejar acción "nuevo"
+  else if (action === 'nuevo' && idPaciente) {
+    console.log('✅ Acción NUEVO detectada para paciente ID:', idPaciente);
+    
+    setTimeout(() => {
+      $('#btnNuevo').click();
+      
+      // Pre-cargar datos del paciente
+      fetch(`/api/v1/paciente`)
+        .then(r => r.json())
+        .then(d => {
+          if (d.success) {
+            const paciente = d.data.find(p => p.id_paciente == idPaciente);
+            if (paciente) {
+              $('#id_paciente').val(paciente.id_paciente);
+              $('#paciente').val(`${paciente.nombre} ${paciente.apellido}`);
+              $('#cedula').val(paciente.cedula_entidad);
+              
+              // Calcular edad
+              if (paciente.fecha_nacimiento) {
+                const f = new Date(paciente.fecha_nacimiento);
+                const today = new Date();
+                let edad = today.getFullYear() - f.getFullYear();
+                const m = today.getMonth() - f.getMonth();
+                if (m < 0 || (m === 0 && today.getDate() < f.getDate())) edad--;
+                $('#edad').val(edad);
+              }
+            }
+          }
+        });
+      
+      // Pre-cargar médico
+      if (idMedico) {
+        fetch(`/api/v1/medico`)
+          .then(r => r.json())
+          .then(d => {
+            if (d.success) {
+              const medico = d.data.find(m => m.id_medico == idMedico);
+              if (medico) {
+                $('#id_medico').val(medico.id_medico);
+                $('#medico').val(`${medico.nombre} ${medico.apellido}`);
+              }
+            }
+          });
+      }
+      
+      // Limpiar URL
+      window.history.replaceState({}, document.title, '/odontograma-index');
+    }, 500);
+  }
 });
 </script>
 {% endblock %}
