@@ -18,6 +18,9 @@ Avisos Recordatorios
         <button type="button" class="btn btn-success btn-sm" id="btnEnviarWhatsApp">
           <i class="fab fa-whatsapp mr-1"></i> Enviar WhatsApp
         </button>
+        <button type="button" class="btn btn-warning btn-sm" id="btnEstadisticas">
+          <i class="fas fa-chart-bar mr-1"></i> Estadísticas
+        </button>
       </div>
       <h5 class="mb-0 font-weight-bold">
         <i class="fas fa-bell mr-2"></i> Avisos Recordatorios
@@ -30,15 +33,17 @@ Avisos Recordatorios
         <table id="tblAvisos" class="table table-hover table-bordered align-middle text-center">
           <thead class="bg-info text-white">
             <tr>
-              <th>Paciente</th>
               <th>Personal</th>
               <th>Consultorio</th>
+              <th>Paciente</th>
+              <th>Teléfono</th>
+              <th>Médico</th>
               <th>Fecha Cita</th>
               <th>Hora Cita</th>
-              <th>Hora Recordatorio</th>
               <th>Forma Envío</th>
               <th>Mensaje</th>
-              <th>Estado</th>
+              <th>Estado Envío</th>
+              <th>Confirmación</th>
               <th>Acciones</th>
             </tr>
           </thead>
@@ -69,63 +74,79 @@ Avisos Recordatorios
             <input type="hidden" id="id_aviso_modal">
 
             <div class="row">
-              <!-- Paciente -->
-              <div class="col-md-6 mb-3">
-                <label class="font-weight-bold">Paciente</label>
-                <div class="input-group">
-                  <input type="text" id="txtpaciente" class="form-control" placeholder="Click para seleccionar paciente" readonly>
-                  <button type="button" class="btn btn-info" onclick="$('#modalBuscarPaciente').modal('show')">
-                    <i class="fas fa-search"></i>
-                  </button>
-                </div>
-                <input type="hidden" id="id_paciente">
-              </div>
-
               <!-- Personal -->
-              <div class="col-md-6 mb-3">
-                <label class="font-weight-bold">Personal</label>
-                <div class="input-group">
-                  <input type="text" id="txtPersonal" class="form-control" placeholder="Click para seleccionar personal" readonly>
-                  <button type="button" class="btn btn-info" onclick="$('#modalBuscarPersonal').modal('show')">
-                    <i class="fas fa-search"></i>
-                  </button>
-                </div>
-                <input type="hidden" id="id_personal_modal">
+            <div class="col-md-6 mb-3">
+              <label class="font-weight-bold">Personal <span class="text-danger">*</span></label>
+              <div class="input-group">
+                <input type="text" id="txtPersonal" class="form-control" placeholder="Click para seleccionar personal" readonly required>
+                <button type="button" class="btn btn-info" onclick="$('#modalBuscarPersonal').modal('show')">
+                  <i class="fas fa-search"></i>
+                </button>
               </div>
+              <input type="hidden" id="id_personal_modal">
+            </div>
 
               <!-- Consultorio -->
+            <div class="col-md-6 mb-3">
+              <label class="font-weight-bold">Consultorio <span class="text-danger">*</span></label>
+              <div class="input-group">
+                <input type="text" id="txtConsultorio" class="form-control" placeholder="Click para seleccionar consultorio" readonly required>
+                <button type="button" class="btn btn-info" onclick="$('#modalBuscarConsultorio').modal('show')">
+                  <i class="fas fa-search"></i>
+                </button>
+              </div>
+              <input type="hidden" id="codigo">
+              <input type="hidden" id="id_consultorio_modal">
+            </div>
+
+              <!-- Paciente -->
+            <div class="col-md-6 mb-3">
+              <label class="font-weight-bold">Paciente <span class="text-danger">*</span></label>
+              <div class="input-group">
+                <input type="text" id="txtpaciente" class="form-control" placeholder="Click para seleccionar paciente" readonly required>
+                <button type="button" class="btn btn-info" onclick="$('#modalBuscarPaciente').modal('show')">
+                  <i class="fas fa-search"></i>
+                </button>
+              </div>
+              <input type="hidden" id="id_paciente">
+            </div>
+
+              <!-- Médico -->
               <div class="col-md-6 mb-3">
-                <label class="font-weight-bold">Consultorio</label>
+                <label class="font-weight-bold">Médico <span class="text-danger">*</span></label>
                 <div class="input-group">
-                  <input type="text" id="txtConsultorio" class="form-control" placeholder="Click para seleccionar consultorio" readonly>
-                  <button type="button" class="btn btn-info" onclick="$('#modalBuscarConsultorio').modal('show')">
+                  <input type="text" id="txtMedico" class="form-control" placeholder="Click para seleccionar médico" readonly>
+                  <button type="button" class="btn btn-info" onclick="$('#modalBuscarMedico').modal('show')">
                     <i class="fas fa-search"></i>
                   </button>
                 </div>
-                <input type="hidden" id="codigo">
-                <input type="hidden" id="id_consultorio_modal">
+                <input type="hidden" id="id_medico">
               </div>
 
               <!-- Fecha y hora de cita -->
-              <div class="col-md-3 mb-3">
-                <label class="font-weight-bold">Fecha Cita</label>
-                <input type="date" id="fecha_cita_modal" class="form-control text-center">
+              <div class="col-md-4 mb-3">
+                <label class="font-weight-bold">Fecha Cita <span class="text-danger">*</span></label>
+                <input type="date" id="fecha_cita_modal" class="form-control text-center" required>
               </div>
-              <div class="col-md-3 mb-3">
-                <label class="font-weight-bold">Hora Cita</label>
-                <input type="time" id="hora_cita_modal" class="form-control text-center">
+              <div class="col-md-4 mb-3">
+                <label class="font-weight-bold">Hora Cita <span class="text-danger">*</span></label>
+                <input type="time" id="hora_cita_modal" class="form-control text-center" required>
               </div>
 
-              <!-- Hora recordatorio -->
-              <div class="col-md-3 mb-3">
-                <label class="font-weight-bold">Hora Recordatorio</label>
-                <input type="time" id="hora_recordatorio_modal" class="form-control text-center">
+              <!-- Estado Confirmación -->
+              <div class="col-md-4 mb-3">
+                <label class="font-weight-bold">Estado Confirmación</label>
+                <select id="estado_confirmacion_modal" class="form-control">
+                  <option value="Pendiente">Pendiente</option>
+                  <option value="Confirmado">Confirmado</option>
+                  <option value="Cancelado">Cancelado</option>
+                </select>
               </div>
 
               <!-- Forma de envío -->
-              <div class="col-md-3 mb-3">
-                <label class="font-weight-bold">Forma de Envío</label>
-                <select id="forma_envio_modal" class="form-control">
+              <div class="col-md-12 mb-3">
+                <label class="font-weight-bold">Forma de Envío <span class="text-danger">*</span></label>
+                <select id="forma_envio_modal" class="form-control" required>
                   <option value="" disabled selected>Seleccione</option>
                   <option value="Gmail">Gmail</option>
                   <option value="SMS">SMS</option>
@@ -157,8 +178,6 @@ Avisos Recordatorios
     </div>
   </div>
 
-
-
   <!-- Modal Estadísticas -->
   <div class="modal fade" id="modalEstadisticas" tabindex="-1">
     <div class="modal-dialog modal-lg">
@@ -169,7 +188,7 @@ Avisos Recordatorios
         </div>
         <div class="modal-body">
           <div class="row">
-            <div class="col-md-6">
+            <div class="col-md-4">
               <div class="card border-primary mb-3">
                 <div class="card-header bg-primary text-white">Por Estado</div>
                 <div class="card-body">
@@ -179,13 +198,23 @@ Avisos Recordatorios
                 </div>
               </div>
             </div>
-            <div class="col-md-6">
+            <div class="col-md-4">
               <div class="card border-info mb-3">
                 <div class="card-header bg-info text-white">Por Forma de Envío</div>
                 <div class="card-body">
                   <p><strong>WhatsApp:</strong> <span id="statWhatsApp" class="badge badge-success">0</span></p>
                   <p><strong>Gmail:</strong> <span id="statGmail" class="badge badge-info">0</span></p>
                   <p><strong>SMS:</strong> <span id="statSMS" class="badge badge-secondary">0</span></p>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="card border-success mb-3">
+                <div class="card-header bg-success text-white">Por Confirmación</div>
+                <div class="card-body">
+                  <p><strong>Confirmados:</strong> <span id="statConfirmados" class="badge badge-success">0</span></p>
+                  <p><strong>Pendientes:</strong> <span id="statPendientesConf" class="badge badge-warning">0</span></p>
+                  <p><strong>Cancelados:</strong> <span id="statCancelados" class="badge badge-danger">0</span></p>
                 </div>
               </div>
             </div>
@@ -199,7 +228,7 @@ Avisos Recordatorios
   </div>
 
   <!-- ========================= -->
-  <!-- Modales Selección Paciente, Personal, Consultorio -->
+  <!-- Modales Selección Paciente, Personal, Médico, Consultorio -->
   <!-- ========================= -->
   <!-- Modal Paciente -->
   <div class="modal fade" id="modalBuscarPaciente" tabindex="-1">
@@ -237,6 +266,29 @@ Avisos Recordatorios
         </div>
         <div class="modal-body">
           <table id="tblPersonal" class="table table-bordered w-100">
+            <thead>
+              <tr>
+                <th>Nombre</th>
+                <th>Apellido</th>
+                <th>Acción</th>
+              </tr>
+            </thead>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Médico -->
+  <div class="modal fade" id="modalBuscarMedico" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Buscar Médico</h5>
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+        </div>
+        <div class="modal-body">
+          <table id="tblMedico" class="table table-bordered w-100">
             <thead>
               <tr>
                 <th>Nombre</th>
@@ -311,19 +363,19 @@ function formatDateForDisplay(fecha) {
   return `${day}/${month}/${year}`;
 }
 
-// --- Tabla principal Avisos ---
 const initDatatableAvisos = () => {
   $('#tblAvisos').DataTable({
     language: { url: "{{ url_for('static', filename='vendor/datatables/es-ES.json') }}" },
     ajax: { url: '/api/v1/avisos', dataSrc: 'data' },
     destroy: true,
     columns: [
-      { data: 'paciente' },
       { data: 'personal' },
       { data: 'nombre_consultorio' },
+      { data: 'paciente' },
+      { data: 'telefono_paciente', render: data => data || 'Sin teléfono' },
+      { data: 'medico', render: data => data || 'Sin médico' },
       { data: 'fecha_cita', render: data => formatDateForDisplay(data) },
       { data: 'hora_cita' },
-      { data: 'hora_recordatorio', render: data => data || '' },
       { 
         data: 'forma_envio',
         render: function(data) {
@@ -353,6 +405,17 @@ const initDatatableAvisos = () => {
           return `<span class="badge ${badges[data] || 'badge-secondary'}">${data}</span>`;
         }
       },
+      { 
+        data: 'estado_confirmacion', 
+        render: function(data) {
+          const badges = {
+            'Pendiente': 'badge-warning',
+            'Confirmado': 'badge-success',
+            'Cancelado': 'badge-danger'
+          };
+          return `<span class="badge ${badges[data] || 'badge-secondary'}">${data || 'Pendiente'}</span>`;
+        }
+      },
       {
         data: function(row) {
           let buttons = `
@@ -362,15 +425,12 @@ const initDatatableAvisos = () => {
             <button type="button" name="btn_eliminar" class="btn btn-danger btn-sm" data-id_aviso="${row.id_aviso}" title="Eliminar">
               <i class="fas fa-trash-alt"></i>
             </button>`;
-          
-          // Botón de envío individual solo para WhatsApp pendientes
           if (row.forma_envio === 'WhatsApp' && row.estado_envio === 'Pendiente') {
             buttons += `
             <button type="button" name="btn_enviar_individual" class="btn btn-success btn-sm" data-id_aviso="${row.id_aviso}" title="Enviar ahora">
               <i class="fab fa-whatsapp"></i>
             </button>`;
           }
-          
           return buttons;
         }
       }
@@ -378,7 +438,6 @@ const initDatatableAvisos = () => {
   });
 };
 
-// --- Enviar todos los avisos WhatsApp pendientes ---
 $('#btnEnviarWhatsApp').on('click', function() {
   Swal.fire({
     title: '¿Enviar avisos por WhatsApp?',
@@ -422,11 +481,8 @@ $('#btnEnviarWhatsApp').on('click', function() {
   });
 });
 
-// --- Enviar aviso individual ---
-// --- Enviar aviso individual ---
 $('#tblAvisos').on('click', 'button[name="btn_enviar_individual"]', function() {
   const id = $(this).data('id_aviso');
-  
   Swal.fire({
     title: '¿Enviar este aviso?',
     text: 'Se abrirá WhatsApp Web en una nueva ventana',
@@ -450,17 +506,10 @@ $('#tblAvisos').on('click', 'button[name="btn_enviar_individual"]', function() {
           Swal.fire({
             icon: 'info',
             title: 'Proceso iniciado',
-            html: `
-              Se abrió WhatsApp Web.<br><br>
-              <strong>Pasos:</strong><br>
-              1. Escanea el código QR<br>
-              2. Espera a que envíe el mensaje<br>
-              3. Recarga la página para ver el estado actualizado
-            `,
+            html: `Se abrió WhatsApp Web.<br><br><strong>Pasos:</strong><br>1. Escanea el código QR<br>2. Espera a que envíe el mensaje<br>3. Recarga la página para ver el estado actualizado`,
             confirmButtonColor: '#25D366',
             confirmButtonText: 'Entendido'
           }).then(() => {
-            // Recargar después de 10 segundos para ver el estado
             setTimeout(() => {
               $('#tblAvisos').DataTable().ajax.reload();
             }, 20000);
@@ -475,7 +524,7 @@ $('#tblAvisos').on('click', 'button[name="btn_enviar_individual"]', function() {
     }
   });
 });
-// --- Ver estadísticas ---
+
 $('#btnEstadisticas').on('click', function() {
   fetch('/api/v1/avisos/estadisticas')
     .then(resp => resp.json())
@@ -489,12 +538,14 @@ $('#btnEstadisticas').on('click', function() {
         $('#statWhatsApp').text(data.por_forma_envio.whatsapp);
         $('#statGmail').text(data.por_forma_envio.gmail);
         $('#statSMS').text(data.por_forma_envio.sms);
+        $('#statConfirmados').text(data.por_confirmacion.confirmados);
+        $('#statPendientesConf').text(data.por_confirmacion.pendientes);
+        $('#statCancelados').text(data.por_confirmacion.cancelados);
         $('#modalEstadisticas').modal('show');
       }
     });
 });
 
-// --- Modales de selección Paciente ---
 const initDatatablePaciente = () => {
   $('#tblPaciente').DataTable({
     language: { url: "{{ url_for('static', filename='vendor/datatables/es-ES.json') }}" },
@@ -504,13 +555,10 @@ const initDatatablePaciente = () => {
       { data: 'nombre' },
       { data: 'apellido' },
       { data: function(row) {
-        return `<button type="button" name="btn_sel_paciente" class="btn btn-primary btn-sm"
-                  data-id="${row.id_paciente}" data-nombre="${row.nombre}" data-apellido="${row.apellido}">
-                  Seleccionar</button>`;
+        return `<button type="button" name="btn_sel_paciente" class="btn btn-primary btn-sm" data-id="${row.id_paciente}" data-nombre="${row.nombre}" data-apellido="${row.apellido}">Seleccionar</button>`;
       }}
     ]
   });
-
   $('#tblPaciente').on('click', 'button[name="btn_sel_paciente"]', function () {
     $('#txtpaciente').val($(this).data('nombre') + ' ' + $(this).data('apellido'));
     $('#id_paciente').val($(this).data('id'));
@@ -518,7 +566,6 @@ const initDatatablePaciente = () => {
   });
 };
 
-// --- Modales de selección Personal ---
 const initDatatablePersonal = () => {
   $('#tblPersonal').DataTable({
     language: { url: "{{ url_for('static', filename='vendor/datatables/es-ES.json') }}" },
@@ -528,13 +575,10 @@ const initDatatablePersonal = () => {
       { data: 'nombre' },
       { data: 'apellido' },
       { data: function(row) {
-        return `<button type="button" name="btn_sel_personal" class="btn btn-primary btn-sm" 
-                  data-id="${row.id_personal}" data-nombre="${row.nombre}" data-apellido="${row.apellido}">
-                  Seleccionar</button>`;
+        return `<button type="button" name="btn_sel_personal" class="btn btn-primary btn-sm" data-id="${row.id_personal}" data-nombre="${row.nombre}" data-apellido="${row.apellido}">Seleccionar</button>`;
       }}
     ]
   });
-
   $('#tblPersonal').on('click', 'button[name="btn_sel_personal"]', function () {
     $('#txtPersonal').val($(this).data('nombre') + ' ' + $(this).data('apellido'));
     $('#id_personal_modal').val($(this).data('id'));
@@ -542,7 +586,26 @@ const initDatatablePersonal = () => {
   });
 };
 
-// --- Modales de selección Consultorio ---
+const initDatatableMedico = () => {
+  $('#tblMedico').DataTable({
+    language: { url: "{{ url_for('static', filename='vendor/datatables/es-ES.json') }}" },
+    ajax: { url: '/api/v1/medico', dataSrc: 'data' },
+    destroy: true,
+    columns: [
+      { data: 'nombre' },
+      { data: 'apellido' },
+      { data: function(row) {
+        return `<button type="button" name="btn_sel_medico" class="btn btn-primary btn-sm" data-id="${row.id_medico}" data-nombre="${row.nombre}" data-apellido="${row.apellido}">Seleccionar</button>`;
+      }}
+    ]
+  });
+  $('#tblMedico').on('click', 'button[name="btn_sel_medico"]', function () {
+    $('#txtMedico').val($(this).data('nombre') + ' ' + $(this).data('apellido'));
+    $('#id_medico').val($(this).data('id'));
+    $('#modalBuscarMedico').modal('hide');
+  });
+};
+
 const initDatatableConsultorio = () => {
   $('#tblConsultorio').DataTable({
     language: { url: "{{ url_for('static', filename='vendor/datatables/es-ES.json') }}" },
@@ -554,7 +617,6 @@ const initDatatableConsultorio = () => {
       }}
     ]
   });
-
   $('#tblConsultorio').on('click', 'button[name="btn_seleccionar_consultorio"]', function () {
     $('#txtConsultorio').val($(this).data('consultorio'));
     $('#codigo').val($(this).data('codigo'));
@@ -562,118 +624,167 @@ const initDatatableConsultorio = () => {
   });
 };
 
-// --- Abrir modal agregar Aviso ---
 const agregarAviso = () => {
   $('#btnAgregar').on('click', () => {
     $('#formAvisoModal')[0].reset();
     $('#id_aviso_modal').val('');
+    $('#estado_confirmacion_modal').val('Pendiente');
     $('#modalTitle').text("Agregar Aviso");
     $('#modalAviso').modal('show');
   });
 };
 
-// --- Guardar Aviso ---
 $('#formAvisoModal').on('submit', async function(e) {
   e.preventDefault();
   const idAviso = $('#id_aviso_modal').val();
   const data = {
     id_paciente: $('#id_paciente').val(),
     id_personal: $('#id_personal_modal').val(),
+    id_medico: $('#id_medico').val() || null,
     codigo: $('#codigo').val() ? parseInt($('#codigo').val()) : null,
-
     fecha_cita: $('#fecha_cita_modal').val(),
     hora_cita: $('#hora_cita_modal').val(),
-    hora_recordatorio: $('#hora_recordatorio_modal').val() || null,
     forma_envio: $('#forma_envio_modal').val(),
     mensaje: $('#mensaje_modal').val(),
-    estado_envio: 'Pendiente'
+    estado_envio: 'Pendiente',
+    estado_confirmacion: $('#estado_confirmacion_modal').val()
   };
-
+  if (!data.id_paciente) {
+    Swal.fire('Error', 'Debe seleccionar un paciente', 'error');
+    return;
+  }
+  if (!data.id_personal) {
+    Swal.fire('Error', 'Debe seleccionar un personal', 'error');
+    return;
+  }
+  if (!data.fecha_cita) {
+    Swal.fire('Error', 'Debe ingresar una fecha de cita', 'error');
+    return;
+  }
+  if (!data.hora_cita) {
+    Swal.fire('Error', 'Debe ingresar una hora de cita', 'error');
+    return;
+  }
+  if (!data.forma_envio) {
+    Swal.fire('Error', 'Debe seleccionar una forma de envío', 'error');
+    return;
+  }
   try {
-    const url = idAviso ? `/api/v1/avisos/${idAviso}` : `/api/v1/avisos`;
-    const method = idAviso ? "PUT" : "POST";
-
+    const url = idAviso ? `/api/v1/avisos/${idAviso}` : '/api/v1/avisos';
+    const method = idAviso ? 'PUT' : 'POST';
     const response = await fetch(url, {
       method: method,
-      headers: { "Content-Type": "application/json", "X-CSRFToken": CSRFToken },
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': CSRFToken
+      },
       body: JSON.stringify(data)
     });
-
     const result = await response.json();
-    if(result.success) {
-      $("#tblAvisos").DataTable().ajax.reload();
-      $("#modalAviso").modal("hide");
-      Swal.fire("Éxito", result.mensaje || "Aviso guardado correctamente", "success");
+    if (result.success) {
+      Swal.fire({
+        icon: 'success',
+        title: idAviso ? 'Aviso actualizado' : 'Aviso creado',
+        text: result.message,
+        confirmButtonColor: '#17a2b8'
+      });
+      $('#modalAviso').modal('hide');
+      $('#tblAvisos').DataTable().ajax.reload();
     } else {
-      Swal.fire("Error", result.error || "No se pudo guardar el aviso", "error");
+      Swal.fire('Error', result.error || 'Error al guardar el aviso', 'error');
     }
-  } catch (err) {
-    Swal.fire("Error", "Hubo un problema con el servidor", "error");
+  } catch (error) {
+    Swal.fire('Error', 'Error de conexión: ' + error, 'error');
   }
 });
 
-// --- Editar Aviso ---
-$('#tblAvisos').on('click', 'button[name="btn_editar"]', function() {
-  const id = $(this).data('id_aviso');
-  fetch(`/api/v1/avisos/${id}`)
-    .then(resp => resp.json())
-    .then(result => {
-      if(!result.success) return Swal.fire("Error", result.error, "error");
-      const d = result.data;
-
-      $('#id_aviso_modal').val(d.id_aviso);
-      $('#txtpaciente').val(d.paciente_nombre);
-      $('#id_paciente').val(d.id_paciente);
-      $('#txtPersonal').val(d.personal_nombre);
-      $('#id_personal_modal').val(d.id_personal);
-      $('#txtConsultorio').val(d.nombre_consultorio);
-      $('#codigo').val(d.codigo);
-      $('#fecha_cita_modal').val(formatDateForInput(d.fecha_cita));
-      $('#hora_cita_modal').val(d.hora_cita);
-      $('#hora_recordatorio_modal').val(d.hora_recordatorio || '');
-      $('#forma_envio_modal').val(d.forma_envio);
-      $('#mensaje_modal').val(d.mensaje);
-
-      $('#modalTitle').text("Editar Aviso");
+$('#tblAvisos').on('click', 'button[name="btn_editar"]', async function() {
+  const idAviso = $(this).data('id_aviso');
+  try {
+    const response = await fetch(`/api/v1/avisos/${idAviso}`);
+    const result = await response.json();
+    if (result.success) {
+      const aviso = result.data;
+      $('#id_aviso_modal').val(aviso.id_aviso);
+      if (aviso.paciente) {
+        $('#txtpaciente').val(aviso.paciente);
+        $('#id_paciente').val(aviso.id_paciente);
+      }
+      if (aviso.personal) {
+        $('#txtPersonal').val(aviso.personal);
+        $('#id_personal_modal').val(aviso.id_personal);
+      }
+      if (aviso.medico) {
+        $('#txtMedico').val(aviso.medico);
+        $('#id_medico').val(aviso.id_medico);
+      }
+      if (aviso.nombre_consultorio) {
+        $('#txtConsultorio').val(aviso.nombre_consultorio);
+        $('#codigo').val(aviso.codigo);
+      }
+      $('#fecha_cita_modal').val(formatDateForInput(aviso.fecha_cita));
+      $('#hora_cita_modal').val(aviso.hora_cita);
+      $('#forma_envio_modal').val(aviso.forma_envio);
+      $('#mensaje_modal').val(aviso.mensaje || '');
+      $('#estado_confirmacion_modal').val(aviso.estado_confirmacion || 'Pendiente');
+      $('#modalTitle').text('Editar Aviso');
       $('#modalAviso').modal('show');
-    });
+    } else {
+      Swal.fire('Error', result.error || 'Error al cargar el aviso', 'error');
+    }
+  } catch (error) {
+    Swal.fire('Error', 'Error de conexión: ' + error, 'error');
+  }
 });
 
-// --- Eliminar Aviso ---
 $('#tblAvisos').on('click', 'button[name="btn_eliminar"]', function() {
-  const id = $(this).data('id_aviso');
+  const idAviso = $(this).data('id_aviso');
   Swal.fire({
-    title: "¿Deseas eliminar este aviso?",
+    title: '¿Está seguro?',
+    text: 'Esta acción no se puede deshacer',
+    icon: 'warning',
     showCancelButton: true,
-    confirmButtonText: "Si",
-    cancelButtonText: "No"
-  }).then(result => {
-    if(result.isConfirmed) {
-      fetch(`/api/v1/avisos/${id}`, {
-        method:'DELETE',
-        headers:{'Content-Type':'application/json','X-CSRFToken':CSRFToken}
-      })
-      .then(resp => resp.json())
-      .then(data => {
-        if(data.success) {
-          $('#tblAvisos').DataTable().ajax.reload();
-          Swal.fire("Eliminado", "Aviso eliminado correctamente.", "success");
-        } else {
-          Swal.fire("Error", data.error, "error");
+    confirmButtonColor: '#d33',
+    cancelButtonColor: '#3085d6',
+    confirmButtonText: 'Sí, eliminar',
+    cancelButtonText: 'Cancelar'
+  }).then((result) => {
+    if (result.isConfirmed) {
+      fetch(`/api/v1/avisos/${idAviso}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': CSRFToken
         }
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          Swal.fire({
+            icon: 'success',
+            title: 'Eliminado',
+            text: 'El aviso ha sido eliminado',
+            confirmButtonColor: '#17a2b8'
+          });
+          $('#tblAvisos').DataTable().ajax.reload();
+        } else {
+          Swal.fire('Error', data.error || 'Error al eliminar el aviso', 'error');
+        }
+      })
+      .catch(error => {
+        Swal.fire('Error', 'Error de conexión: ' + error, 'error');
       });
     }
   });
 });
 
-// --- Inicialización ---
-$(function() {
+$(document).ready(function() {
   initDatatableAvisos();
   initDatatablePaciente();
   initDatatablePersonal();
+  initDatatableMedico();
   initDatatableConsultorio();
   agregarAviso();
 });
-
 </script>
 {% endblock %}

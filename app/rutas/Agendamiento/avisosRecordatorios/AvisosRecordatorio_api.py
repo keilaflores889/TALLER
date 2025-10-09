@@ -97,8 +97,8 @@ def enviar_aviso_individual(id_aviso):
         if aviso.get('forma_envio') != 'WhatsApp':
             return jsonify(success=False, error="Este aviso no es de WhatsApp")
         
-        servicio = AvisoRecordatorioService()
-        telefono = servicio.obtener_telefono_paciente(aviso['id_paciente'])
+        # ✅ Ahora usamos el teléfono que ya viene en el aviso
+        telefono = aviso.get('telefono_paciente')
         
         if not telefono:
             return jsonify(success=False, error="Paciente sin teléfono registrado")
@@ -107,6 +107,8 @@ def enviar_aviso_individual(id_aviso):
         def enviar_en_segundo_plano():
             try:
                 ws = WhatsAppService()
+                servicio = AvisoRecordatorioService()
+                
                 print(f"\n{'='*60}")
                 print(f"Iniciando envío de aviso #{id_aviso}")
                 print(f"{'='*60}\n")
@@ -173,6 +175,11 @@ def estadisticas_avisos():
         gmail = len([a for a in avisos if a.get('forma_envio') == 'Gmail'])
         sms = len([a for a in avisos if a.get('forma_envio') == 'SMS'])
         
+        # ✅ Agregar estadísticas de confirmación
+        confirmados = len([a for a in avisos if a.get('estado_confirmacion') == 'Confirmado'])
+        pendientes_conf = len([a for a in avisos if a.get('estado_confirmacion') == 'Pendiente'])
+        cancelados = len([a for a in avisos if a.get('estado_confirmacion') == 'Cancelado'])
+        
         return jsonify(
             success=True,
             data={
@@ -186,6 +193,11 @@ def estadisticas_avisos():
                     'whatsapp': whatsapp,
                     'gmail': gmail,
                     'sms': sms
+                },
+                'por_confirmacion': {
+                    'confirmados': confirmados,
+                    'pendientes': pendientes_conf,
+                    'cancelados': cancelados
                 }
             }
         )

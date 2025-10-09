@@ -11,19 +11,22 @@ class AvisoRecordatorioDao:
         sql = """
         SELECT a.id_aviso,
                p.nombre || ' ' || p.apellido AS paciente,
+               p.telefono AS telefono_paciente,
                per.nombre || ' ' || per.apellido AS personal,
+               m.nombre || ' ' || m.apellido AS medico,
                c.nombre_consultorio,
                a.fecha_cita,
                a.hora_cita,
-               a.hora_recordatorio,
                a.forma_envio,
                a.mensaje,
-               a.estado_envio
+               a.estado_envio,
+               a.estado_confirmacion
         FROM avisos_recordatorios a
         JOIN paciente p ON a.id_paciente = p.id_paciente
         JOIN personal per ON a.id_personal = per.id_personal
+        LEFT JOIN medico m ON a.id_medico = m.id_medico
         JOIN consultorio c ON a.codigo = c.codigo
-        ORDER BY a.id_aviso;
+        ORDER BY a.fecha_cita DESC, a.hora_cita DESC;
         """
         conexion = Conexion()
         con = conexion.getConexion()
@@ -39,8 +42,6 @@ class AvisoRecordatorioDao:
                     data["fecha_cita"] = data["fecha_cita"].isoformat()
                 if data.get("hora_cita") and hasattr(data["hora_cita"], "strftime"):
                     data["hora_cita"] = data["hora_cita"].strftime("%H:%M")
-                if data.get("hora_recordatorio") and hasattr(data["hora_recordatorio"], "strftime"):
-                    data["hora_recordatorio"] = data["hora_recordatorio"].strftime("%H:%M")
                 return data
 
             return [convert(row) for row in rows]
@@ -59,19 +60,23 @@ class AvisoRecordatorioDao:
         SELECT a.id_aviso,
                p.id_paciente,
                p.nombre || ' ' || p.apellido AS paciente_nombre,
+               p.telefono AS telefono_paciente,
                per.id_personal,
                per.nombre || ' ' || per.apellido AS personal_nombre,
+               a.id_medico,
+               m.nombre || ' ' || m.apellido AS medico_nombre,
                c.codigo,
                c.nombre_consultorio,
                a.fecha_cita,
                a.hora_cita,
-               a.hora_recordatorio,
                a.forma_envio,
                a.mensaje,
-               a.estado_envio
+               a.estado_envio,
+               a.estado_confirmacion
         FROM avisos_recordatorios a
         JOIN paciente p ON a.id_paciente = p.id_paciente
         JOIN personal per ON a.id_personal = per.id_personal
+        LEFT JOIN medico m ON a.id_medico = m.id_medico
         JOIN consultorio c ON a.codigo = c.codigo
         WHERE a.id_aviso = %s;
         """
@@ -91,8 +96,6 @@ class AvisoRecordatorioDao:
                 data["fecha_cita"] = data["fecha_cita"].isoformat()
             if data.get("hora_cita") and hasattr(data["hora_cita"], "strftime"):
                 data["hora_cita"] = data["hora_cita"].strftime("%H:%M")
-            if data.get("hora_recordatorio") and hasattr(data["hora_recordatorio"], "strftime"):
-                data["hora_recordatorio"] = data["hora_recordatorio"].strftime("%H:%M")
 
             return data
         except Exception as e:
@@ -108,10 +111,10 @@ class AvisoRecordatorioDao:
     def addAviso(self, aviso):
         sql = """
         INSERT INTO avisos_recordatorios (
-            id_paciente, id_personal, codigo,
-            fecha_cita, hora_cita, hora_recordatorio,
-            forma_envio, mensaje, estado_envio
-        ) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s)
+            id_paciente, id_personal, id_medico, codigo,
+            fecha_cita, hora_cita,
+            forma_envio, mensaje, estado_envio, estado_confirmacion
+        ) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
         RETURNING id_aviso;
         """
         conexion = Conexion()
@@ -126,10 +129,6 @@ class AvisoRecordatorioDao:
             if hora_cita:
                 hora_cita = datetime.strptime(hora_cita, "%H:%M").time()
 
-            hora_recordatorio = aviso.get("hora_recordatorio")
-            if hora_recordatorio:
-                hora_recordatorio = datetime.strptime(hora_recordatorio, "%H:%M").time()
-
             # ✅ Sanitizar codigo
             codigo = aviso.get("codigo")
             if codigo in ("", None):
@@ -137,16 +136,24 @@ class AvisoRecordatorioDao:
             else:
                 codigo = int(codigo)
 
+            # ✅ Sanitizar id_medico
+            id_medico = aviso.get("id_medico")
+            if id_medico in ("", None):
+                id_medico = None
+            else:
+                id_medico = int(id_medico)
+
             cur.execute(sql, (
                 aviso["id_paciente"],
                 aviso["id_personal"],
+                id_medico,
                 codigo,
                 fecha_cita,
                 hora_cita,
-                hora_recordatorio,
                 aviso["forma_envio"],
                 aviso["mensaje"],
-                aviso.get("estado_envio", "Pendiente")
+                aviso.get("estado_envio", "Pendiente"),
+                aviso.get("estado_confirmacion", "Pendiente")
             ))
             id_aviso = cur.fetchone()[0]
             con.commit()
@@ -167,13 +174,14 @@ class AvisoRecordatorioDao:
         UPDATE avisos_recordatorios SET
             id_paciente = %s,
             id_personal = %s,
+            id_medico = %s,
             codigo = %s,
             fecha_cita = %s,
             hora_cita = %s,
-            hora_recordatorio = %s,
             forma_envio = %s,
             mensaje = %s,
-            estado_envio = %s
+            estado_envio = %s,
+            estado_confirmacion = %s
         WHERE id_aviso = %s;
         """
         conexion = Conexion()
@@ -188,10 +196,6 @@ class AvisoRecordatorioDao:
             if hora_cita:
                 hora_cita = datetime.strptime(hora_cita, "%H:%M").time()
 
-            hora_recordatorio = aviso.get("hora_recordatorio")
-            if hora_recordatorio:
-                hora_recordatorio = datetime.strptime(hora_recordatorio, "%H:%M").time()
-
             # ✅ Sanitizar codigo
             codigo = aviso.get("codigo")
             if codigo in ("", None):
@@ -199,16 +203,24 @@ class AvisoRecordatorioDao:
             else:
                 codigo = int(codigo)
 
+            # ✅ Sanitizar id_medico
+            id_medico = aviso.get("id_medico")
+            if id_medico in ("", None):
+                id_medico = None
+            else:
+                id_medico = int(id_medico)
+
             cur.execute(sql, (
                 aviso["id_paciente"],
                 aviso["id_personal"],
+                id_medico,
                 codigo,
                 fecha_cita,
                 hora_cita,
-                hora_recordatorio,
                 aviso["forma_envio"],
                 aviso["mensaje"],
                 aviso.get("estado_envio", "Pendiente"),
+                aviso.get("estado_confirmacion", "Pendiente"),
                 id_aviso
             ))
             con.commit()
