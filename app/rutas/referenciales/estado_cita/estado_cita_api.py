@@ -1,179 +1,203 @@
 from flask import Blueprint, request, jsonify, current_app as app
 from app.dao.referenciales.estado_cita.EstadoCitaDao import EstadoCitaDao
+import re
 
 estacitapi = Blueprint('estacitapi', __name__)
 
-# Lista de estados de la cita válidos
-ESTADOCITA_VALIDOS= ['RESERVADO', 'CONFIRMADO', 'REALIZADO', 'CANCELADO']
 
-# Trae todos los Estados de la Cita
-@estacitapi.route('/estadocita', methods=['GET'])
-def getEstadosCita():
-    estacitdao = EstadoCitaDao()
+# ===============================
+# Función auxiliar para validar descripción
+# ===============================
+def validar_descripcion(texto):
+    patron = r'^[A-Za-zÁÉÍÓÚáéíóúÑñÜü\s]+$'
+    return re.match(patron, texto) is not None
 
+
+# ===============================
+# Trae todos los estados de cita
+# ===============================
+@estacitapi.route('/estadoscitas', methods=['GET'])
+def getEstadosCitas():
+    estdao = EstadoCitaDao()
     try:
-        estadoscitas = estacitdao.getEstadosCitas()
-
+        estados = estdao.getEstadosCitas()
         return jsonify({
             'success': True,
-            'data': estadoscitas,
+            'data': estados,
             'error': None
         }), 200
-
     except Exception as e:
-        app.logger.error(f"Error al obtener todos los Estados de la Cita: {str(e)}")
+        app.logger.error(f"Error al obtener todos los estados de cita: {str(e)}")
         return jsonify({
             'success': False,
             'error': 'Ocurrió un error interno. Consulte con el administrador.'
         }), 500
 
+
+# ===============================
+# Trae un estado de cita por ID
+# ===============================
 @estacitapi.route('/estadoscitas/<int:estado_id>', methods=['GET'])
 def getEstadoCita(estado_id):
-    estacitdao = EstadoCitaDao()
-
+    estdao = EstadoCitaDao()
     try:
-        estadocita = estacitdao.getEstadoCitaById(estado_id)
-
-        if estadocita:
+        estado = estdao.getEstadoCitaById(estado_id)
+        if estado:
             return jsonify({
                 'success': True,
-                'data': estadocita,
+                'data': estado,
                 'error': None
             }), 200
         else:
             return jsonify({
                 'success': False,
-                'error': 'No se encontró el estado de la cita con el ID proporcionado.'
+                'error': 'No se encontró el estado de cita con el ID proporcionado.'
             }), 404
-
     except Exception as e:
-        app.logger.error(f"Error al obtener estado de la cita: {str(e)}")
+        app.logger.error(f"Error al obtener estado de cita: {str(e)}")
         return jsonify({
             'success': False,
             'error': 'Ocurrió un error interno. Consulte con el administrador.'
         }), 500
 
-# Agrega uno nuevo Estado de la cita 
+
+# ===============================
+# Agrega un nuevo estado de cita
+# ===============================
 @estacitapi.route('/estadoscitas', methods=['POST'])
 def addEstadoCita():
     data = request.get_json()
-    estacitdao = EstadoCitaDao()
+    estdao = EstadoCitaDao()
 
-    # Validar que el JSON no esté vacío y tenga las propiedades necesarias
-    campos_requeridos = ['descripcion']
-
-    # Verificar si faltan campos o son vacíos
-    for campo in campos_requeridos:
-        if campo not in data or data[campo] is None or len(data[campo].strip()) == 0:
-            return jsonify({
-                'success': False,
-                'error': f'El campo {campo} es obligatorio y no puede estar vacío.'
-            }), 400
-
-    try:
-        descripcion = data['descripcion'].upper()
-
-        # Validar si el ESTADO está en la lista de TURNOS válidos
-        if descripcion not in ESTADOCITA_VALIDOS:
-            return jsonify({
-                'success': False,
-                'error': 'Estado de la cita inválido. Solo se permiten Estado de "Confirmado", "Reservado", "Cancelado", "Realizado".'
-            }), 400
-        
-        # Verificar si ya existe el estado con esa descripcion
-        existe = estacitdao.existeDescripcion(descripcion)
-        if existe:
-            return jsonify({
-                'success': False,
-                'error': f'El estado de cita "{descripcion}" ya está registrado.'
-            }), 409  # 409 Conflict
-        
-        estado_id = estacitdao.guardarEstadoCita(descripcion)
-        if estado_id is not None and estado_id is not False:
-            return jsonify({
-                'success': True,
-                'data': {'estado_id':estado_id, 'descripcion': descripcion},
-                'error': None
-            }), 201
-        else:
-            return jsonify({ 'success': False, 'error': 'No se pudo guardar el Estado de la Cita. Consulte con el administrador.' }), 500
-    except Exception as e:
-        app.logger.error(f"Error al agregar Estado de Cita: {str(e)}")
+    if not data or 'descripcion' not in data:
         return jsonify({
             'success': False,
-            'error': 'Ocurrió un error interno. Consulte con el administrador.'
-        }), 500
-
-@estacitapi.route('/estadoscitas/<int:estado_id>', methods=['PUT'])
-def updateEstadoCita(estado_id):
-    data = request.get_json()
-    estacitdao = EstadoCitaDao()
-
-    # Validar que el JSON no esté vacío y tenga las propiedades necesarias
-    campos_requeridos = ['descripcion']
-
-    # Verificar si faltan campos o son vacíos
-    for campo in campos_requeridos:
-        if campo not in data or data[campo] is None or len(data[campo].strip()) == 0:
-            return jsonify({
-                'success': False,
-                'error': f'El campo {campo} es obligatorio y no puede estar vacío.'
-            }), 400
-    descripcion = data['descripcion'].upper()
-    
-    # Validar si el ESTADO está en la lista de TURNOS válidos
-    if descripcion not in ESTADOCITA_VALIDOS:
-        return jsonify({
-            'success': False,
-            'error': 'Estado de la cita inválido. Solo se permiten Estado de "Confirmado", "Reservado", "Cancelado", "Realizado".'
+            'error': 'El campo descripción es obligatorio.'
         }), 400
-    
-    # Verificar si otro registro ya tiene esa descripcion (evitar duplicados al actualizar)
-    existe = estacitdao.existeDescripcionExceptoId(descripcion, estado_id)
-    if existe:
+
+    descripcion = data['descripcion'].strip().upper()
+
+    if not descripcion:
         return jsonify({
             'success': False,
-            'error': f'El estado de cita "{descripcion}" ya está registrado en otro registro.'
+            'error': 'La descripción no puede estar vacía.'
+        }), 400
+
+    # Validar formato
+    if not validar_descripcion(descripcion):
+        return jsonify({
+            'success': False,
+            'error': 'La descripción solo puede contener letras y espacios.'
+        }), 400
+
+   
+
+    # Validar duplicado
+    if estdao.existeDescripcion(descripcion):
+        return jsonify({
+            'success': False,
+            'error': f'Ya existe un estado de cita con la descripción "{descripcion}".'
         }), 409
 
     try:
-        if estacitdao.updateEstadoCita(estado_id, descripcion):
+        estado_id = estdao.guardarEstadoCita(descripcion)
+        if estado_id:
             return jsonify({
                 'success': True,
-                'data': {'estado_id': estado_id, 'descripcion': descripcion},
+                'data': {'id_estado_cita': estado_id, 'descripcion': descripcion},
                 'error': None
-            }), 200
+            }), 201
         else:
             return jsonify({
                 'success': False,
-                'error': 'No se encontró el estado de la cita con el ID proporcionado o no se pudo actualizar.'
-            }), 404
+                'error': 'No se pudo guardar el estado de cita.'
+            }), 500
     except Exception as e:
-        app.logger.error(f"Error al actualizar Estado de Cita: {str(e)}")
+        app.logger.error(f"Error al agregar estado de cita: {str(e)}")
         return jsonify({
             'success': False,
             'error': 'Ocurrió un error interno. Consulte con el administrador.'
         }), 500
 
-@estacitapi.route('/estadoscitas/<int:estado_id>', methods=['DELETE'])
-def deleteEstadoCita(estado_id):
-    estacitdao = EstadoCitaDao()
+
+# ===============================
+# Actualiza un estado de cita
+# ===============================
+@estacitapi.route('/estadoscitas/<int:estado_id>', methods=['PUT'])
+def updateEstadoCita(estado_id):
+    data = request.get_json()
+    estdao = EstadoCitaDao()
+
+    if not data or 'descripcion' not in data:
+        return jsonify({
+            'success': False,
+            'error': 'El campo descripción es obligatorio.'
+        }), 400
+
+    descripcion = data['descripcion'].strip().upper()
+
+    if not descripcion:
+        return jsonify({
+            'success': False,
+            'error': 'La descripción no puede estar vacía.'
+        }), 400
+
+    if not validar_descripcion(descripcion):
+        return jsonify({
+            'success': False,
+            'error': 'La descripción solo puede contener letras y espacios.'
+        }), 400
+
+   
+
+    if estdao.existeDescripcionExceptoId(descripcion, estado_id):
+        return jsonify({
+            'success': False,
+            'error': f'Otro estado de cita con la descripción "{descripcion}" ya existe.'
+        }), 409
 
     try:
-        if estacitdao.deleteEstadoCita(estado_id):
+        actualizado = estdao.updateEstadoCita(estado_id, descripcion)
+        if actualizado:
             return jsonify({
                 'success': True,
-                'mensaje': f'EstadoCita con ID {estado_id} eliminada correctamente.',
+                'data': {'id_estado_cita': estado_id, 'descripcion': descripcion},
                 'error': None
             }), 200
         else:
             return jsonify({
                 'success': False,
-                'error': 'No se encontró el estado de la cita con el ID proporcionado o no se pudo eliminar.'
+                'error': 'No se encontró el estado de cita con el ID proporcionado o no se pudo actualizar.'
             }), 404
-
     except Exception as e:
-        app.logger.error(f"Error al eliminar Estado de la Cita: {str(e)}")
+        app.logger.error(f"Error al actualizar estado de cita: {str(e)}")
+        return jsonify({
+            'success': False,
+            'error': 'Ocurrió un error interno. Consulte con el administrador.'
+        }), 500
+
+
+# ===============================
+# Elimina un estado de cita
+# ===============================
+@estacitapi.route('/estadoscitas/<int:estado_id>', methods=['DELETE'])
+def deleteEstadoCita(estado_id):
+    estdao = EstadoCitaDao()
+    try:
+        eliminado = estdao.deleteEstadoCita(estado_id)
+        if eliminado:
+            return jsonify({
+                'success': True,
+                'mensaje': f'Estado de cita con ID {estado_id} eliminado correctamente.',
+                'error': None
+            }), 200
+        else:
+            return jsonify({
+                'success': False,
+                'error': 'No se encontró el estado de cita con el ID proporcionado o no se pudo eliminar.'
+            }), 404
+    except Exception as e:
+        app.logger.error(f"Error al eliminar estado de cita: {str(e)}")
         return jsonify({
             'success': False,
             'error': 'Ocurrió un error interno. Consulte con el administrador.'

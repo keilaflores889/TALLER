@@ -1,100 +1,121 @@
 {% extends 'base.html' %}
-    
+
 {% block titulo %}
 Estado de la Cita
 {% endblock %}
 
 {% block contenido %}
 <div class="container mt-4">
-    <h3>Listar Estado de la Cita</h3>
 
-    <!-- tarjeta -->
-    <div class="card">
-      <div class="card-header">
-        <button type="button" class="btn btn-outline-info" id="btnAgregar">Agregar</button>
-      </div>
-      <div class="card-body">
-        <table class="table table-striped" id="tbl">
-          <thead>
+  <!-- Card principal -->
+  <div class="card shadow-sm border-0 rounded-lg">
+    <!-- Header: Botón Agregar y Título -->
+    <div class="card-header bg-info text-white d-flex justify-content-between align-items-center">
+      <button type="button" class="btn btn-light btn-sm" id="btnAgregar">
+        <i class="fas fa-plus-circle mr-1"></i> Agregar
+      </button>
+      <h5 class="mb-0 font-weight-bold">
+        <i class="fas fa-calendar-check mr-2"></i> Estado de la Cita
+      </h5>
+    </div>
+
+    <!-- Body: Tabla -->
+    <div class="card-body p-2">
+      <div class="table-responsive shadow-sm rounded">
+        <table class="table table-hover table-bordered align-middle text-center" id="tbl">
+          <thead class="bg-info text-white">
             <tr>
               <th>Estado</th>
               <th>Acciones</th>
             </tr>
           </thead>
           <tbody></tbody>
-      </table>
+        </table>
       </div>
     </div>
-    <!-- /tarjeta -->
+  </div>
 
-    <!-- El formulario -->
-    <div class="modal" id="modalFormulario">
-      <!-- La clase modal-dialog-centered centra el modal -->
-      <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
+  <!-- =========================== -->
+  <!-- Modal Formulario EstadoCita -->
+  <!-- =========================== -->
+  <div class="modal fade" id="modalFormulario" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+      <div class="modal-content shadow-lg border-0 rounded-lg">
 
-          <!-- Modal Header -->
-          <div class="modal-header">
-            <h4 class="modal-title" id="modalTitle"></h4>
-            <button type="button" class="close" data-dismiss="modal">&times;</button>
-          </div>
-
-          <!-- Modal body -->
-          <div class="modal-body">
-            <div class="form-group">
-              <input type="hidden" id="txtIdEstadoCita">
-              <label for="txtDescripcion">Estado de la Cita:</label>
-              <input type="text" class="form-control" placeholder="Ingrese el estado de la cita" id="txtDescripcion">
-            </div>
-          </div>
-
-          <!-- Modal footer -->
-          <div class="modal-footer">
-            <button type="button" class="btn btn-primary" id="btnGuardar">Guardar</button>
-            <button type="button" class="btn btn-danger" data-dismiss="modal">Cerrar</button>
-          </div>
-
+        <!-- Header -->
+        <div class="modal-header bg-info text-white rounded-top">
+          <h5 class="modal-title font-weight-bold">
+            <i class="fas fa-calendar-check mr-2"></i> <span id="modalTitle">Nuevo Estado de Cita</span>
+          </h5>
+          <button type="button" class="close text-white" data-dismiss="modal">&times;</button>
         </div>
+
+        <!-- Body -->
+        <div class="modal-body">
+          <input type="hidden" id="txtIdEstadoCita">
+
+          <div class="form-group">
+            <label for="txtDescripcion" class="font-weight-bold">
+              <i class="fas fa-pen mr-1"></i> Estado de la Cita:
+            </label>
+            <input type="text" 
+                   class="form-control" 
+                   id="txtDescripcion">
+           
+          </div>
+
+        <!-- Footer -->
+        <div class="modal-footer bg-light">
+          <button type="button" class="btn btn-info" id="btnGuardar">
+            <i class="fas fa-save mr-1"></i> Guardar
+          </button>
+          <button type="button" class="btn btn-danger" data-dismiss="modal">
+            <i class="fas fa-times mr-1"></i> Cerrar
+          </button>
+        </div>
+
       </div>
     </div>
+  </div>
 
-    <div class="row mt-4 d-none" id="rowAlerta">
-        <div class="col col-md-12">
-            <div class="alert alert-success">
-                <strong>Registro Exitoso!</strong>
-                <div class="row" id="mostrarAlerta"></div>
-            </div>
-        </div>
-    </div>
 </div>
 {% endblock %}
 
 {% block js %}
 <script>
-
   const CSRFToken = "{{ csrf_token() }}" || null;
+  
+
   const initDatatable = () => {
     $('#tbl').DataTable({
       language: {
         url: "{{ url_for('static', filename='vendor/datatables/es-ES.json') }}",
       },
-      ajax:'/api/v1/estadocita',
+      ajax: '/api/v1/estadoscitas',
       columns: [
         { data: 'descripcion' },
         { data: function(row) {
-            return `<button type="button" name="btn_editar" class="btn btn-info" data-id="${row.id_estado}"title="Editar"><i class="fas fa-edit"></i>
-                    <button type="button" name="btn_eliminar" class="btn btn-danger" data-id="${row.id_estado}"title="Eliminar"><i class="fas fa-trash-alt"></i>`
+            return `
+              <button type="button" name="btn_editar" class="btn btn-sm btn-info" data-id_estado="${row.id_estado}" title="Editar">
+                <i class="fas fa-edit"></i>
+              </button>
+              <button type="button" name="btn_eliminar" class="btn btn-sm btn-danger" data-id_estado="${row.id_estado}" title="Eliminar">
+                <i class="fas fa-trash-alt"></i>
+              </button>`;
           }
         }
       ]
     });
   }
 
+  const validarDescripcion = (descripcion) => {
+    if (!descripcion) return false;
+    descripcion = descripcion.trim().toUpperCase();
+  }
+
   const agregar = () => {
     $('#btnAgregar').on('click', function(){
-      // Setear un título a modal
-      $('#modalTitle').text("Agregar Estado de la Cita");
-      // inicia ventana modal
+      $('#modalTitle').text("Nuevo Estado de la Cita");
       $('#txtIdEstadoCita').val("");
       $('#txtDescripcion').val("");
       $('#modalFormulario').modal();
@@ -103,85 +124,74 @@ Estado de la Cita
 
   const guardar = () => {
     $('#btnGuardar').on('click', function() {
-      const idEstadoCita = $('#txtIdEstadoCita').val();
-      const nuevaDescripcion = $('#txtDescripcion').val();
+      const idEstado = $('#txtIdEstadoCita').val();
+      const descripcion = $('#txtDescripcion').val().trim().toUpperCase();
       const tabla = $('#tbl').DataTable();
 
-      if(idEstadoCita) {
+
+      const payload = { descripcion };
+
+      if (idEstado) {
         // update
-        fetch(`/api/v1/estadoscitas/${idEstadoCita}`, {
+        fetch(`/api/v1/estadoscitas/${idEstado}`, {
           method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json'
-            , 'X-CSRFToken': CSRFToken
-          }, body: JSON.stringify({ descripcion: nuevaDescripcion})
+          headers: { 'Content-Type': 'application/json', 'X-CSRFToken': CSRFToken },
+          body: JSON.stringify(payload)
         })
         .then(resp => resp.json())
         .then(data => {
-          if(data && !data.error && data.success) {
+          if (data.success) {
             tabla.ajax.reload();
-            Swal.fire("Actualizado", "El Estado de la Cita ha sido actualizada correctamente.", "success");
+            $('#modalFormulario').modal("hide");
+            Swal.fire('Actualizado', 'El estado ha sido actualizado correctamente.', 'success');
           } else {
-            Swal.fire(data.error);
+            Swal.fire('Error', data.error || 'No se pudo actualizar el estado.', 'error');
           }
-        }).catch(err => {
-          console.error(err);
-          Swal.fire("Error", "Ocurrió un error al actualizar el Estado de la Cita.", "error");
         });
       } else {
         // insert
         fetch(`/api/v1/estadoscitas`, {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-            , 'X-CSRFToken': CSRFToken
-          }, body: JSON.stringify({ descripcion: nuevaDescripcion})
+          headers: { 'Content-Type': 'application/json', 'X-CSRFToken': CSRFToken },
+          body: JSON.stringify(payload)
         })
         .then(resp => resp.json())
         .then(data => {
-          if(data && !data.error && data.success) {
+          if (data.success) {
             tabla.ajax.reload();
-            Swal.fire("Actualizado", "El Estado de la Cita ha sido agregada correctamente.", "success");
+            $('#modalFormulario').modal("hide");
+            Swal.fire('Agregado', 'El estado ha sido agregado correctamente.', 'success');
           } else {
-            Swal.fire(data.error);
+            Swal.fire('Error', data.error || 'No se pudo guardar el estado.', 'error');
           }
-        }).catch(err => {
-          console.error(err);
-          Swal.fire("Error", "Ocurrió un error al guardar el Estado de la Cita.", "error");
         });
       }
-      $('#txtDescripcion').val("");
-      $('#modalFormulario').modal("hide");
     });
   }
 
   const editar = () => {
-    $('#tbl').on('click', 'button[name="btn_editar"]',function(){
-      // Mostrar mensaje de confirmación usando sweetalert
+    $('#tbl').on('click', 'button[name="btn_editar"]', function() {
       Swal.fire({
         title: "¿Deseas editar este registro?",
+        icon: 'question',
         showCancelButton: true,
-        confirmButtonText: "Si",
-        cancelButtonText: `No`
+        confirmButtonText: "Sí",
+        cancelButtonText: "No"
       }).then((result) => {
         if (result.isConfirmed) {
-          //Swal.fire("Saved!", "", "success");
-          $('#modalTitle').text("Editar Estado de Cita");
+          const idEstado = $(this).data('id_estado');
+          $('#modalTitle').text("Editar Estado de la Cita");
+          $('#txtIdEstadoCita').val(idEstado);
 
-          const idEstadoCita = $(this).data('id');
-          $('#txtIdEstadoCita').val(idEstadoCita);
-
-          // Necesitamos obtener la descripción del backend
-          fetch(`/api/v1/estadoscitas/${idEstadoCita}`, {
-            method: 'GET',
-            headers: {
-              'Content-Type': 'application/json'
-            }
-          })
+          fetch(`/api/v1/estadoscitas/${idEstado}`)
           .then(resp => resp.json())
           .then(data => {
-            $('#txtDescripcion').val(data.data.descripcion);
-            $('#modalFormulario').modal();
+            if (data.success) {
+              $('#txtDescripcion').val(data.data.descripcion);
+              $('#modalFormulario').modal();
+            } else {
+              Swal.fire('Error', 'No se pudo cargar el estado.', 'error');
+            }
           });
         }
       });
@@ -189,40 +199,36 @@ Estado de la Cita
   }
 
   const eliminar = () => {
-    $('#tbl').on('click', 'button[name="btn_eliminar"]',function(){
-      const idEstadoCita = $(this).data('id');
-      // Mostrar mensaje de confirmación usando sweetalert
+    $('#tbl').on('click', 'button[name="btn_eliminar"]', function() {
+      const idEstado = $(this).data('id_estado');
+      const boton = $(this);
+
       Swal.fire({
         title: "¿Deseas eliminar este registro?",
+        icon: 'warning',
         showCancelButton: true,
-        confirmButtonText: "Si",
-        cancelButtonText: `No`
+        confirmButtonText: "Sí, eliminar",
+        cancelButtonText: "Cancelar",
+        confirmButtonColor: '#dc3545'
       }).then((result) => {
         if (result.isConfirmed) {
-          fetch(`/api/v1/estadoscitas/${idEstadoCita}`, {
+          fetch(`/api/v1/estadoscitas/${idEstado}`, {
             method: 'DELETE',
-            headers: {
-              'Content-Type': 'application/json'
-              , 'X-CSRFToken': CSRFToken
-            }
+            headers: { 'Content-Type': 'application/json', 'X-CSRFToken': CSRFToken }
           })
           .then(resp => resp.json())
           .then(data => {
-            if(data && !data.error && data.success) {
-              // Para borrar la fila del datatable(cliente)
-              const fila =$(this).closest('tr');
+            if (data.success) {
               const tabla = $('#tbl').DataTable();
+              const fila = boton.closest('tr');
               tabla.row(fila).remove().draw();
-              Swal.fire("Eliminado", "", data.success);
+              Swal.fire('Eliminado', 'El estado ha sido eliminado correctamente.', 'success');
             } else {
-              Swal.fire(data.error);
+              Swal.fire('Error', data.error || 'No se pudo eliminar el estado.', 'error');
             }
-          }).catch(err => {
-            Swal.fire("Error", "Ocurrió un error al eliminar el Estado de Cita.", "error");
           });
         }
       });
-
     });
   }
 
