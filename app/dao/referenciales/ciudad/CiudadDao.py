@@ -1,3 +1,4 @@
+import re
 from flask import current_app as app
 from app.conexion.Conexion import Conexion
 
@@ -44,7 +45,17 @@ class CiudadDao:
             cur.close()
             con.close()
 
+    # ============================
+    # VALIDACIONES
+    # ============================
+
+    def validarDescripcion(self, descripcion):
+        """Permite letras (incluyendo ñ y acentuadas), números y espacios."""
+        patron = r"^[A-Za-zÁÉÍÓÚáéíóúÑñ0-9\s]+$"
+        return bool(re.match(patron, descripcion))
+
     def existeDescripcion(self, descripcion):
+        """Verifica si ya existe una ciudad con esa descripción."""
         sql = """
         SELECT 1 FROM ciudad WHERE descripcion = %s
         """
@@ -62,6 +73,7 @@ class CiudadDao:
             con.close()
 
     def existeDescripcionExceptoId(self, descripcion, id_ciudad):
+        """Verifica si existe otra ciudad con esa descripción, excluyendo el id actual."""
         sql = """
         SELECT 1 FROM ciudad WHERE descripcion = %s AND id_ciudad != %s
         """
@@ -77,6 +89,10 @@ class CiudadDao:
         finally:
             cur.close()
             con.close()
+
+    # ============================
+    # CRUD
+    # ============================
 
     def guardarCiudad(self, descripcion):
         insertSQL = """

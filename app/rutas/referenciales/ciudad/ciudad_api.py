@@ -1,15 +1,11 @@
-import re
 from flask import Blueprint, request, jsonify, current_app as app
 from app.dao.referenciales.ciudad.CiudadDao import CiudadDao
 
 ciuapi = Blueprint('ciuapi', __name__)
 
-# Función auxiliar para validar descripcion
-def validar_descripcion(descripcion):
-    # Permite letras (mayúsc/minúsc), números, espacios y guiones bajos
-    patron = r'^[A-Za-z0-9\s]+$'
-    return re.match(patron, descripcion) is not None
-
+# ===============================
+# Trae todas las ciudades
+# ===============================
 @ciuapi.route('/ciudades', methods=['GET'])
 def getCiudades():
     ciudao = CiudadDao()
@@ -27,6 +23,9 @@ def getCiudades():
             'error': 'Ocurrió un error interno. Consulte con el administrador.'
         }), 500
 
+# ===============================
+# Trae una ciudad por ID
+# ===============================
 @ciuapi.route('/ciudades/<int:ciudad_id>', methods=['GET'])
 def getCiudad(ciudad_id):
     ciudao = CiudadDao()
@@ -50,6 +49,9 @@ def getCiudad(ciudad_id):
             'error': 'Ocurrió un error interno. Consulte con el administrador.'
         }), 500
 
+# ===============================
+# Agrega una nueva ciudad
+# ===============================
 @ciuapi.route('/ciudades', methods=['POST'])
 def addCiudad():
     data = request.get_json()
@@ -57,36 +59,44 @@ def addCiudad():
 
     campos_requeridos = ['descripcion']
 
+    # Validar que el campo exista y no esté vacío
     for campo in campos_requeridos:
-        if campo not in data or data[campo] is None or len(data[campo].strip()) == 0:
+        if campo not in data:
             return jsonify({
                 'success': False,
-                'error': f'El campo {campo} es obligatorio y no puede estar vacío.'
+                'error': f'El campo {campo} es obligatorio.'
+            }), 400
+        if data[campo] is None or len(data[campo].strip()) == 0:
+            return jsonify({
+                'success': False,
+                'error': 'La descripción no puede estar vacía.'
             }), 400
 
-    descripcion = data['descripcion'].strip()
-    
-    # Validar caracteres permitidos
-    if not validar_descripcion(descripcion):
-        return jsonify({
-            'success': False,
-            'error': 'La descripción solo puede contener letras, números y espacios.'
-        }), 400
-
-    descripcion = descripcion.upper()
-
-    if ciudao.existeDescripcion(descripcion):
-        return jsonify({
-            'success': False,
-            'error': 'Ya existe una ciudad con esa descripción.'
-        }), 409
-
     try:
+        descripcion = data['descripcion'].strip().upper()
+
+        # Validar formato de descripción
+        if not ciudao.validarDescripcion(descripcion):
+            return jsonify({
+                'success': False,
+                'error': 'La descripción solo puede contener letras, números y espacios.'
+            }), 400
+
+        # Validar que no exista duplicado
+        if ciudao.existeDescripcion(descripcion):
+            return jsonify({
+                'success': False,
+                'error': 'Ya existe una ciudad con esa descripción.'
+            }), 409
+
         ciudad_id = ciudao.guardarCiudad(descripcion)
         if ciudad_id:
             return jsonify({
                 'success': True,
-                'data': {'id_ciudad': ciudad_id, 'descripcion': descripcion},
+                'data': {
+                    'id_ciudad': ciudad_id,
+                    'descripcion': descripcion
+                },
                 'error': None
             }), 201
         else:
@@ -101,6 +111,9 @@ def addCiudad():
             'error': 'Ocurrió un error interno. Consulte con el administrador.'
         }), 500
 
+# ===============================
+# Actualiza una ciudad
+# ===============================
 @ciuapi.route('/ciudades/<int:ciudad_id>', methods=['PUT'])
 def updateCiudad(ciudad_id):
     data = request.get_json()
@@ -108,36 +121,44 @@ def updateCiudad(ciudad_id):
 
     campos_requeridos = ['descripcion']
 
+    # Validar que el campo exista y no esté vacío
     for campo in campos_requeridos:
-        if campo not in data or data[campo] is None or len(data[campo].strip()) == 0:
+        if campo not in data:
             return jsonify({
                 'success': False,
-                'error': f'El campo {campo} es obligatorio y no puede estar vacío.'
+                'error': f'El campo {campo} es obligatorio.'
+            }), 400
+        if data[campo] is None or len(data[campo].strip()) == 0:
+            return jsonify({
+                'success': False,
+                'error': 'La descripción no puede estar vacía.'
             }), 400
 
-    descripcion = data['descripcion'].strip()
-
-    # Validar caracteres permitidos
-    if not validar_descripcion(descripcion):
-        return jsonify({
-            'success': False,
-            'error': 'La descripción solo puede contener letras, números y espacios.'
-        }), 400
-
-    descripcion = descripcion.upper()
-
-    if ciudao.existeDescripcionExceptoId(descripcion, ciudad_id):
-        return jsonify({
-            'success': False,
-            'error': 'Otra ciudad con esa descripción ya existe.'
-        }), 409
-
     try:
+        descripcion = data['descripcion'].strip().upper()
+
+        # Validar formato de descripción
+        if not ciudao.validarDescripcion(descripcion):
+            return jsonify({
+                'success': False,
+                'error': 'La descripción solo puede contener letras, números y espacios.'
+            }), 400
+
+        # Validar que no exista otra ciudad con la misma descripción
+        if ciudao.existeDescripcionExceptoId(descripcion, ciudad_id):
+            return jsonify({
+                'success': False,
+                'error': 'Otra ciudad con esa descripción ya existe.'
+            }), 409
+
         actualizado = ciudao.updateCiudad(ciudad_id, descripcion)
         if actualizado:
             return jsonify({
                 'success': True,
-                'data': {'id_ciudad': ciudad_id, 'descripcion': descripcion},
+                'data': {
+                    'id_ciudad': ciudad_id,
+                    'descripcion': descripcion
+                },
                 'error': None
             }), 200
         else:
@@ -152,6 +173,9 @@ def updateCiudad(ciudad_id):
             'error': 'Ocurrió un error interno. Consulte con el administrador.'
         }), 500
 
+# ===============================
+# Elimina una ciudad
+# ===============================
 @ciuapi.route('/ciudades/<int:ciudad_id>', methods=['DELETE'])
 def deleteCiudad(ciudad_id):
     ciudao = CiudadDao()
