@@ -6,74 +6,101 @@ Consultorios
 
 {% block contenido %}
 <div class="container mt-4">
-  <h3>Listar Consultorios</h3>
 
-  <!-- tarjeta -->
-  <div class="card">
-    <div class="card-header">
-      <button type="button" class="btn btn-outline-info" id="btnAgregar">Agregar</button>
+  <!-- Card principal -->
+  <div class="card shadow-sm border-0 rounded-lg">
+    <!-- Header: Botón Agregar y Título -->
+    <div class="card-header bg-info text-white d-flex justify-content-between align-items-center">
+      <button type="button" class="btn btn-light btn-sm" id="btnAgregar">
+        <i class="fas fa-plus-circle mr-1"></i> Agregar
+      </button>
+      <h5 class="mb-0 font-weight-bold">
+        <i class="fas fa-clinic-medical mr-2"></i> Consultorios
+      </h5>
     </div>
-    <div class="card-body">
-      <table class="table table-striped w-100" id="tbl">
-        <thead class="table-info">
-          <tr>
-            <th>Nombre Consultorio</th>
-            <th>Dirección</th>
-            <th>Teléfono</th>
-            <th>Correo</th>
-            <th>Acciones</th>
-          </tr>
-        </thead>
-        <tbody></tbody>
-      </table>
+
+    <!-- Body: Tabla de consultorios -->
+    <div class="card-body p-2">
+      <div class="table-responsive shadow-sm rounded">
+        <table class="table table-hover table-bordered align-middle text-center" id="tbl">
+          <thead class="bg-info text-white">
+            <tr>
+              <th>Nombre Consultorio</th>
+              <th>Dirección</th>
+              <th>Teléfono</th>
+              <th>Correo</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
     </div>
   </div>
-  <!-- /tarjeta -->
 
-  <!-- Modal Formulario -->
-  <div class="modal" id="modalFormulario">
-    <div class="modal-dialog modal-dialog-centered modal-lg">
-      <div class="modal-content">
+  <!-- =========================== -->
+  <!-- Modal Formulario Consultorio -->
+  <!-- =========================== -->
+  <div class="modal fade" id="modalFormulario" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+      <div class="modal-content shadow-lg border-0 rounded-lg">
 
-        <div class="modal-header">
-          <h4 class="modal-title" id="modalTitle"></h4>
-          <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <!-- Header -->
+        <div class="modal-header bg-info text-white rounded-top">
+          <h5 class="modal-title font-weight-bold">
+            <i class="fas fa-clinic-medical mr-2"></i> <span id="modalTitle">Nuevo Consultorio</span>
+          </h5>
+          <button type="button" class="close text-white" data-dismiss="modal">&times;</button>
         </div>
 
+        <!-- Body -->
         <div class="modal-body">
           <input type="hidden" id="txtCodigo">
 
           <div class="form-group">
-            <label for="txtNombre">Nombre Consultorio:</label>
+            <label for="txtNombre" class="font-weight-bold">
+              <i class="fas fa-hospital mr-1"></i> Nombre Consultorio:
+            </label>
             <input type="text" class="form-control" id="txtNombre" placeholder="Ingrese nombre del consultorio">
           </div>
 
           <div class="form-group">
-            <label for="txtDireccion">Dirección:</label>
+            <label for="txtDireccion" class="font-weight-bold">
+              <i class="fas fa-map-marker-alt mr-1"></i> Dirección:
+            </label>
             <input type="text" class="form-control" id="txtDireccion" placeholder="Ingrese dirección">
           </div>
 
           <div class="form-group">
-            <label for="txtTelefono">Teléfono:</label>
+            <label for="txtTelefono" class="font-weight-bold">
+              <i class="fas fa-phone mr-1"></i> Teléfono:
+            </label>
             <input type="text" class="form-control" id="txtTelefono" placeholder="Ingrese teléfono">
           </div>
 
           <div class="form-group">
-            <label for="txtCorreo">Correo:</label>
-            <input type="email" class="form-control" id="txtCorreo" placeholder="Ingrese correo">
+            <label for="txtCorreo" class="font-weight-bold">
+              <i class="fas fa-envelope mr-1"></i> Correo:
+            </label>
+            <input type="email" class="form-control" id="txtCorreo" placeholder="Ingrese correo electrónico">
           </div>
         </div>
 
-        <div class="modal-footer">
-          <button type="button" class="btn btn-primary" id="btnGuardar">Guardar</button>
-          <button type="button" class="btn btn-danger" data-dismiss="modal">Cerrar</button>
+        <!-- Footer -->
+        <div class="modal-footer bg-light">
+          <button type="button" class="btn btn-info" id="btnGuardar">
+            <i class="fas fa-save mr-1"></i> Guardar
+          </button>
+          <button type="button" class="btn btn-danger" data-dismiss="modal">
+            <i class="fas fa-times mr-1"></i> Cerrar
+          </button>
         </div>
 
       </div>
     </div>
   </div>
-
 </div>
+
 {% endblock %}
 
 {% block js %}
@@ -92,22 +119,26 @@ Consultorios
           data: function (row) {
             const direccion = encodeURIComponent(row.direccion || "");
             return `<a href="https://www.google.com/maps/search/?api=1&query=${direccion}" 
-                      target="_blank" 
-                      title="Ver en Google Maps">${row.direccion}</a>`;
+                      target="_blank" title="Ver en Google Maps">
+                      <i class="fas fa-map-marker-alt text-danger mr-1"></i>${row.direccion || ''}
+                    </a>`;
           }
         },
         { data: 'telefono' },
         { data: 'correo' },
         {
           data: function (row) {
-            return `<button type="button" name="btn_editar" class="btn btn-info" 
+            return `
+              <div class="text-center">
+                <button type="button" name="btn_editar" class="btn btn-sm btn-info mr-1" 
                         data-codigo="${row.codigo}" title="Editar">
-                      <i class="fas fa-edit"></i>
-                    </button>
-                    <button type="button" name="btn_eliminar" class="btn btn-danger" 
+                  <i class="fas fa-edit"></i>
+                </button>
+                <button type="button" name="btn_eliminar" class="btn btn-sm btn-danger" 
                         data-codigo="${row.codigo}" title="Eliminar">
-                      <i class="fas fa-trash-alt"></i>
-                    </button>`;
+                  <i class="fas fa-trash-alt"></i>
+                </button>
+              </div>`;
           }
         }
       ]
@@ -117,12 +148,8 @@ Consultorios
   const agregar = () => {
     $('#btnAgregar').on('click', function () {
       $('#modalTitle').text("Agregar Consultorio");
-      $('#txtCodigo').val("");
-      $('#txtNombre').val("");
-      $('#txtDireccion').val("");
-      $('#txtTelefono').val("");
-      $('#txtCorreo').val("");
-      $('#modalFormulario').modal();
+      $('#txtCodigo, #txtNombre, #txtDireccion, #txtTelefono, #txtCorreo').val("");
+      $('#modalFormulario').modal('show');
     });
   };
 
@@ -153,47 +180,40 @@ Consultorios
         },
         body: JSON.stringify(datos)
       })
-        .then(resp => resp.json())
-        .then(data => {
-          if (data && data.success) {
-            tabla.ajax.reload();
-            Swal.fire("Éxito", codigo ? "Consultorio actualizado" : "Consultorio agregado", "success");
-          } else {
-            Swal.fire("Error", data.error || "No se pudo guardar", "error");
-          }
-        })
-        .catch(err => {
-          console.error(err);
-          Swal.fire("Error", "Ocurrió un error al guardar.", "error");
-        });
-
-      $('#modalFormulario').modal("hide");
+      .then(r => r.json())
+      .then(d => {
+        if (d.success) {
+          tabla.ajax.reload();
+          Swal.fire("Éxito", codigo ? "Consultorio actualizado" : "Consultorio agregado", "success");
+          $('#modalFormulario').modal('hide');
+        } else {
+          Swal.fire("Error", d.error || "No se pudo guardar", "error");
+        }
+      })
+      .catch(err => {
+        console.error(err);
+        Swal.fire("Error", "Ocurrió un error al guardar.", "error");
+      });
     });
   };
 
   const editar = () => {
     $('#tbl').on('click', 'button[name="btn_editar"]', function () {
       const codigo = $(this).data('codigo');
-      fetch(`/api/v1/consultorios/${codigo}`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-CSRFToken': CSRFToken
-        }
-      })
-        .then(resp => resp.json())
-        .then(data => {
-          if (data.success) {
-            const c = data.data;
+      fetch(`/api/v1/consultorios/${codigo}`)
+        .then(r => r.json())
+        .then(d => {
+          if (d.success) {
+            const c = d.data;
             $('#modalTitle').text("Editar Consultorio");
             $('#txtCodigo').val(c.codigo);
             $('#txtNombre').val(c.nombre_consultorio);
             $('#txtDireccion').val(c.direccion);
             $('#txtTelefono').val(c.telefono);
             $('#txtCorreo').val(c.correo);
-            $('#modalFormulario').modal();
+            $('#modalFormulario').modal('show');
           } else {
-            Swal.fire("Error", data.error, "error");
+            Swal.fire("Error", d.error, "error");
           }
         });
     });
@@ -207,7 +227,7 @@ Consultorios
         showCancelButton: true,
         confirmButtonText: "Sí",
         cancelButtonText: "No"
-      }).then((result) => {
+      }).then(result => {
         if (result.isConfirmed) {
           fetch(`/api/v1/consultorios/${codigo}`, {
             method: 'DELETE',
@@ -216,23 +236,23 @@ Consultorios
               'X-CSRFToken': CSRFToken
             }
           })
-            .then(resp => resp.json())
-            .then(data => {
-              if (data && data.success) {
-                $('#tbl').DataTable().ajax.reload();
-                Swal.fire("Eliminado", "El consultorio ha sido eliminado", "success");
-              } else {
-                Swal.fire("Error", data.error, "error");
-              }
-            });
+          .then(r => r.json())
+          .then(d => {
+            if (d.success) {
+              $('#tbl').DataTable().ajax.reload();
+              Swal.fire("Eliminado", "El consultorio ha sido eliminado", "success");
+            } else {
+              Swal.fire("Error", d.error, "error");
+            }
+          });
         }
       });
     });
   };
 
-// Validación del campo de telefono para que solo acepte números
+  // Validar teléfono: solo números
   $('#txtTelefono').on('input', function() {
-    this.value = this.value.replace(/[^0-9]/g, '');  // Solo permite números
+    this.value = this.value.replace(/[^0-9]/g, '');
   });
 
   $(function () {
