@@ -6,66 +6,82 @@ Cargos
 
 {% block contenido %}
 <div class="container mt-4">
-    <h3>Listar Cargos</h3>
 
-    <!-- tarjeta -->
-    <div class="card">
-      <div class="card-header">
-        <button type="button" class="btn btn-outline-info" id="btnAgregar">Agregar</button>
-      </div>
-      <div class="card-body">
-        <table class="table table-striped w-100" id="tbl">
-              <thead class="table-info">
-          
+  <!-- Card principal -->
+  <div class="card shadow-sm border-0 rounded-lg">
+    <!-- Header: Botón Agregar y Título -->
+    <div class="card-header bg-info text-white d-flex justify-content-between align-items-center">
+      <button type="button" class="btn btn-light btn-sm" id="btnAgregar">
+        <i class="fas fa-plus-circle mr-1"></i> Agregar
+      </button>
+      <h5 class="mb-0 font-weight-bold">
+        <i class="fas fa-briefcase mr-2"></i> Cargos
+      </h5>
+    </div>
+
+    <!-- Body: Tabla de cargos -->
+    <div class="card-body p-2">
+      <div class="table-responsive shadow-sm rounded">
+        <table class="table table-hover table-bordered align-middle text-center" id="tbl">
+          <thead class="bg-info text-white">
             <tr>
-              <th>Cargos</th>
+              <th>Cargo</th>
               <th>Acciones</th>
             </tr>
           </thead>
           <tbody></tbody>
-      </table>
+        </table>
       </div>
     </div>
-    <!-- /tarjeta -->
+  </div>
 
-    <!-- El formulario -->
-    <div class="modal" id="modalFormulario">
-      <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
+  <!-- =========================== -->
+  <!-- Modal Formulario Cargo -->
+  <!-- =========================== -->
+  <div class="modal fade" id="modalFormulario" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+      <div class="modal-content shadow-lg border-0 rounded-lg">
 
-          <!-- Modal Header -->
-          <div class="modal-header">
-            <h4 class="modal-title" id="modalTitle"></h4>
-            <button type="button" class="close" data-dismiss="modal">&times;</button>
-          </div>
-
-          <!-- Modal body -->
-          <div class="modal-body">
-            <div class="form-group">
-              <input type="hidden" id="txtIdCargo">
-              <label for="txtDescripcion">Cargo:</label>
-              <input type="text" class="form-control" placeholder="Ingrese el cargo" id="txtDescripcion">
-            </div>
-          </div>
-
-          <!-- Modal footer -->
-          <div class="modal-footer">
-            <button type="button" class="btn btn-primary" id="btnGuardar">Guardar</button>
-            <button type="button" class="btn btn-danger" data-dismiss="modal">Cerrar</button>
-          </div>
-
+        <!-- Header -->
+        <div class="modal-header bg-info text-white rounded-top">
+          <h5 class="modal-title font-weight-bold">
+            <i class="fas fa-briefcase mr-2"></i> <span id="modalTitle">Nuevo Cargo</span>
+          </h5>
+          <button type="button" class="close text-white" data-dismiss="modal">&times;</button>
         </div>
+
+        <!-- Body -->
+        <div class="modal-body">
+          <input type="hidden" id="txtIdCargo">
+
+          <div class="form-group">
+            <label for="txtDescripcion" class="font-weight-bold">
+              <i class="fas fa-pen mr-1"></i> Cargo:
+            </label>
+            <input type="text" 
+                   class="form-control" 
+                   placeholder="Ingrese el nombre del cargo" 
+                   id="txtDescripcion">
+            <small class="form-text text-muted">
+              <i class="fas fa-info-circle"></i> Solo se permiten letras, números y espacios.
+            </small>
+          </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="modal-footer bg-light">
+          <button type="button" class="btn btn-info" id="btnGuardar">
+            <i class="fas fa-save mr-1"></i> Guardar
+          </button>
+          <button type="button" class="btn btn-danger" data-dismiss="modal">
+            <i class="fas fa-times mr-1"></i> Cerrar
+          </button>
+        </div>
+
       </div>
     </div>
+  </div>
 
-    <div class="row mt-4 d-none" id="rowAlerta">
-        <div class="col col-md-12">
-            <div class="alert alert-success">
-                <strong>Registro Exitoso!</strong>
-                <div class="row" id="mostrarAlerta"></div>
-            </div>
-        </div>
-    </div>
 </div>
 {% endblock %}
 
@@ -82,17 +98,27 @@ Cargos
       columns: [
         { data: 'descripcion' },
         { data: function(row) {
-            return `<button type="button" name="btn_editar" class="btn btn-info" data-id_cargo="${row.id_cargo}" title="Editar"><i class="fas fa-edit"></i></button>
-                    <button type="button" name="btn_eliminar" class="btn btn-danger" data-id_cargo="${row.id_cargo}" title="Eliminar"><i class="fas fa-trash-alt"></i></button>`
+            return `<button type="button" name="btn_editar" class="btn btn-sm btn-info" data-id_cargo="${row.id_cargo}" title="Editar">
+                      <i class="fas fa-edit"></i>
+                    </button>
+                    <button type="button" name="btn_eliminar" class="btn btn-sm btn-danger" data-id_cargo="${row.id_cargo}" title="Eliminar">
+                      <i class="fas fa-trash-alt"></i>
+                    </button>`
           }
         }
       ]
     });
   }
 
+  // Validación de descripción
+  const validarDescripcion = (descripcion) => {
+    const patron = /^[A-Za-zÁÉÍÓÚáéíóúÑñÜü0-9\s]+$/;
+    return patron.test(descripcion);
+  }
+
   const agregar = () => {
     $('#btnAgregar').on('click', function(){
-      $('#modalTitle').text("Agregar Cargo");
+      $('#modalTitle').text("Nuevo Cargo");
       $('#txtIdCargo').val("");
       $('#txtDescripcion').val("");
       $('#modalFormulario').modal();
@@ -102,13 +128,28 @@ Cargos
   const guardar = () => {
     $('#btnGuardar').on('click', function() {
       const idCargo = $('#txtIdCargo').val();
-      const nuevaDescripcion = $('#txtDescripcion').val();
+      const nuevaDescripcion = $('#txtDescripcion').val().trim();
       const tabla = $('#tbl').DataTable();
 
-      if(!nuevaDescripcion.trim()) {
-        Swal.fire("Error", "El campo Cargo no puede estar vacío.", "error");
+      if (!nuevaDescripcion) {
+        Swal.fire({
+          icon: 'warning',
+          title: 'Campo requerido',
+          text: 'La descripción no puede estar vacía.'
+        });
         return;
       }
+
+      if (!validarDescripcion(nuevaDescripcion)) {
+        Swal.fire({
+          icon: 'warning',
+          title: 'Formato inválido',
+          text: 'La descripción solo puede contener letras, números y espacios.'
+        });
+        return;
+      }
+
+      const payload = { descripcion: nuevaDescripcion };
 
       if(idCargo) {
         // update
@@ -117,15 +158,25 @@ Cargos
           headers: {
             'Content-Type': 'application/json',
             'X-CSRFToken': CSRFToken
-          }, body: JSON.stringify({ descripcion: nuevaDescripcion })
+          },
+          body: JSON.stringify(payload)
         })
         .then(resp => resp.json())
         .then(data => {
           if(data && !data.error && data.success) {
             tabla.ajax.reload();
-            Swal.fire("Actualizado", "El cargo ha sido actualizado correctamente.", "success");
+            $('#modalFormulario').modal("hide");
+            Swal.fire({
+              icon: 'success',
+              title: 'Actualizado',
+              text: 'El cargo ha sido actualizado correctamente.'
+            });
           } else {
-            Swal.fire(data.error);
+            Swal.fire({
+              icon: 'error',
+              title: 'Error',
+              text: data.error || 'No se pudo actualizar el cargo.'
+            });
           }
         }).catch(err => {
           console.error(err);
@@ -138,33 +189,44 @@ Cargos
           headers: {
             'Content-Type': 'application/json',
             'X-CSRFToken': CSRFToken
-          }, body: JSON.stringify({ descripcion: nuevaDescripcion })
+          },
+          body: JSON.stringify(payload)
         })
         .then(resp => resp.json())
         .then(data => {
           if(data && !data.error && data.success) {
             tabla.ajax.reload();
-            Swal.fire("Agregado", "El cargo ha sido agregado correctamente.", "success");
+            $('#modalFormulario').modal("hide");
+            Swal.fire({
+              icon: 'success',
+              title: 'Agregado',
+              text: 'El cargo ha sido agregado correctamente.'
+            });
           } else {
-            Swal.fire(data.error);
+            Swal.fire({
+              icon: 'error',
+              title: 'Error',
+              text: data.error || 'No se pudo guardar el cargo.'
+            });
           }
         }).catch(err => {
           console.error(err);
           Swal.fire("Error", "Ocurrió un error al guardar el cargo.", "error");
         });
       }
-      $('#txtDescripcion').val("");
-      $('#modalFormulario').modal("hide");
     });
   }
 
   const editar = () => {
-    $('#tbl').on('click', 'button[name="btn_editar"]',function(){
+    $('#tbl').on('click', 'button[name="btn_editar"]', function() {
       Swal.fire({
         title: "¿Deseas editar este registro?",
+        icon: 'question',
         showCancelButton: true,
-        confirmButtonText: "Si",
-        cancelButtonText: `No`
+        confirmButtonText: "Sí",
+        cancelButtonText: "No",
+        confirmButtonColor: '#17a2b8',
+        cancelButtonColor: '#6c757d'
       }).then((result) => {
         if (result.isConfirmed) {
           $('#modalTitle').text("Editar Cargo");
@@ -174,30 +236,43 @@ Cargos
 
           fetch(`/api/v1/cargos/${idCargo}`, {
             method: 'GET',
-            headers: {
-              'Content-Type': 'application/json',
-              'X-CSRFToken': CSRFToken
-            }
+            headers: { 'Content-Type': 'application/json' }
           })
           .then(resp => resp.json())
           .then(data => {
-            $('#txtIdCargo').val(data.data.id_cargo);
-            $('#txtDescripcion').val(data.data.descripcion);
-            $('#modalFormulario').modal();
+            if(data && data.success && data.data) {
+              $('#txtDescripcion').val(data.data.descripcion);
+              $('#modalFormulario').modal();
+            } else {
+              Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'No se pudo cargar el cargo.'
+              });
+            }
+          })
+          .catch(err => {
+            console.error(err);
+            Swal.fire("Error", "Ocurrió un error al cargar el cargo.", "error");
           });
         }
       });
     });
-  }
+  };
 
   const eliminar = () => {
-    $('#tbl').on('click', 'button[name="btn_eliminar"]',function(){
+    $('#tbl').on('click', 'button[name="btn_eliminar"]', function(){
       const idCargo = $(this).data('id_cargo');
+      const botonEliminar = $(this);
+
       Swal.fire({
         title: "¿Deseas eliminar este registro?",
+        icon: 'warning',
         showCancelButton: true,
-        confirmButtonText: "Si",
-        cancelButtonText: `No`
+        confirmButtonText: "Sí, eliminar",
+        cancelButtonText: "No, cancelar",
+        confirmButtonColor: '#dc3545',
+        cancelButtonColor: '#6c757d'
       }).then((result) => {
         if (result.isConfirmed) {
           fetch(`/api/v1/cargos/${idCargo}`, {
@@ -210,19 +285,27 @@ Cargos
           .then(resp => resp.json())
           .then(data => {
             if(data && !data.error && data.success) {
-              const fila = $(this).closest('tr');
+              const fila = botonEliminar.closest('tr');
               const tabla = $('#tbl').DataTable();
               tabla.row(fila).remove().draw();
-              Swal.fire("Eliminado", "", data.success);
+              Swal.fire({
+                icon: 'success',
+                title: 'Eliminado',
+                text: 'El cargo ha sido eliminado correctamente.'
+              });
             } else {
-              Swal.fire(data.error);
+              Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: data.error || 'No se pudo eliminar el cargo.'
+              });
             }
           }).catch(err => {
+            console.error(err);
             Swal.fire("Error", "Ocurrió un error al eliminar el cargo.", "error");
           });
         }
       });
-
     });
   }
 
