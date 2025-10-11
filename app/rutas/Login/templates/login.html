@@ -1,115 +1,319 @@
 <!DOCTYPE html>
-<html lang="en">
-
+<html lang="es">
 <head>
-
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="description" content="">
     <meta name="author" content="">
     <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
-
-    <title>Login</title>
-
-    <!-- Custom fonts for this template-->
+    <title>Login - Consultorio Odontológico</title>
+    
+    <!-- Custom fonts -->
     <link href="{{ url_for('static', filename='vendor/fontawesome-free/css/all.min.css') }}" rel="stylesheet" type="text/css">
-    <link
-        href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
-        rel="stylesheet">
-
-    <!-- Custom styles for this template-->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Custom styles -->
     <link href="{{ url_for('static', filename='css/sb-admin-2.min.css') }}" rel="stylesheet">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #1e8a7e 0%, #24a298 50%, #2ec4b6 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px);
+            background-size: 50px 50px;
+        }
+
+        .login-container {
+            position: relative;
+            z-index: 1;
+            max-width: 950px;
+            width: 100%;
+        }
+
+        .login-card {
+            background: rgba(255, 255, 255, 0.98);
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            display: flex;
+            flex-direction: row;
+            backdrop-filter: blur(10px);
+        }
+
+        .image-section {
+            flex: 0 0 40%;
+            background-image: url('/static/img/odont.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            min-height: 550px;
+            position: relative;
+        }
+
+
+
+        .form-section {
+            flex: 1;
+            padding: 60px 50px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .logo-section {
+            text-align: center;
+            margin-bottom: 35px;
+        }
+
+        .logo-icon {
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(135deg, #24a298, #2ec4b6);
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 15px;
+            box-shadow: 0 8px 20px rgba(36, 162, 152, 0.3);
+        }
+
+        .logo-icon i {
+            font-size: 32px;
+            color: white;
+        }
+
+        .login-title {
+            font-size: 26px;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+
+        .login-subtitle {
+            font-size: 15px;
+            color: #24a298;
+            font-weight: 500;
+            font-style: italic;
+        }
+
+        .alert {
+            border-radius: 12px;
+            border: none;
+            padding: 12px 18px;
+            margin-bottom: 25px;
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+            position: relative;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: #5a6c7d;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 18px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #24a298;
+            font-size: 18px;
+            z-index: 1;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 14px 20px 14px 50px;
+            border: 2px solid #e1e8ed;
+            border-radius: 12px;
+            font-size: 15px;
+            transition: all 0.3s ease;
+            background: #f8f9fa;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #24a298;
+            background: white;
+            box-shadow: 0 0 0 4px rgba(36, 162, 152, 0.1);
+        }
+
+        .form-control::placeholder {
+            color: #adb5bd;
+        }
+
+        .btn-login {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #24a298, #2ec4b6);
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 8px 20px rgba(36, 162, 152, 0.3);
+            margin-top: 10px;
+        }
+
+        .btn-login:hover {
+            box-shadow: 0 12px 28px rgba(36, 162, 152, 0.4);
+        }
+
+        .divider {
+            margin: 30px 0;
+            border: none;
+            border-top: 1px solid #e1e8ed;
+        }
+
+        .footer-text {
+            text-align: center;
+            font-size: 12px;
+            color: #6c757d;
+            margin-top: 20px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .login-card {
+                flex-direction: column;
+            }
+
+            .image-section {
+                min-height: 200px;
+                flex: 0 0 200px;
+            }
+
+            .form-section {
+                padding: 40px 30px;
+            }
+
+            .login-title {
+                font-size: 22px;
+            }
+        }
+    </style>
 </head>
 
-<body style="background-color: #24a298; display: flex; align-items: center; justify-content: center; height: 100vh;">
+<body>
+    <div class="login-container">
+        <div class="login-card">
+            <!-- Image Section -->
+            <div class="image-section"></div>
+            
+            <!-- Form Section -->
+            <div class="form-section">
+                <div class="logo-section">
+                    <div class="logo-icon">
+                        <i class="fas fa-tooth"></i>
+                    </div>
+                    <h1 class="login-title">Consultorio Odontológico</h1>
+                    <p class="login-subtitle">"Dra. Diana Barreto"</p>
+                </div>
 
-    <div class="container">
-        <!-- Outer Row -->
-        <div class="row justify-content-center">
-            <div class="col-xl-7 col-lg-8 col-md-10">
-                <div class="card o-hidden border-0 shadow-lg">
-                    <div class="card-body p-0">
-                        <!-- Nested Row within Card Body -->
-                        <div class="row">
-                            <!-- Image Section -->
-                            <div class="col-lg-5 d-none d-lg-block" style="
-                                background-image: url('/static/img/odont.jpg'); 
-                                background-size: cover; 
-                                background-repeat: no-repeat; 
-                                background-position: center; 
-                                min-height: 300px;">
-                            </div>
-    
-                            <!-- Formulario de login -->
-                            <div class="col-lg-7">
-                                <div class="p-5">
-                                    <div class="text-center">
-                                        <h1 class="h4 text-gray-900 font-weight-bold mb-2">Bienvenido al Consultorio Odontológico</h1>
-                                        <h2 class="h5 text-primary font-italic mb-4">"Dra. Diana Barreto"</h2>
-                                    </div>
+                <!-- Error Messages -->
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        <div class="alert">
+                            {% for category, message in messages %}
+                                <strong>{{ category.capitalize() }}:</strong> {{ message }}<br>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                {% endwith %}
 
-                                    <!-- ⚠️ Aquí se muestra el mensaje de error -->
-                                    {% with messages = get_flashed_messages(with_categories=true) %}
-                                            {% if messages %}
-                                                <div class="alert alert-warning">
-                                                    {% for category, message in messages %}
-                                                        <strong>{{ category.capitalize() }}:</strong> {{ message }} <br>
-                                                    {% endfor %}
-                                                </div>
-                                            {% endif %}
-                                        {% endwith %}
+                <!-- Login Form -->
+                <form method="post" action="{{ url_for('login.login') }}">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                    
+                    <!-- Username Field -->
+                    <div class="form-group">
+                        <label class="form-label">Usuario</label>
+                        <div class="input-wrapper">
+                            <i class="fas fa-user input-icon"></i>
+                            <input type="text" 
+                                   class="form-control" 
+                                   name="usuario_nombre" 
+                                   placeholder="Ingrese su nombre de usuario" 
+                                   required>
+                        </div>
+                    </div>
+                    
+                    <!-- Password Field -->
+                    <div class="form-group">
+                        <label class="form-label">Contraseña</label>
+                        <div class="input-wrapper">
+                            <i class="fas fa-lock input-icon"></i>
+                            <input type="password" 
+                                   class="form-control" 
+                                   name="usuario_clave" 
+                                   placeholder="Ingrese su contraseña" 
+                                   required>
+                        </div>
+                    </div>
 
-                                    <form class="user" method="post" action="{{ url_for('login.login') }}">
-                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-                                        
-                                        <!-- Campo de usuario -->
-                                        <div class="form-group">
-                                            <input type="text" 
-                                                   class="form-control form-control-user rounded-pill" 
-                                                   name="usuario_nombre" 
-                                                   placeholder="Nombre de usuario" 
-                                                   required>
-                                        </div>
-                                        
-                                        <!-- Campo de contraseña -->
-                                        <div class="form-group">
-                                            <input type="password" 
-                                                   class="form-control form-control-user rounded-pill" 
-                                                   name="usuario_clave" 
-                                                   placeholder="Contraseña" 
-                                                   required>
-                                        </div>
-        
-                                        <!-- Botón de inicio de sesión -->
-                                        <button type="submit" class="btn btn-info btn-user btn-block rounded-pill"> Iniciar Sesión</button>
-                                        <hr>
-                                    </form>
-    
-                                    <!-- Footer -->
-                                    <div class="text-center">
-                                        <p class="small text-muted">© 2025 Consultorio Odontológico Dra. Diana Barreto. Todos los derechos reservados.</p>
-                                    </div>
-                                </div>
-                            </div> 
-                        </div> 
-                    </div> 
-                </div> 
-            </div> 
-        </div> 
-    </div> 
+                    <!-- Login Button -->
+                    <button type="submit" class="btn-login">
+                        <i class="fas fa-sign-in-alt" style="margin-right: 8px;"></i>
+                        Iniciar Sesión
+                    </button>
+                </form>
+
+                <hr class="divider">
+
+                <!-- Footer -->
+                <div class="footer-text">
+                    <i class="fas fa-shield-alt" style="color: #24a298; margin-right: 5px;"></i>
+                    © 2025 Consultorio Odontológico Dra. Diana Barreto<br>
+                    Todos los derechos reservados
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- Bootstrap core JavaScript-->
     <script src="{{ url_for('static', filename='vendor/jquery/jquery.min.js') }}"></script>
     <script src="{{ url_for('static', filename='vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
-
-    <!-- Core plugin JavaScript-->
     <script src="{{ url_for('static', filename='vendor/jquery-easing/jquery.easing.min.js') }}"></script>
-
-    <!-- Custom scripts for all pages-->
     <script src="{{ url_for('static', filename='js/sb-admin-2.min.js') }}"></script>
-
 </body>
-
 </html>
