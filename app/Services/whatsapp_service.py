@@ -164,13 +164,17 @@ class WhatsAppService:
                     except:
                         print("   No se pudo enviar el mensaje")
             
+            # ✅ AGREGAR ESTE CÓDIGO: Mantener la ventana abierta
+            if boton_encontrado:
+                print("   ✅ Mensaje enviado. La ventana permanecerá abierta.")
+                # NO cerrar el driver aquí - se mantendrá abierto
+            
             time.sleep(2)
             return boton_encontrado
             
         except Exception as e:
             print(f"   Error al enviar a {numero}: {str(e)}")
             return False
-    
     def cerrar(self):
         """Cierra el navegador"""
         if self.driver:
@@ -194,30 +198,44 @@ class AvisoRecordatorioService:
         Returns:
             str: Mensaje formateado para WhatsApp
         """
-        if aviso.get('mensaje') and aviso['mensaje'].strip():
-            return aviso['mensaje']
+        # ✅ Verificar si el mensaje existe Y no está vacío
+        mensaje_personalizado = aviso.get('mensaje', '')
+        if mensaje_personalizado and mensaje_personalizado.strip():
+            return mensaje_personalizado
         
-        paciente = aviso.get('paciente', 'Estimado paciente')
+        # Si no hay mensaje o está vacío, generar automático
+        paciente = aviso.get('paciente', 'Estimado/a paciente')
+        personal = aviso.get('personal', 'Nuestro equipo')
         fecha = aviso.get('fecha_cita', 'N/A')
         hora = aviso.get('hora_cita', 'N/A')
-        personal = aviso.get('personal', 'Nuestro equipo medico')
-        consultorio = aviso.get('nombre_consultorio', 'la clinica')
+        medico = aviso.get('medico')  # ✅ Puede ser None
+        consultorio = aviso.get('nombre_consultorio', 'nuestras instalaciones')
         
-        mensaje = f"""Hola {paciente}!
-
-Este es un recordatorio de tu cita medica:
-
-Fecha: {fecha}
-Hora: {hora}
-Profesional: {personal}
-Consultorio: {consultorio}
-
-Por favor, confirma tu asistencia respondiendo este mensaje.
-
-Si necesitas reagendar, contactanos con anticipacion.
-
-Gracias!"""
+        # ✅ Construir la línea del médico solo si existe
+        if medico:
+            linea_medico = f"👨‍⚕️ *Médico:* {medico}"
+        else:
+            linea_medico = "👨‍⚕️ *Médico:* Por asignar"
         
+        mensaje = f"""Buenos días/tardes, {paciente}
+
+        Le saluda {personal} del {consultorio}.
+
+        Le recordamos que tiene una cita médica programada con los siguientes detalles:
+
+        📅 *Fecha:* {fecha}
+        🕐 *Hora:* {hora}
+        {linea_medico}
+        🏥 *Consultorio:* {consultorio}
+
+        Por favor, le solicitamos confirmar su asistencia respondiendo a este mensaje.
+
+        En caso de necesitar reprogramar su cita, le pedimos que nos avise con la mayor anticipación posible.
+
+        Quedamos atentos a su confirmación.
+
+        Gracias.
+        """ 
         return mensaje
     
     def obtener_telefono_paciente(self, id_paciente):
@@ -280,54 +298,84 @@ Gracias!"""
                 id_aviso = aviso['id_aviso']
                 paciente = aviso.get('paciente', 'Paciente')
                 
+                print(f"{'='*60}")
                 print(f"Procesando aviso #{id_aviso} - {paciente}")
+                print(f"{'='*60}")
                 
                 aviso_completo = self.dao.getAvisoById(id_aviso)
                 if not aviso_completo:
-                    print(f"   No se encontro el aviso\n")
+                    print(f"   ❌ No se encontró el aviso\n")
                     continue
                 
                 id_paciente = aviso_completo.get('id_paciente')
                 telefono = self.obtener_telefono_paciente(id_paciente)
                 
                 if not telefono:
-                    print(f"   Paciente sin telefono registrado\n")
+                    print(f"   ❌ Paciente sin teléfono registrado\n")
                     self._marcar_error(id_aviso)
                     fallidos += 1
                     continue
                 
-                mensaje = self.formatear_mensaje(aviso)
+                # ✅ PASO 1: Generar el mensaje automático
+                print(f"   📝 Generando mensaje automático...")
+                mensaje_generado = self.formatear_mensaje(aviso_completo)
                 
-                print(f"   Enviando a: {telefono}")
-                if self.whatsapp.enviar_mensaje(telefono, mensaje):
-                    self._marcar_enviado(id_aviso)
-                    exitosos += 1
-                    print(f"   Enviado correctamente\n")
+                print(f"   ✅ Mensaje generado ({len(mensaje_generado)} caracteres)")
+                print(f"   Primeros 150 caracteres:")
+                print(f"   {mensaje_generado[:150]}...")
+                print()
+                
+                # ✅ PASO 2: Enviar por WhatsApp
+                print(f"   📤 Enviando a: {telefono}")
+                
+                if self.whatsapp.enviar_mensaje(telefono, mensaje_generado):
+                    print(f"   ✅ Mensaje enviado por WhatsApp exitosamente")
+                    
+                    # ✅ PASO 3: GUARDAR EL MENSAJE GENERADO EN LA BD
+                    print(f"   💾 Guardando mensaje en la base de datos...")
+                    
+                    # Preparar datos para actualizar
+                    datos_para_actualizar = {
+                        'id_paciente': aviso_completo['id_paciente'],
+                        'id_personal': aviso_completo['id_personal'],
+                        'id_medico': aviso_completo.get('id_medico'),
+                        'codigo': aviso_completo.get('codigo'),
+                        'fecha_cita': aviso_completo['fecha_cita'],
+                        'hora_cita': aviso_completo['hora_cita'],
+                        'forma_envio': aviso_completo['forma_envio'],
+                        'mensaje': mensaje_generado,  # ✅ EL MENSAJE GENERADO
+                        'estado_envio': 'Enviado',     # ✅ MARCAR COMO ENVIADO
+                        'estado_confirmacion': aviso_completo.get('estado_confirmacion', 'Pendiente')
+                    }
+                    
+                    # Actualizar en la BD
+                    resultado = self.dao.updateAviso(id_aviso, datos_para_actualizar)
+                    
+                    if resultado:
+                        print(f"   ✅ Mensaje guardado en BD correctamente")
+                        exitosos += 1
+                    else:
+                        print(f"   ⚠️ Mensaje enviado pero hubo error al guardar en BD")
+                        exitosos += 1  # Igual cuenta como exitoso porque se envió
+                    
                 else:
+                    print(f"   ❌ Error al enviar mensaje por WhatsApp")
                     self._marcar_error(id_aviso)
                     fallidos += 1
-                    print(f"   Error en envio\n")
                 
-                time.sleep(3)
+                print()
+                time.sleep(3)  # Esperar entre mensajes
             
             print(f"\n{'='*60}")
-            print(f"Resumen:")
-            print(f"   Exitosos: {exitosos}")
-            print(f"   Fallidos: {fallidos}")
+            print(f"RESUMEN FINAL:")
+            print(f"   ✅ Exitosos: {exitosos}")
+            print(f"   ❌ Fallidos: {fallidos}")
             print(f"{'='*60}\n")
             
         except Exception as e:
-            print(f"Error general al procesar avisos: {str(e)}")
-    
-    def _marcar_enviado(self, id_aviso):
-        """Marca un aviso como enviado"""
-        try:
-            aviso = self.dao.getAvisoById(id_aviso)
-            if aviso:
-                aviso['estado_envio'] = 'Enviado'
-                self.dao.updateAviso(id_aviso, aviso)
-        except Exception as e:
-            print(f"Error al marcar como enviado: {e}")
+            print(f"❌ Error general al procesar avisos: {str(e)}")
+            import traceback
+            traceback.print_exc()
     
     def _marcar_error(self, id_aviso):
         """Marca un aviso como error"""

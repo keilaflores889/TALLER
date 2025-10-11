@@ -389,9 +389,25 @@ const initDatatableAvisos = () => {
       },
       { 
         data: 'mensaje',
-        render: function(data) {
-          if (!data || data.length < 50) return data;
-          return data.substring(0, 50) + '...';
+        render: function(data, type, row) {
+          if (!data || data.trim() === '') {
+            // Si está vacío, mostrar que es automático
+            return `<span class="badge badge-info">Automático</span>
+                    <button type="button" class="btn btn-sm btn-link p-0 ml-1" 
+                            onclick="verMensajeAutomatico(${row.id_aviso})" 
+                            title="Ver mensaje">
+                      <i class="fas fa-eye"></i>
+                    </button>`;
+          } else {
+            // Si tiene mensaje personalizado
+            const mensajeCorto = data.length > 30 ? data.substring(0, 30) + '...' : data;
+            return `<span title="${data}">${mensajeCorto}</span>
+                    <button type="button" class="btn btn-sm btn-link p-0 ml-1" 
+                            onclick="verMensajeCompleto('${data.replace(/'/g, "\\'")}', 'Personalizado')" 
+                            title="Ver completo">
+                      <i class="fas fa-eye"></i>
+                    </button>`;
+          }
         }
       },
       { 
@@ -425,18 +441,55 @@ const initDatatableAvisos = () => {
             <button type="button" name="btn_eliminar" class="btn btn-danger btn-sm" data-id_aviso="${row.id_aviso}" title="Eliminar">
               <i class="fas fa-trash-alt"></i>
             </button>`;
-          if (row.forma_envio === 'WhatsApp' && row.estado_envio === 'Pendiente') {
+          
+          if (row.forma_envio === 'WhatsApp' && 
+              row.estado_envio === 'Pendiente' && 
+              row.estado_confirmacion === 'Pendiente') {
             buttons += `
             <button type="button" name="btn_enviar_individual" class="btn btn-success btn-sm" data-id_aviso="${row.id_aviso}" title="Enviar ahora">
               <i class="fab fa-whatsapp"></i>
             </button>`;
           }
+          
           return buttons;
         }
       }
     ]
   });
 };
+
+// Función para ver mensaje automático
+function verMensajeAutomatico(idAviso) {
+  fetch(`/api/v1/avisos/${idAviso}/mensaje-preview`)
+    .then(response => response.json())
+    .then(result => {
+      if (result.success) {
+        Swal.fire({
+          title: 'Mensaje Automático',
+          html: `<pre style="text-align: left; white-space: pre-wrap;">${result.mensaje}</pre>`,
+          icon: 'info',
+          width: '600px',
+          confirmButtonColor: '#17a2b8'
+        });
+      } else {
+        Swal.fire('Error', result.error, 'error');
+      }
+    })
+    .catch(error => {
+      Swal.fire('Error', 'No se pudo cargar el mensaje: ' + error, 'error');
+    });
+}
+
+// Función para ver mensaje personalizado completo
+function verMensajeCompleto(mensaje, tipo) {
+  Swal.fire({
+    title: `Mensaje ${tipo}`,
+    html: `<pre style="text-align: left; white-space: pre-wrap;">${mensaje}</pre>`,
+    icon: 'info',
+    width: '600px',
+    confirmButtonColor: '#17a2b8'
+  });
+}
 
 $('#btnEnviarWhatsApp').on('click', function() {
   Swal.fire({
@@ -481,48 +534,51 @@ $('#btnEnviarWhatsApp').on('click', function() {
   });
 });
 
-$('#tblAvisos').on('click', 'button[name="btn_enviar_individual"]', function() {
-  const id = $(this).data('id_aviso');
-  Swal.fire({
-    title: '¿Enviar este aviso?',
-    text: 'Se abrirá WhatsApp Web en una nueva ventana',
-    icon: 'question',
-    showCancelButton: true,
-    confirmButtonText: 'Sí, enviar',
-    cancelButtonText: 'Cancelar',
-    confirmButtonColor: '#25D366'
-  }).then((result) => {
-    if(result.isConfirmed) {
-      fetch(`/api/v1/avisos/${id}/enviar-whatsapp`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-CSRFToken': CSRFToken
-        }
-      })
-      .then(response => response.json())
-      .then(data => {
-        if (data.success) {
-          Swal.fire({
-            icon: 'info',
-            title: 'Proceso iniciado',
-            html: `Se abrió WhatsApp Web.<br><br><strong>Pasos:</strong><br>1. Escanea el código QR<br>2. Espera a que envíe el mensaje<br>3. Recarga la página para ver el estado actualizado`,
-            confirmButtonColor: '#25D366',
-            confirmButtonText: 'Entendido'
-          }).then(() => {
-            setTimeout(() => {
-              $('#tblAvisos').DataTable().ajax.reload();
-            }, 20000);
-          });
-        } else {
-          Swal.fire('Error', data.error, 'error');
-        }
-      })
-      .catch(error => {
-        Swal.fire('Error', 'Error de conexión: ' + error, 'error');
-      });
+$('#tblAvisos').on('click', 'button[name="btn_editar"]', async function() {
+  const idAviso = $(this).data('id_aviso');
+  try {
+    const response = await fetch(`/api/v1/avisos/${idAviso}`);
+    const result = await response.json();
+    if (result.success) {
+      const aviso = result.data;
+      $('#id_aviso_modal').val(aviso.id_aviso);
+      
+      // ✅ CAMBIAR: usar paciente_nombre en lugar de paciente
+      if (aviso.paciente_nombre) {
+        $('#txtpaciente').val(aviso.paciente_nombre);
+        $('#id_paciente').val(aviso.id_paciente);
+      }
+      
+      // ✅ CAMBIAR: usar personal_nombre en lugar de personal
+      if (aviso.personal_nombre) {
+        $('#txtPersonal').val(aviso.personal_nombre);
+        $('#id_personal_modal').val(aviso.id_personal);
+      }
+      
+      // ✅ CAMBIAR: usar medico_nombre en lugar de medico
+      if (aviso.medico_nombre) {
+        $('#txtMedico').val(aviso.medico_nombre);
+        $('#id_medico').val(aviso.id_medico);
+      }
+      
+      if (aviso.nombre_consultorio) {
+        $('#txtConsultorio').val(aviso.nombre_consultorio);
+        $('#codigo').val(aviso.codigo);
+      }
+      
+      $('#fecha_cita_modal').val(formatDateForInput(aviso.fecha_cita));
+      $('#hora_cita_modal').val(aviso.hora_cita);
+      $('#forma_envio_modal').val(aviso.forma_envio);
+      $('#mensaje_modal').val(aviso.mensaje || '');
+      $('#estado_confirmacion_modal').val(aviso.estado_confirmacion || 'Pendiente');
+      $('#modalTitle').text('Editar Aviso');
+      $('#modalAviso').modal('show');
+    } else {
+      Swal.fire('Error', result.error || 'Error al cargar el aviso', 'error');
     }
-  });
+  } catch (error) {
+    Swal.fire('Error', 'Error de conexión: ' + error, 'error');
+  }
 });
 
 $('#btnEstadisticas').on('click', function() {
@@ -637,6 +693,11 @@ const agregarAviso = () => {
 $('#formAvisoModal').on('submit', async function(e) {
   e.preventDefault();
   const idAviso = $('#id_aviso_modal').val();
+  
+  // ✅ Obtener el mensaje y limpiarlo
+  const mensajeTexto = $('#mensaje_modal').val();
+  const mensajeLimpio = mensajeTexto ? mensajeTexto.trim() : '';
+  
   const data = {
     id_paciente: $('#id_paciente').val(),
     id_personal: $('#id_personal_modal').val(),
@@ -645,10 +706,16 @@ $('#formAvisoModal').on('submit', async function(e) {
     fecha_cita: $('#fecha_cita_modal').val(),
     hora_cita: $('#hora_cita_modal').val(),
     forma_envio: $('#forma_envio_modal').val(),
-    mensaje: $('#mensaje_modal').val(),
-    estado_envio: 'Pendiente',
+    mensaje: mensajeLimpio,  // ✅ Envía "" si está vacío (no null)
     estado_confirmacion: $('#estado_confirmacion_modal').val()
   };
+
+  // SOLO agregar estado_envio si es un NUEVO aviso
+  if (!idAviso) {
+    data.estado_envio = 'Pendiente';
+  }
+
+  // Validaciones
   if (!data.id_paciente) {
     Swal.fire('Error', 'Debe seleccionar un paciente', 'error');
     return;
@@ -669,6 +736,7 @@ $('#formAvisoModal').on('submit', async function(e) {
     Swal.fire('Error', 'Debe seleccionar una forma de envío', 'error');
     return;
   }
+  
   try {
     const url = idAviso ? `/api/v1/avisos/${idAviso}` : '/api/v1/avisos';
     const method = idAviso ? 'PUT' : 'POST';
@@ -698,80 +766,63 @@ $('#formAvisoModal').on('submit', async function(e) {
   }
 });
 
-$('#tblAvisos').on('click', 'button[name="btn_editar"]', async function() {
-  const idAviso = $(this).data('id_aviso');
-  try {
-    const response = await fetch(`/api/v1/avisos/${idAviso}`);
-    const result = await response.json();
-    if (result.success) {
-      const aviso = result.data;
-      $('#id_aviso_modal').val(aviso.id_aviso);
-      if (aviso.paciente) {
-        $('#txtpaciente').val(aviso.paciente);
-        $('#id_paciente').val(aviso.id_paciente);
-      }
-      if (aviso.personal) {
-        $('#txtPersonal').val(aviso.personal);
-        $('#id_personal_modal').val(aviso.id_personal);
-      }
-      if (aviso.medico) {
-        $('#txtMedico').val(aviso.medico);
-        $('#id_medico').val(aviso.id_medico);
-      }
-      if (aviso.nombre_consultorio) {
-        $('#txtConsultorio').val(aviso.nombre_consultorio);
-        $('#codigo').val(aviso.codigo);
-      }
-      $('#fecha_cita_modal').val(formatDateForInput(aviso.fecha_cita));
-      $('#hora_cita_modal').val(aviso.hora_cita);
-      $('#forma_envio_modal').val(aviso.forma_envio);
-      $('#mensaje_modal').val(aviso.mensaje || '');
-      $('#estado_confirmacion_modal').val(aviso.estado_confirmacion || 'Pendiente');
-      $('#modalTitle').text('Editar Aviso');
-      $('#modalAviso').modal('show');
-    } else {
-      Swal.fire('Error', result.error || 'Error al cargar el aviso', 'error');
-    }
-  } catch (error) {
-    Swal.fire('Error', 'Error de conexión: ' + error, 'error');
-  }
-});
-
-$('#tblAvisos').on('click', 'button[name="btn_eliminar"]', function() {
-  const idAviso = $(this).data('id_aviso');
+// --- Enviar aviso individual ---
+$('#tblAvisos').on('click', 'button[name="btn_enviar_individual"]', function() {
+  const id = $(this).data('id_aviso');
+  
+  console.log('Click en botón WhatsApp, ID:', id);  // ✅ Para debug
+  
   Swal.fire({
-    title: '¿Está seguro?',
-    text: 'Esta acción no se puede deshacer',
-    icon: 'warning',
+    title: '¿Enviar este aviso?',
+    text: 'Se abrirá WhatsApp Web en una nueva ventana',
+    icon: 'question',
     showCancelButton: true,
-    confirmButtonColor: '#d33',
-    cancelButtonColor: '#3085d6',
-    confirmButtonText: 'Sí, eliminar',
-    cancelButtonText: 'Cancelar'
+    confirmButtonText: 'Sí, enviar',
+    cancelButtonText: 'Cancelar',
+    confirmButtonColor: '#25D366'
   }).then((result) => {
-    if (result.isConfirmed) {
-      fetch(`/api/v1/avisos/${idAviso}`, {
-        method: 'DELETE',
+    if(result.isConfirmed) {
+      console.log('Enviando aviso:', id);  // ✅ Para debug
+      
+      fetch(`/api/v1/avisos/${id}/enviar-whatsapp`, {
+        method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'X-CSRFToken': CSRFToken
         }
       })
-      .then(response => response.json())
+      .then(response => {
+        console.log('Respuesta del servidor:', response);  // ✅ Para debug
+        return response.json();
+      })
       .then(data => {
+        console.log('Datos recibidos:', data);  // ✅ Para debug
+        
         if (data.success) {
           Swal.fire({
-            icon: 'success',
-            title: 'Eliminado',
-            text: 'El aviso ha sido eliminado',
-            confirmButtonColor: '#17a2b8'
+            icon: 'info',
+            title: 'Proceso iniciado',
+            html: `
+              Se abrió WhatsApp Web.<br><br>
+              <strong>Pasos:</strong><br>
+              1. Escanea el código QR si es necesario<br>
+              2. Espera a que envíe el mensaje<br>
+              3. Recarga la página para ver el estado actualizado
+            `,
+            confirmButtonColor: '#25D366',
+            confirmButtonText: 'Entendido'
+          }).then(() => {
+            // Recargar después de 20 segundos para ver el estado
+            setTimeout(() => {
+              $('#tblAvisos').DataTable().ajax.reload();
+            }, 20000);
           });
-          $('#tblAvisos').DataTable().ajax.reload();
         } else {
-          Swal.fire('Error', data.error || 'Error al eliminar el aviso', 'error');
+          Swal.fire('Error', data.error, 'error');
         }
       })
       .catch(error => {
+        console.error('Error en fetch:', error);  // ✅ Para debug
         Swal.fire('Error', 'Error de conexión: ' + error, 'error');
       });
     }

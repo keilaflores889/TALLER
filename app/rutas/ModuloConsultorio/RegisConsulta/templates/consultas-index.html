@@ -1205,7 +1205,7 @@ $('#tblDetalles').on('click', 'button[name="btn_editar_detalle"]', function() {
   $('#txtTipoDiagnostico').val(btn.data('descripcion_tipo_diagnostico') || '');
   
   // ✅ AGREGAR: Cargar tipo de procedimiento
-  $('#id_tipo_procedimiento_medico').val(btn.data('id_tipo_procedimiento') || '');
+  $('#id_tipo_procedimiento').val(btn.data('id_tipo_procedimiento') || '');
   $('#txtTipoProcedimiento').val(btn.data('descripcion_tipo_procedimiento') || '');
   
   $('#btnAgregarDetalle').html('<i class="fas fa-save"></i> Actualizar Detalle');
@@ -1230,6 +1230,7 @@ $('#btnAgregarDetalle').on('click', () => {
     procedimiento: $('#procedimiento').val() || null,
     id_tipo_diagnostico: (idTipoDiagnostico && idTipoDiagnostico !== '') ? parseInt(idTipoDiagnostico) : null,
     id_tipo_procedimiento: (idTipoProcedimiento && idTipoProcedimiento !== '') ? parseInt(idTipoProcedimiento) : null
+    
   };
 
   let valido = true;
