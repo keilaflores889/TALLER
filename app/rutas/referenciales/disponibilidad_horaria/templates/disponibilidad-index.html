@@ -5,98 +5,166 @@ Disponibilidad Horaria
 {% endblock %}
 
 {% block contenido %}
-<div class="container mt-4">
-  <h3>Listar Disponibilidad Horaria</h3>
+<div class="container-fluid mt-4">
 
-  <!-- Tarjeta -->
-  <div class="card">
-    <div class="card-header">
-      <button type="button" class="btn btn-outline-info" id="btnAgregar">Agregar</button>
+  <!-- Card principal -->
+  <div class="card shadow-sm border-0 rounded-lg">
+    <!-- Header: Botón Agregar y Título -->
+    <div class="card-header bg-info text-white d-flex justify-content-between align-items-center">
+      <button type="button" class="btn btn-light btn-sm" id="btnAgregar">
+        <i class="fas fa-plus-circle mr-1"></i> Agregar
+      </button>
+      <h5 class="mb-0 font-weight-bold">
+        <i class="fas fa-clock mr-2"></i> Disponibilidad Horaria
+      </h5>
     </div>
-    <div class="card-body">
-      <table class="table table-striped" id="tbl">
-        <thead>
-          <tr>
-            <th>Médico</th>
-            <th>Fecha</th>
-            <th>Hora Inicio</th>
-            <th>Hora Fin</th>
-            <th>Cupos</th>
-            <th>Acciones</th>
-          </tr>
-        </thead>
-        <tbody></tbody>
-      </table>
-    </div>
-  </div>
-  <!-- /Tarjeta -->
 
-  <!-- Modal Formulario -->
-  <div class="modal" id="modalFormulario">
-    <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h4 class="modal-title" id="modalTitle">Nueva Disponibilidad</h4>
-          <button type="button" class="close" data-dismiss="modal">&times;</button>
-        </div>
-        <div class="modal-body">
-          <input type="hidden" id="txtIdDisponibilidad">
-          
-          <!-- Selección Médico -->
-          <div class="form-group">
-            <input type="hidden" id="id_medico">
-            <label for="medico">Médico:</label>
-            <input type="text" id="txtmedico" class="form-control" placeholder="Click para seleccionar Médico" readonly>
-          </div>
-
-          <!-- Fecha -->
-          <div class="form-group">
-            <label for="fecha">Fecha:</label>
-            <input type="date" id="txtFecha" name="disponibilidad_fecha" class="form-control">
-          </div>
-
-          <!-- Hora Inicio -->
-          <div class="form-group">
-            <label for="hora_inicio">Hora Inicio:</label>
-            <input type="time" id="txtHoraInicio" class="form-control">
-          </div>
-
-          <!-- Hora Fin -->
-          <div class="form-group">
-            <label for="hora_fin">Hora Fin:</label>
-            <input type="time" id="txtHoraFin" class="form-control">
-          </div>
-
-          <!-- Cupos -->
-          <div class="form-group">
-            <label for="cupos">Cupos:</label>
-            <input type="number" id="txtCupos" class="form-control" min="1">
-          </div>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-primary" id="btnGuardar">Guardar</button>
-          <button type="button" class="btn btn-danger" data-dismiss="modal">Cerrar</button>
-        </div>
+    <!-- Body: Tabla de disponibilidad -->
+    <div class="card-body p-2">
+      <div class="table-responsive shadow-sm rounded">
+        <table class="table table-hover table-bordered align-middle text-center" id="tbl">
+          <thead class="bg-info text-white">
+            <tr>
+              <th>Médico</th>
+              <th>Fecha</th>
+              <th>Hora Inicio</th>
+              <th>Hora Fin</th>
+              <th>Cupos</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
       </div>
     </div>
   </div>
 
-  <!-- Modal para seleccionar médico -->
-  <div class="modal fade" id="modalBuscarMedico" tabindex="-1" role="dialog">
+  <!-- =========================== -->
+  <!-- Modal Formulario Disponibilidad -->
+  <!-- =========================== -->
+  <div class="modal fade" id="modalFormulario" tabindex="-1" role="dialog">
     <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h4 class="modal-title">Seleccionar Médico</h4>
-          <button type="button" class="close" data-dismiss="modal">&times;</button>
+      <div class="modal-content shadow-lg border-0 rounded-lg">
+
+        <!-- Header -->
+        <div class="modal-header bg-info text-white rounded-top">
+          <h5 class="modal-title font-weight-bold">
+            <i class="fas fa-clock mr-2"></i> <span id="modalTitle">Nueva Disponibilidad</span>
+          </h5>
+          <button type="button" class="close text-white" data-dismiss="modal">&times;</button>
+        </div>
+
+        <!-- Body -->
+        <div class="modal-body">
+          <input type="hidden" id="txtIdDisponibilidad">
+
+          <div class="row">
+
+            <!-- Médico -->
+            <div class="col-md-12 mb-3">
+              <input type="hidden" id="id_medico">
+              <label class="font-weight-bold">
+                <i class="fas fa-user-md mr-1"></i> Médico:
+              </label>
+              <input type="text" 
+                     id="txtmedico" 
+                     class="form-control" 
+                     placeholder="Click para seleccionar Médico" 
+                     readonly>
+            </div>
+
+            <!-- Fecha -->
+            <div class="col-md-6 mb-3">
+              <label class="font-weight-bold">
+                <i class="fas fa-calendar-alt mr-1"></i> Fecha:
+              </label>
+              <input type="date" 
+                     id="txtFecha" 
+                     name="disponibilidad_fecha" 
+                     class="form-control">
+              <small class="form-text text-muted">
+                <i class="fas fa-info-circle"></i> Seleccione la fecha de disponibilidad
+              </small>
+            </div>
+
+            <!-- Cupos -->
+            <div class="col-md-6 mb-3">
+              <label class="font-weight-bold">
+                <i class="fas fa-users mr-1"></i> Cupos:
+              </label>
+              <input type="number" 
+                     id="txtCupos" 
+                     class="form-control" 
+                     min="1" 
+                     placeholder="Cantidad de cupos">
+              <small class="form-text text-muted">
+                <i class="fas fa-info-circle"></i> Debe ser mayor a 0
+              </small>
+            </div>
+
+            <!-- Hora Inicio -->
+            <div class="col-md-6 mb-3">
+              <label class="font-weight-bold">
+                <i class="fas fa-clock mr-1"></i> Hora Inicio:
+              </label>
+              <input type="time" 
+                     id="txtHoraInicio" 
+                     class="form-control">
+              <small class="form-text text-muted">
+                <i class="fas fa-info-circle"></i> Formato 24 horas (HH:MM)
+              </small>
+            </div>
+
+            <!-- Hora Fin -->
+            <div class="col-md-6 mb-3">
+              <label class="font-weight-bold">
+                <i class="fas fa-clock mr-1"></i> Hora Fin:
+              </label>
+              <input type="time" 
+                     id="txtHoraFin" 
+                     class="form-control">
+              <small class="form-text text-muted">
+                <i class="fas fa-info-circle"></i> Debe ser mayor a la hora de inicio
+              </small>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="modal-footer bg-light">
+          <button type="button" class="btn btn-info" id="btnGuardar">
+            <i class="fas fa-save mr-1"></i> Guardar
+          </button>
+          <button type="button" class="btn btn-danger" data-dismiss="modal">
+            <i class="fas fa-times mr-1"></i> Cerrar
+          </button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================== -->
+  <!-- Modal para seleccionar Médico -->
+  <!-- =========================== -->
+  <div class="modal fade" id="modalBuscarMedico" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-content shadow-lg border-0 rounded-lg">
+        <div class="modal-header bg-info text-white">
+          <h5 class="modal-title font-weight-bold">
+            <i class="fas fa-user-md mr-2"></i> Seleccionar Médico
+          </h5>
+          <button type="button" class="close text-white" data-dismiss="modal">&times;</button>
         </div>
         <div class="modal-body">
           <div class="table-responsive">
-            <table class="table table-striped table-bordered w-100" id="tblMedico">
-              <thead>
+            <table class="table table-hover table-bordered w-100" id="tblMedico">
+              <thead class="bg-info text-white">
                 <tr>
                   <th>Nombre</th>
                   <th>Apellido</th>
-                  <th>Acciones</th>
+                  <th>Acción</th>
                 </tr>
               </thead>
               <tbody></tbody>
@@ -106,15 +174,8 @@ Disponibilidad Horaria
       </div>
     </div>
   </div>
-</div>
 
-<!-- Librerías -->
-<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
-<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</div>
 {% endblock %}
 
 {% block js %}
@@ -123,7 +184,9 @@ const CSRFToken = "{{ csrf_token() }}" || null;
 
 const initDatatable = () => {
   $('#tbl').DataTable({
-    language: { url: "{{ url_for('static', filename='vendor/datatables/es-ES.json') }}" },
+    language: { 
+      url: "{{ url_for('static', filename='vendor/datatables/es-ES.json') }}" 
+    },
     ajax: '/api/v1/disponibilidades',
     columns: [
       { data: 'medico_nombre' },
@@ -132,13 +195,12 @@ const initDatatable = () => {
       { data: 'disponibilidad_hora_fin' },
       { data: 'disponibilidad_cupos' },
       { data: function(row) {
-          return `
-            <button type="button" name="btn_editar" class="btn btn-info btn-sm" data-id_disponibilidad="${row.id_disponibilidad}">
-              <i class="fas fa-edit"></i>
-            </button>
-            <button type="button" name="btn_eliminar" class="btn btn-danger btn-sm" data-id_disponibilidad="${row.id_disponibilidad}">
-              <i class="fas fa-trash-alt"></i>
-            </button>`;
+          return `<button type="button" name="btn_editar" class="btn btn-sm btn-info" data-id_disponibilidad="${row.id_disponibilidad}" title="Editar">
+                    <i class="fas fa-edit"></i>
+                  </button>
+                  <button type="button" name="btn_eliminar" class="btn btn-sm btn-danger" data-id_disponibilidad="${row.id_disponibilidad}" title="Eliminar">
+                    <i class="fas fa-trash-alt"></i>
+                  </button>`;
         }
       }
     ]
@@ -147,13 +209,17 @@ const initDatatable = () => {
 
 const initDatatablem = () => {
   $('#tblMedico').DataTable({
-    language: { url: "{{ url_for('static', filename='vendor/datatables/es-ES.json') }}" },
-    ajax:'/api/v1/medico',
+    language: { 
+      url: "{{ url_for('static', filename='vendor/datatables/es-ES.json') }}" 
+    },
+    ajax: '/api/v1/medico',
     columns: [
       { data: 'nombre' },
       { data: 'apellido'},
       { data: function(row) {
-        return `<button type="button" name="btn_seleccionar_Medico" class="btn btn-primary" data-id="${row.id_medico}" data-nombre="${row.nombre}" data-apellido="${row.apellido}">Seleccionar</button>`;
+          return `<button type="button" name="btn_seleccionar_Medico" class="btn btn-sm btn-warning" data-id="${row.id_medico}" data-nombre="${row.nombre}" data-apellido="${row.apellido}">
+                    <i class="fas fa-check mr-1"></i> Seleccionar
+                  </button>`;
         }
       }
     ]
@@ -169,17 +235,120 @@ const initDatatablem = () => {
   });
 }
 
-    const buscarMedico = () => {
-    $('#txtmedico').on('click', function () {
-      $('#modalMedicoTitle').text("Seleccionar Medico");
-      $('#modalBuscarMedico').modal(); 
-    });
-  };
+const buscarMedico = () => {
+  $('#txtmedico').on('click', function () {
+    $('#modalBuscarMedico').modal(); 
+  });
+};
+
+// ✅ NUEVA FUNCIÓN: Convertir hora de 12h (a.m./p.m.) a 24h (HH:MM)
+const convertir12hA24h = (hora12h) => {
+  if (!hora12h) return '';
+  
+  try {
+    // Eliminar espacios extras y convertir a minúsculas
+    hora12h = hora12h.trim().toLowerCase();
+    
+    // Extraer hora, minutos y período (a.m./p.m.)
+    const regex = /(\d{1,2}):(\d{2})\s*(a\.m\.|p\.m\.|am|pm)/;
+    const match = hora12h.match(regex);
+    
+    if (!match) {
+      console.error('Formato de hora inválido:', hora12h);
+      return '';
+    }
+    
+    let horas = parseInt(match[1]);
+    const minutos = match[2];
+    const periodo = match[3].replace(/\./g, ''); // Eliminar puntos (a.m. -> am)
+    
+    // Convertir a formato 24 horas
+    if (periodo === 'pm' && horas !== 12) {
+      horas += 12;
+    } else if (periodo === 'am' && horas === 12) {
+      horas = 0;
+    }
+    
+    // Formatear con ceros a la izquierda
+    const horasStr = horas.toString().padStart(2, '0');
+    
+    return `${horasStr}:${minutos}`;
+  } catch (error) {
+    console.error('Error al convertir hora:', error);
+    return '';
+  }
+};
+
+// ✅ NUEVA FUNCIÓN: Validar duración máxima de jornada (cliente)
+const validarDuracionJornada = (horaInicio, horaFin, maxHoras = 10) => {
+  if (!horaInicio || !horaFin) {
+    return { valido: false, mensaje: 'Debe ingresar hora de inicio y fin.' };
+  }
+
+  try {
+    // Convertir strings de tiempo a objetos Date
+    const [horaI, minI] = horaInicio.split(':').map(Number);
+    const [horaF, minF] = horaFin.split(':').map(Number);
+    
+    const inicio = new Date(2000, 0, 1, horaI, minI);
+    const fin = new Date(2000, 0, 1, horaF, minF);
+    
+    // Calcular diferencia en horas
+    const diferenciaMs = fin - inicio;
+    const diferenciaHoras = diferenciaMs / (1000 * 60 * 60);
+    
+    if (diferenciaHoras <= 0) {
+      return { 
+        valido: false, 
+        mensaje: 'La hora de fin debe ser posterior a la hora de inicio.' 
+      };
+    }
+    
+    if (diferenciaHoras > maxHoras) {
+      return { 
+        valido: false, 
+        mensaje: `La jornada de atención no puede superar las ${maxHoras} horas. Duración seleccionada: ${diferenciaHoras.toFixed(1)} horas.` 
+      };
+    }
+    
+    return { valido: true, duracion: diferenciaHoras };
+  } catch (error) {
+    return { 
+      valido: false, 
+      mensaje: 'Error al validar las horas. Verifique el formato.' 
+    };
+  }
+}
+
+// Validaciones existentes
+const validarHorarios = (horaInicio, horaFin) => {
+  if (!horaInicio || !horaFin) {
+    return { valido: false, mensaje: 'Debe ingresar hora de inicio y fin.' };
+  }
+  if (horaInicio >= horaFin) {
+    return { valido: false, mensaje: 'La hora de inicio debe ser menor a la hora de fin.' };
+  }
+  return { valido: true };
+}
+
+const validarCamposRequeridos = (id_medico, fecha, cupos) => {
+  if (!id_medico) {
+    return { valido: false, mensaje: 'Debe seleccionar un médico.' };
+  }
+  if (!fecha) {
+    return { valido: false, mensaje: 'Debe seleccionar una fecha.' };
+  }
+  if (!cupos || cupos <= 0) {
+    return { valido: false, mensaje: 'Los cupos deben ser mayor a 0.' };
+  }
+  return { valido: true };
+}
 
 const agregar = () => {
   $('#btnAgregar').on('click', function() {
-    $('#modalTitle').text("Agregar Disponibilidad");
+    $('#modalTitle').text("Nueva Disponibilidad");
     $('#txtIdDisponibilidad').val("");
+    $('#id_medico').val("");
     $('#txtmedico').val("");
     $('#txtFecha').val("");
     $('#txtHoraInicio').val("");
@@ -196,12 +365,50 @@ const guardar = () => {
     const disponibilidad_fecha = $('#txtFecha').val();
     const disponibilidad_hora_inicio = $('#txtHoraInicio').val();
     const disponibilidad_hora_fin = $('#txtHoraFin').val();
-    const disponibilidad_cupos = $('#txtCupos').val();
+    const disponibilidad_cupos = Number($('#txtCupos').val());
     const tabla = $('#tbl').DataTable();
 
-    // Validación de campos obligatorios
-    if(!id_medico || !disponibilidad_fecha || !disponibilidad_hora_inicio || !disponibilidad_hora_fin || !disponibilidad_cupos) {
-      Swal.fire("Error", "Todos los campos son obligatorios.", "error");
+    // ✅ VALIDACIÓN 1: Campos requeridos
+    const validacionCampos = validarCamposRequeridos(id_medico, disponibilidad_fecha, disponibilidad_cupos);
+    if (!validacionCampos.valido) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Campos incompletos',
+        text: validacionCampos.mensaje,
+        confirmButtonColor: '#f39c12'
+      });
+      return;
+    }
+
+    // ✅ VALIDACIÓN 2: Horarios básicos
+    const validacionHorarios = validarHorarios(disponibilidad_hora_inicio, disponibilidad_hora_fin);
+    if (!validacionHorarios.valido) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Horarios inválidos',
+        text: validacionHorarios.mensaje,
+        confirmButtonColor: '#f39c12'
+      });
+      return;
+    }
+
+    // ✅ VALIDACIÓN 3: Duración máxima de jornada (10 horas)
+    const validacionDuracion = validarDuracionJornada(disponibilidad_hora_inicio, disponibilidad_hora_fin, 10);
+    if (!validacionDuracion.valido) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Jornada muy extensa',
+        html: `
+          <p>${validacionDuracion.mensaje}</p>
+          <hr>
+          <small class="text-muted">
+            <i class="fas fa-info-circle"></i> 
+            Por políticas del consultorio, la jornada de atención no debe exceder las 10 horas continuas.
+          </small>
+        `,
+        confirmButtonColor: '#f39c12',
+        confirmButtonText: 'Entendido'
+      });
       return;
     }
 
@@ -217,89 +424,196 @@ const guardar = () => {
       // Editar
       fetch(`/api/v1/disponibilidades/${idDisponibilidad}`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json', 'X-CSRFToken': CSRFToken },
+        headers: { 
+          'Content-Type': 'application/json', 
+          'X-CSRFToken': CSRFToken 
+        },
         body: JSON.stringify(data)
       })
       .then(resp => resp.json())
       .then(result => {
         if(result && !result.error && result.success) {
           tabla.ajax.reload();
-          Swal.fire("Actualizado", "La disponibilidad ha sido actualizada correctamente.", "success")
-            .then(() => { $('#modalFormulario').modal("hide"); });
+          $('#modalFormulario').modal("hide");
+          Swal.fire({
+            icon: 'success',
+            title: 'Actualizado',
+            text: 'La disponibilidad ha sido actualizada correctamente.',
+            confirmButtonColor: '#28a745'
+          });
         } else {
-          Swal.fire(result.error || "Error al actualizar.");
+          Swal.fire({
+            icon: 'error',
+            title: 'Error al actualizar',
+            text: result.error || 'No se pudo actualizar la disponibilidad.',
+            confirmButtonColor: '#dc3545'
+          });
         }
       })
-      .catch(err => Swal.fire("Error", "Ocurrió un error al actualizar.", "error"));
+      .catch(err => {
+        console.error(err);
+        Swal.fire({
+          icon: 'error',
+          title: 'Error de conexión',
+          text: 'Ocurrió un error al actualizar. Por favor, intente nuevamente.',
+          confirmButtonColor: '#dc3545'
+        });
+      });
     } else {
       // Agregar
       fetch(`/api/v1/disponibilidades`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'X-CSRFToken': CSRFToken },
+        headers: { 
+          'Content-Type': 'application/json', 
+          'X-CSRFToken': CSRFToken 
+        },
         body: JSON.stringify(data)
       })
       .then(resp => resp.json())
       .then(result => {
         if(result && !result.error && result.success) {
           tabla.ajax.reload();
-          Swal.fire("Registrado", "La disponibilidad ha sido registrada correctamente.", "success")
-            .then(() => { $('#modalFormulario').modal("hide"); });
+          $('#modalFormulario').modal("hide");
+          Swal.fire({
+            icon: 'success',
+            title: 'Registrado',
+            text: 'La disponibilidad ha sido registrada correctamente.',
+            confirmButtonColor: '#28a745'
+          });
         } else {
-          Swal.fire(result.error || "Error al guardar.");
+          Swal.fire({
+            icon: 'error',
+            title: 'Error al guardar',
+            text: result.error || 'No se pudo guardar la disponibilidad.',
+            confirmButtonColor: '#dc3545'
+          });
         }
       })
-      .catch(err => Swal.fire("Error", "Ocurrió un error al guardar.", "error"));
+      .catch(err => {
+        console.error(err);
+        Swal.fire({
+          icon: 'error',
+          title: 'Error de conexión',
+          text: 'Ocurrió un error al guardar. Por favor, intente nuevamente.',
+          confirmButtonColor: '#dc3545'
+        });
+      });
     }
   });
 };
-
 
 const editar = () => {
   $('#tbl').on('click', 'button[name="btn_editar"]', function() {
     const idDisponibilidad = $(this).data('id_disponibilidad');
 
-    fetch(`/api/v1/disponibilidades/${idDisponibilidad}`, { method: 'GET' })
-      .then(resp => resp.json())
-      .then(data => {
-        if(data && data.success) {
-          $('#txtIdDisponibilidad').val(data.data.id_disponibilidad);
-          $('#id_medico').val(data.data.id_medico);
-          $('#txtmedico').val(data.data.medico_nombre);
-          $('#txtFecha').val(data.data.disponibilidad_fecha);
-          $('#txtHoraInicio').val(data.data.disponibilidad_hora_inicio);
-          $('#txtHoraFin').val(data.data.disponibilidad_hora_fin);
-          $('#txtCupos').val(data.data.disponibilidad_cupos);
-          $('#modalFormulario').modal();
-        }
-      });
+    Swal.fire({
+      title: "¿Deseas editar este registro?",
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: "Sí, editar",
+      cancelButtonText: "Cancelar",
+      confirmButtonColor: '#17a2b8',
+      cancelButtonColor: '#6c757d'
+    }).then((result) => {
+      if(result.isConfirmed) {
+        $('#modalTitle').text("Editar Disponibilidad");
+        
+        fetch(`/api/v1/disponibilidades/${idDisponibilidad}`, { 
+          method: 'GET',
+          headers: { 'Content-Type': 'application/json' }
+        })
+        .then(resp => resp.json())
+        .then(data => {
+          if(data && data.success && data.data) {
+            $('#txtIdDisponibilidad').val(data.data.id_disponibilidad);
+            $('#id_medico').val(data.data.id_medico);
+            $('#txtmedico').val(data.data.medico_nombre);
+            $('#txtFecha').val(data.data.disponibilidad_fecha);
+            
+            // ✅ Convertir horas de 12h a 24h para los inputs type="time"
+            const horaInicio24h = convertir12hA24h(data.data.disponibilidad_hora_inicio);
+            const horaFin24h = convertir12hA24h(data.data.disponibilidad_hora_fin);
+            
+            $('#txtHoraInicio').val(horaInicio24h);
+            $('#txtHoraFin').val(horaFin24h);
+            $('#txtCupos').val(data.data.disponibilidad_cupos);
+            $('#modalFormulario').modal();
+          } else {
+            Swal.fire({
+              icon: 'error',
+              title: 'Error',
+              text: 'No se pudo cargar la disponibilidad.',
+              confirmButtonColor: '#dc3545'
+            });
+          }
+        })
+        .catch(err => {
+          console.error(err);
+          Swal.fire({
+            icon: 'error',
+            title: 'Error de conexión',
+            text: 'Ocurrió un error al cargar la disponibilidad.',
+            confirmButtonColor: '#dc3545'
+          });
+        });
+      }
+    });
   });
 };
 
 const eliminar = () => {
   $('#tbl').on('click', 'button[name="btn_eliminar"]', function() {
     const idDisponibilidad = $(this).data('id_disponibilidad');
-    const tabla = $('#tbl').DataTable();
+    const botonEliminar = $(this);
 
     Swal.fire({
       title: "¿Deseas eliminar esta disponibilidad?",
+      text: "Esta acción no se puede deshacer",
+      icon: 'warning',
       showCancelButton: true,
-      confirmButtonText: "Sí",
-      cancelButtonText: "No"
+      confirmButtonText: "Sí, eliminar",
+      cancelButtonText: "Cancelar",
+      confirmButtonColor: '#dc3545',
+      cancelButtonColor: '#6c757d'
     }).then((result) => {
       if(result.isConfirmed) {
         fetch(`/api/v1/disponibilidades/${idDisponibilidad}`, {
           method: 'DELETE',
-          headers: { 'Content-Type': 'application/json', 'X-CSRFToken': CSRFToken }
+          headers: { 
+            'Content-Type': 'application/json', 
+            'X-CSRFToken': CSRFToken 
+          }
         })
         .then(resp => resp.json())
         .then(result => {
           if(result && !result.error && result.success) {
-            tabla.ajax.reload();
-            Swal.fire("Eliminado", "Disponibilidad eliminada correctamente.", "success");
+            const fila = botonEliminar.closest('tr');
+            const tabla = $('#tbl').DataTable();
+            tabla.row(fila).remove().draw();
+            Swal.fire({
+              icon: 'success',
+              title: 'Eliminado',
+              text: 'La disponibilidad ha sido eliminada correctamente.',
+              confirmButtonColor: '#28a745'
+            });
           } else {
-            Swal.fire(result.error || "Error al eliminar.");
+            Swal.fire({
+              icon: 'error',
+              title: 'Error al eliminar',
+              text: result.error || 'No se pudo eliminar la disponibilidad.',
+              confirmButtonColor: '#dc3545'
+            });
           }
-        }).catch(err => Swal.fire("Error", "Ocurrió un error al eliminar.", "error"));
+        })
+        .catch(err => {
+          console.error(err);
+          Swal.fire({
+            icon: 'error',
+            title: 'Error de conexión',
+            text: 'Ocurrió un error al eliminar. Por favor, intente nuevamente.',
+            confirmButtonColor: '#dc3545'
+          });
+        });
       }
     });
   });
@@ -314,10 +628,31 @@ const addEvents = () => {
   buscarMedico();
 };
 
+// ✅ SOLUCIÓN PARA EVITAR MOVIMIENTO DEL MODAL
+const fixModalShift = () => {
+  // Deshabilitar el ajuste automático de padding de Bootstrap
+  $.fn.modal.Constructor.prototype._setScrollbar = function() {};
+  $.fn.modal.Constructor.prototype._resetScrollbar = function() {};
+  
+  // Forzar padding cero cuando se abren modales
+  $(document).on('show.bs.modal', '.modal', function () {
+    setTimeout(() => {
+      $('body').css('padding-right', '0');
+      $('.modal').css('padding-right', '0');
+      $('.navbar-fixed-top, .navbar-fixed-bottom').css('padding-right', '0');
+    }, 0);
+  });
+
+  $(document).on('hidden.bs.modal', '.modal', function () {
+    $('body').css('padding-right', '0');
+  });
+};
+
 $(function() {
   initDatatable();
   initDatatablem();
   addEvents();
+  fixModalShift(); // ✅ Llamar la función para evitar movimientos
 });
 
 </script>

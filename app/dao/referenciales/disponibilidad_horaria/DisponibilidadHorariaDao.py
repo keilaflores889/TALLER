@@ -1,6 +1,75 @@
 # Data access object - DAO
 from flask import current_app as app
 from app.conexion.Conexion import Conexion
+from datetime import datetime  # ✅ AGREGAR ESTE IMPORT
+
+# ✅ AGREGAR ESTA FUNCIÓN COMPLETA AQUÍ (después de los imports, antes de la clase)
+def formatear_hora_12h(hora_24h):
+    """Convierte hora formato 24h a 12h con a.m./p.m. en minúsculas y formato 01:00"""
+    if not hora_24h:
+        return None
+    
+    try:
+        # Si hora_24h es string (ej: "14:30:00")
+        if isinstance(hora_24h, str):
+            # Intentar con ambos formatos
+            try:
+                hora_obj = datetime.strptime(hora_24h, "%H:%M:%S")
+            except ValueError:
+                hora_obj = datetime.strptime(hora_24h, "%H:%M")
+        else:
+            # Si es un objeto time
+            hora_obj = datetime.combine(datetime.today(), hora_24h)
+        
+        # Formato con ceros a la izquierda (01, 02, etc.) y am/pm en minúsculas con puntos
+        hora_formateada = hora_obj.strftime("%I:%M %p").lower()
+        return hora_formateada.replace('am', 'a.m.').replace('pm', 'p.m.')  # ✅ Agregar puntos
+    except Exception as e:
+        app.logger.error(f"Error al formatear hora: {str(e)}")
+        return str(hora_24h)
+
+def validar_duracion_maxima(hora_inicio, hora_fin, max_horas=10):
+    """Valida que la diferencia entre hora_inicio y hora_fin no supere max_horas"""
+    try:
+        # Convertir strings a objetos datetime
+        if isinstance(hora_inicio, str):
+            # ✅ Intentar primero con formato HH:MM:SS, luego HH:MM
+            try:
+                inicio = datetime.strptime(hora_inicio, "%H:%M:%S")
+            except ValueError:
+                inicio = datetime.strptime(hora_inicio, "%H:%M")
+        else:
+            inicio = datetime.combine(datetime.today(), hora_inicio)
+            
+        if isinstance(hora_fin, str):
+            # ✅ Intentar primero con formato HH:MM:SS, luego HH:MM
+            try:
+                fin = datetime.strptime(hora_fin, "%H:%M:%S")
+            except ValueError:
+                fin = datetime.strptime(hora_fin, "%H:%M")
+        else:
+            fin = datetime.combine(datetime.today(), hora_fin)
+        
+        # Calcular diferencia en horas
+        diferencia = (fin - inicio).total_seconds() / 3600
+        
+        if diferencia > max_horas:
+            return {
+                'valido': False,
+                'mensaje': f'La jornada de atención no puede superar las {max_horas} horas. Duración actual: {diferencia:.1f} horas.'
+            }
+        
+        if diferencia <= 0:
+            return {
+                'valido': False,
+                'mensaje': 'La hora de fin debe ser posterior a la hora de inicio.'
+            }
+            
+        return {'valido': True, 'duracion': diferencia}
+        
+    except Exception as e:
+        app.logger.error(f"Error al validar duración: {str(e)}")
+        return {'valido': False, 'mensaje': 'Error al validar las horas.'}
 
 class DisponibilidadDao:
 
@@ -22,8 +91,8 @@ class DisponibilidadDao:
                 {
                     'id_disponibilidad': d[0],
                     'id_medico': d[1],
-                    'disponibilidad_hora_inicio': str(d[2]),
-                    'disponibilidad_hora_fin': str(d[3]),
+                    'disponibilidad_hora_inicio': formatear_hora_12h(d[2]),
+                    'disponibilidad_hora_fin': formatear_hora_12h(d[3]),
                     'disponibilidad_fecha': str(d[4]),
                     'disponibilidad_cupos': d[5],
                     'medico_nombre': d[6]
@@ -55,8 +124,8 @@ class DisponibilidadDao:
                 return {
                     'id_disponibilidad': d[0],
                     'id_medico': d[1],
-                    'disponibilidad_hora_inicio': str(d[2]),
-                    'disponibilidad_hora_fin': str(d[3]),
+                    'disponibilidad_hora_inicio': formatear_hora_12h(d[2]),  
+                    'disponibilidad_hora_fin': formatear_hora_12h(d[3]), 
                     'disponibilidad_fecha': str(d[4]),
                     'disponibilidad_cupos': d[5],
                     'medico_nombre': d[6]
@@ -88,8 +157,8 @@ class DisponibilidadDao:
             return [
                 {
                     'id_disponibilidad': r[0],
-                    'disponibilidad_hora_inicio': str(r[1]),
-                    'disponibilidad_hora_fin': str(r[2]),
+                    'disponibilidad_hora_inicio': formatear_hora_12h(r[1]),  
+                    'disponibilidad_hora_fin': formatear_hora_12h(r[2]),  
                     'disponibilidad_cupos': r[3]
                 } for r in rows
             ]
@@ -136,13 +205,19 @@ class DisponibilidadDao:
             con.close()
 
     def guardarDisponibilidad(self, id_medico, hora_inicio, hora_fin, fecha, cupos):
+        # ✅ AGREGAR VALIDACIÓN DE 8 HORAS
+        validacion = validar_duracion_maxima(hora_inicio, hora_fin, max_horas=10)  # ✅
+        if not validacion['valido']:
+            app.logger.warning(validacion['mensaje'])
+            return {'error': validacion['mensaje'], 'success': False}
+        
         if self.existeDisponibilidad(id_medico, hora_inicio, hora_fin, fecha):
             app.logger.warning("Disponibilidad duplicada detectada")
-            return False
+            return {'error': 'Ya existe una disponibilidad en ese horario.', 'success': False}
 
         sql = """
         INSERT INTO disponibilidad_horaria(id_medico, disponibilidad_hora_inicio, 
-                                           disponibilidad_hora_fin, disponibilidad_fecha, disponibilidad_cupos)
+                                        disponibilidad_hora_fin, disponibilidad_fecha, disponibilidad_cupos)
         VALUES (%s, %s, %s, %s, %s)
         RETURNING id_disponibilidad
         """
@@ -153,19 +228,25 @@ class DisponibilidadDao:
             cur.execute(sql, (id_medico, hora_inicio, hora_fin, fecha, cupos))
             new_id = cur.fetchone()[0]
             con.commit()
-            return new_id
+            return {'success': True, 'id': new_id}
         except Exception as e:
             app.logger.error(f"Error al insertar disponibilidad: {str(e)}")
             con.rollback()
-            return False
+            return {'error': 'Error al guardar la disponibilidad.', 'success': False}
         finally:
             cur.close()
             con.close()
 
     def updateDisponibilidad(self, id_disponibilidad, id_medico, hora_inicio, hora_fin, fecha, cupos):
+        # ✅ AGREGAR VALIDACIÓN DE 8 HORAS
+        validacion = validar_duracion_maxima(hora_inicio, hora_fin, max_horas=10)  # 
+        if not validacion['valido']:
+            app.logger.warning(validacion['mensaje'])
+            return {'error': validacion['mensaje'], 'success': False}
+        
         if self.existeDisponibilidad(id_medico, hora_inicio, hora_fin, fecha, excluir_id=id_disponibilidad):
             app.logger.warning("Disponibilidad duplicada detectada en update")
-            return False
+            return {'error': 'Ya existe una disponibilidad en ese horario.', 'success': False}
 
         sql = """
         UPDATE disponibilidad_horaria
@@ -183,11 +264,11 @@ class DisponibilidadDao:
             cur.execute(sql, (id_medico, hora_inicio, hora_fin, fecha, cupos, id_disponibilidad))
             filas = cur.rowcount
             con.commit()
-            return filas > 0
+            return {'success': True, 'updated': filas > 0}
         except Exception as e:
             app.logger.error(f"Error al actualizar disponibilidad: {str(e)}")
             con.rollback()
-            return False
+            return {'error': 'Error al actualizar la disponibilidad.', 'success': False}
         finally:
             cur.close()
             con.close()
