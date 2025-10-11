@@ -1,235 +1,401 @@
 {% extends 'base.html' %}
-    
+
 {% block titulo %}
 Turnos
 {% endblock %}
 
 {% block contenido %}
 <div class="container mt-4">
-    <h3>Listar Turnos</h3>
 
-    <!-- tarjeta -->
-    <div class="card">
-      <div class="card-header">
-        <button type="button" class="btn btn-outline-info" id="btnAgregar">Agregar</button>
-      </div>
-      <div class="card-body">
-        <table class="table table-striped" id="tbl">
-          <thead>
+  <!-- Card principal -->
+  <div class="card shadow-sm border-0 rounded-lg">
+    <!-- Header: Botón Agregar y Título -->
+    <div class="card-header bg-info text-white d-flex justify-content-between align-items-center">
+      <button type="button" class="btn btn-light btn-sm" id="btnAgregar">
+        <i class="fas fa-plus-circle mr-1"></i> Agregar
+      </button>
+      <h5 class="mb-0 font-weight-bold">
+        <i class="fas fa-clock mr-2"></i> Turnos
+      </h5>
+    </div>
+
+    <!-- Body: Tabla de turnos -->
+    <div class="card-body p-2">
+      <div class="table-responsive shadow-sm rounded">
+        <table class="table table-hover table-bordered align-middle text-center" id="tbl">
+          <thead class="bg-info text-white">
             <tr>
-              <th>Turnos</th>
+              <th>Descripción</th>
               <th>Acciones</th>
             </tr>
           </thead>
           <tbody></tbody>
-      </table>
+        </table>
       </div>
     </div>
-    <!-- /tarjeta -->
+  </div>
 
-    <!-- El formulario -->
-    <div class="modal" id="modalFormulario">
-      <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
+  <!-- =========================== -->
+  <!-- Modal Formulario Turno -->
+  <!-- =========================== -->
+  <div class="modal fade" 
+       id="modalFormulario" 
+       tabindex="-1" 
+       role="dialog"
+       data-backdrop="true"
+       data-keyboard="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content shadow-lg border-0 rounded-lg">
 
-          <!-- Modal Header -->
-          <div class="modal-header">
-            <h4 class="modal-title" id="modalTitle"></h4>
-            <button type="button" class="close" data-dismiss="modal">&times;</button>
-          </div>
+        <!-- Header -->
+        <div class="modal-header bg-info text-white rounded-top">
+          <h5 class="modal-title font-weight-bold">
+            <i class="fas fa-clock mr-2"></i> <span id="modalTitle">Nuevo Turno</span>
+          </h5>
+          <button type="button" class="close text-white" data-dismiss="modal">&times;</button>
+        </div>
 
-          <!-- Modal body -->
-          <div class="modal-body">
-            <div class="form-group">
-              <input type="hidden" id="txtIdTurno">
-              <label for="txtDescripcion">Turno:</label>
-              <input type="text" class="form-control" placeholder="Ingrese el turno" id="txtDescripcion">
-            </div>
-          </div>
+        <!-- Body -->
+        <div class="modal-body">
+          <input type="hidden" id="txtIdTurno">
 
-          <!-- Modal footer -->
-          <div class="modal-footer">
-            <button type="button" class="btn btn-primary" id="btnGuardar">Guardar</button>
-            <button type="button" class="btn btn-danger" data-dismiss="modal">Cerrar</button>
+          <div class="form-group">
+            <label class="font-weight-bold">
+              <i class="fas fa-file-alt mr-1"></i> Descripción: <span class="text-danger">*</span>
+            </label>
+            <input type="text" 
+                   id="txtDescripcion" 
+                   class="form-control" 
+                   placeholder="Ingrese el turno"
+                   maxlength="50"
+                   required>
+            <small class="form-text text-muted">
+              <i class="fas fa-info-circle"></i> Solo letras y espacios permitidos
+            </small>
           </div>
 
         </div>
+
+        <!-- Footer -->
+        <div class="modal-footer bg-light">
+          <button type="button" class="btn btn-info" id="btnGuardar">
+            <i class="fas fa-save mr-1"></i> Guardar
+          </button>
+          <button type="button" class="btn btn-danger" data-dismiss="modal">
+            <i class="fas fa-times mr-1"></i> Cerrar
+          </button>
+        </div>
+
       </div>
     </div>
+  </div>
 
-    <div class="row mt-4 d-none" id="rowAlerta">
-        <div class="col col-md-12">
-            <div class="alert alert-success">
-                <strong>Registro Exitoso!</strong>
-                <div class="row" id="mostrarAlerta"></div>
-            </div>
-        </div>
-    </div>
 </div>
+
 {% endblock %}
 
 {% block js %}
 <script>
-  const CSRFToken = "{{ csrf_token() }}" || null;
+const CSRFToken = "{{ csrf_token() }}" || null;
 
-  const initDatatable = () => {
-    $('#tbl').DataTable({
-      language: {
-        url: "{{ url_for('static', filename='vendor/datatables/es-ES.json') }}",
+// ==========================================
+// DATATABLE
+// ==========================================
+const initDatatable = () => {
+  $('#tbl').DataTable({
+    language: { 
+      url: "{{ url_for('static', filename='vendor/datatables/es-ES.json') }}" 
+    },
+    ajax: '/api/v1/turnos',
+    columns: [
+      { data: 'descripcion' },
+      { 
+        data: function(row) {
+          return `
+            <button type="button" name="btn_editar" class="btn btn-sm btn-info" 
+                    data-id_turno="${row.id_turno}" title="Editar">
+              <i class="fas fa-edit"></i>
+            </button>
+            <button type="button" name="btn_eliminar" class="btn btn-sm btn-danger" 
+                    data-id_turno="${row.id_turno}" title="Eliminar">
+              <i class="fas fa-trash-alt"></i>
+            </button>
+          `;
+        },
+        className: 'text-center',
+        orderable: false
+      }
+    ]
+  });
+};
+
+// ==========================================
+// VALIDACIONES
+// ==========================================
+const validarDescripcion = (descripcion) => {
+  if (!descripcion || descripcion.trim() === '') {
+    return { valido: false, mensaje: 'La descripción es obligatoria.' };
+  }
+  
+  if (descripcion.length < 3) {
+    return { valido: false, mensaje: 'La descripción debe tener al menos 3 caracteres.' };
+  }
+  
+  if (descripcion.length > 50) {
+    return { valido: false, mensaje: 'La descripción no puede superar los 50 caracteres.' };
+  }
+  
+  // Validar solo letras (con acentos y ñ) y espacios - NO permite números ni caracteres especiales
+  const patron = /^[A-Za-zÁÉÍÓÚáéíóúÑñÜü\s]+$/;
+  if (!patron.test(descripcion)) {
+    return { valido: false, mensaje: 'La descripción solo puede contener letras y espacios.' };
+  }
+  
+  return { valido: true };
+};
+
+// ==========================================
+// VERIFICAR SI EXISTE TURNO
+// ==========================================
+const existeTurno = (descripcion, idTurnoActual = null) => {
+  const tabla = $('#tbl').DataTable();
+  const datos = tabla.rows().data().toArray();
+  
+  // Normalizar la descripción ingresada (minúsculas y sin espacios extra)
+  const descripcionNormalizada = descripcion.trim().toLowerCase();
+  
+  // Buscar si existe algún turno con la misma descripción
+  return datos.some(turno => {
+    const descripcionExistente = turno.descripcion.trim().toLowerCase();
+    const esElMismo = turno.id_turno == idTurnoActual;
+    
+    // Si es el mismo turno que estamos editando, no contar como duplicado
+    return descripcionExistente === descripcionNormalizada && !esElMismo;
+  });
+};
+
+// ==========================================
+// CRUD
+// ==========================================
+const agregar = () => {
+  $('#btnAgregar').on('click', function() {
+    $('#modalTitle').text("Nuevo Turno");
+    $('#txtIdTurno').val("");
+    $('#txtDescripcion').val("").removeClass('is-invalid');
+    $('#modalFormulario').modal();
+  });
+};
+
+const guardar = () => {
+  $('#btnGuardar').on('click', function() {
+    const idTurno = $('#txtIdTurno').val();
+    const descripcion = $('#txtDescripcion').val().trim();
+    const tabla = $('#tbl').DataTable();
+
+    // Validar descripción
+    const validacion = validarDescripcion(descripcion);
+    if (!validacion.valido) {
+      $('#txtDescripcion').addClass('is-invalid');
+      Swal.fire({
+        icon: 'warning',
+        title: 'Datos inválidos',
+        text: validacion.mensaje,
+        confirmButtonColor: '#f39c12'
+      });
+      return;
+    }
+
+    // Verificar si el turno ya existe
+    if (existeTurno(descripcion, idTurno)) {
+      $('#txtDescripcion').addClass('is-invalid');
+      Swal.fire({
+        icon: 'warning',
+        title: 'Turno duplicado',
+        text: 'Ya existe un turno con esta descripción.',
+        confirmButtonColor: '#f39c12'
+      });
+      return;
+    }
+
+    $('#txtDescripcion').removeClass('is-invalid');
+
+    const data = { descripcion: descripcion };
+    const url = idTurno 
+      ? `/api/v1/turnos/${idTurno}` 
+      : '/api/v1/turnos';
+    const method = idTurno ? 'PUT' : 'POST';
+
+    fetch(url, {
+      method: method,
+      headers: { 
+        'Content-Type': 'application/json', 
+        'X-CSRFToken': CSRFToken 
       },
-      ajax:'/api/v1/turnos',
-      columns: [
-        { data: 'descripcion' },
-        { data: function(row) {
-            return `<button type="button" name="btn_editar" class="btn btn-info" data-id_turno="${row.id_turno}"title="Editar"><i class="fas fa-edit"></i>
-                    <button type="button" name="btn_eliminar" class="btn btn-danger" data-id_turno="${row.id_turno}"title="Eliminar"><i class="fas fa-trash-alt"></i>`
-          }
-        }
-      ]
-    });
-  }
-
-  const agregar = () => {
-    $('#btnAgregar').on('click', function(){
-      $('#modalTitle').text("Agregar un Turno");
-      $('#txtIdTurno').val("");
-      $('#txtDescripcion').val("");
-      $('#modalFormulario').modal();
-    });
-  }
-
-  const guardar = () => {
-    $('#btnGuardar').on('click', function() {
-      const idTurno = $('#txtIdTurno').val();
-      const nuevaDescripcion = $('#txtDescripcion').val();
-      const tabla = $('#tbl').DataTable();
-
-      if(idTurno) {
-        // update
-        fetch(`/api/v1/turnos/${idTurno}`, {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json'
-            , 'X-CSRFToken': CSRFToken
-          }, body: JSON.stringify({ descripcion: nuevaDescripcion, idTurno: idTurno})
-        })
-        .then(resp => resp.json())
-        .then(data => {
-          if(data && !data.error && data.success) {
-            tabla.ajax.reload();
-            Swal.fire("Actualizado", "El turno ha sido actualizado correctamente.", "success");
-          } else {
-            Swal.fire(data.error);
-          }
-        }).catch(err => {
-          console.error(err);
-          Swal.fire("Error", "Ocurrió un error al actualizar el turno.", "error");
+      body: JSON.stringify(data)
+    })
+    .then(resp => resp.json())
+    .then(result => {
+      if (result && !result.error && result.success) {
+        tabla.ajax.reload();
+        $('#modalFormulario').modal("hide");
+        Swal.fire({
+          icon: 'success',
+          title: idTurno ? 'Actualizado' : 'Registrado',
+          text: `El turno ha sido ${idTurno ? 'actualizado' : 'registrado'} correctamente.`,
+          confirmButtonColor: '#28a745'
         });
       } else {
-        // insert
-        fetch(`/api/v1/turnos`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-            , 'X-CSRFToken': CSRFToken
-          }, body: JSON.stringify({ descripcion: nuevaDescripcion, idTurno: idTurno})
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: result.error || 'No se pudo guardar el turno.',
+          confirmButtonColor: '#dc3545'
+        });
+      }
+    })
+    .catch(err => {
+      console.error(err);
+      Swal.fire({
+        icon: 'error',
+        title: 'Error de conexión',
+        text: 'Ocurrió un error al guardar.',
+        confirmButtonColor: '#dc3545'
+      });
+    });
+  });
+};
+
+const editar = () => {
+  $('#tbl').on('click', 'button[name="btn_editar"]', function() {
+    const idTurno = $(this).data('id_turno');
+
+    Swal.fire({
+      title: "¿Deseas editar este registro?",
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: "Sí, editar",
+      cancelButtonText: "Cancelar",
+      confirmButtonColor: '#17a2b8',
+      cancelButtonColor: '#6c757d'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        $('#modalTitle').text("Editar Turno");
+        
+        fetch(`/api/v1/turnos/${idTurno}`, { 
+          method: 'GET',
+          headers: { 'Content-Type': 'application/json' }
         })
         .then(resp => resp.json())
         .then(data => {
-          if(data && !data.error && data.success) {
-            tabla.ajax.reload();
-            Swal.fire("Agregado", "El turno ha sido agregado correctamente.", "success");
+          if (data && data.success && data.data) {
+            $('#txtIdTurno').val(data.data.id_turno);
+            $('#txtDescripcion').val(data.data.descripcion).removeClass('is-invalid');
+            $('#modalFormulario').modal();
           } else {
-            Swal.fire(data.error);
+            Swal.fire({
+              icon: 'error',
+              title: 'Error',
+              text: 'No se pudo cargar el turno.',
+              confirmButtonColor: '#dc3545'
+            });
           }
-        }).catch(err => {
+        })
+        .catch(err => {
           console.error(err);
-          Swal.fire("Error", "Ocurrió un error al guardar el turno.", "error");
+          Swal.fire({
+            icon: 'error',
+            title: 'Error de conexión',
+            text: 'Ocurrió un error al cargar el turno.',
+            confirmButtonColor: '#dc3545'
+          });
         });
       }
-      $('#txtDescripcion').val("");
-      $('#modalFormulario').modal("hide");
     });
-  }
-
-  const editar = () => {
-    $('#tbl').on('click', 'button[name="btn_editar"]',function(){
-      Swal.fire({
-        title: "¿Deseas editar este registro?",
-        showCancelButton: true,
-        confirmButtonText: "Si",
-        cancelButtonText: `No`
-      }).then((result) => {
-        if (result.isConfirmed) {
-          $('#modalTitle').text("Editar un Turno");
-
-          const idTurno = $(this).data('id_turno');
-          $('#txtIdTurno').val(idTurno);
-
-          fetch(`/api/v1/turnos/${idTurno}`, {
-            method: 'GET',
-            headers: {
-              'Content-Type': 'application/json'
-              , 'X-CSRFToken': CSRFToken
-            }
-          })
-          .then(resp => resp.json())
-          .then(data => {
-            $('#txtIdTurno').val(data.data.id_turno);
-            $('#txtDescripcion').val(data.data.descripcion);
-            $('#modalFormulario').modal();
-          });
-        }
-      });
-    });
-  }
-
-  const eliminar = () => {
-    $('#tbl').on('click', 'button[name="btn_eliminar"]',function(){
-      const idTurno = $(this).data('id_turno');
-      Swal.fire({
-        title: "¿Deseas eliminar este registro?",
-        showCancelButton: true,
-        confirmButtonText: "Si",
-        cancelButtonText: `No`
-      }).then((result) => {
-        if (result.isConfirmed) {
-          fetch(`/api/v1/turnos/${idTurno}`, {
-            method: 'DELETE',
-            headers: {
-              'Content-Type': 'application/json'
-              , 'X-CSRFToken': CSRFToken
-            }
-          })
-          .then(resp => resp.json())
-          .then(data => {
-            if(data && !data.error && data.success) {
-              const fila =$(this).closest('tr');
-              const tabla = $('#tbl').DataTable();
-              tabla.row(fila).remove().draw();
-              Swal.fire("Eliminado", "", data.success);
-            } else {
-              Swal.fire(data.error);
-            }
-          }).catch(err => {
-            Swal.fire("Error", "Ocurrió un error al eliminar el turno.", "error");
-          });
-        }
-      });
-
-    });
-  }
-
-  const addEvents = () => {
-    agregar();
-    guardar();
-    editar();
-    eliminar();
-  }
-
-  $(function() {
-    initDatatable();
-    addEvents();
   });
+};
+
+const eliminar = () => {
+  $('#tbl').on('click', 'button[name="btn_eliminar"]', function() {
+    const idTurno = $(this).data('id_turno');
+    const botonEliminar = $(this);
+
+    Swal.fire({
+      title: "¿Deseas eliminar este turno?",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: "Sí, eliminar",
+      cancelButtonText: "Cancelar",
+      confirmButtonColor: '#dc3545',
+      cancelButtonColor: '#6c757d'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        fetch(`/api/v1/turnos/${idTurno}`, {
+          method: 'DELETE',
+          headers: { 
+            'Content-Type': 'application/json', 
+            'X-CSRFToken': CSRFToken 
+          }
+        })
+        .then(resp => resp.json())
+        .then(result => {
+          if (result && !result.error && result.success) {
+            const fila = botonEliminar.closest('tr');
+            const tabla = $('#tbl').DataTable();
+            tabla.row(fila).remove().draw();
+            Swal.fire({
+              icon: 'success',
+              title: 'Eliminado',
+              text: 'El turno ha sido eliminado correctamente.',
+              confirmButtonColor: '#28a745'
+            });
+          } else {
+            Swal.fire({
+              icon: 'error',
+              title: 'Error al eliminar',
+              text: result.error || 'No se pudo eliminar el turno.',
+              confirmButtonColor: '#dc3545'
+            });
+          }
+        })
+        .catch(err => {
+          console.error(err);
+          Swal.fire({
+            icon: 'error',
+            title: 'Error de conexión',
+            text: 'Ocurrió un error al eliminar.',
+            confirmButtonColor: '#dc3545'
+          });
+        });
+      }
+    });
+  });
+};
+
+// Validación en tiempo real: solo letras y espacios
+$('#txtDescripcion').on('keypress', function(e) {
+  const char = String.fromCharCode(e.which);
+  // Permitir solo letras (incluye acentos y ñ) y espacios
+  const patron = /^[A-Za-zÁÉÍÓÚáéíóúÑñÜü\s]$/;
+  
+  if (!patron.test(char)) {
+    e.preventDefault();
+  }
+});
+
+// ==========================================
+// INICIALIZACIÓN
+// ==========================================
+const addEvents = () => {
+  agregar();
+  guardar();
+  editar();
+  eliminar();
+};
+
+$(function() {
+  initDatatable();
+  addEvents();
+});
+
 </script>
 {% endblock %}

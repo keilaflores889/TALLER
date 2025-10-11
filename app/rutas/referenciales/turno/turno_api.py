@@ -3,8 +3,7 @@ from app.dao.referenciales.turno.TurnoDao import TurnoDao
 
 turnoapi = Blueprint('turnoapi', __name__)
 
-# Lista de turnos validos
-TURNOS_VALIDOS= ['MAÑANA', 'TARDE', 'NOCHE', 'MAÑANA, TARDE Y NOCHE', 'MAÑANA Y TARDE', 'TARDE Y NOCHE']
+
 
 
 # Trae todos los turnos
@@ -74,12 +73,7 @@ def addTurno():
     try:
         descripcion = data['descripcion'].upper()
  
-        # Validar si el TURNO está en la lista de TURNOS válidos
-        if descripcion not in TURNOS_VALIDOS:
-            return jsonify({
-                'success': False,
-                'error': 'Turno inválido. Solo se permiten Turnos de "Mañana", "Tarde", "Noche", "Mañana, Tarde y Noche", "Mañana y Tarde", "Tarde y Noche".'
-            }), 400
+       
 
 
         turno_id = turnodao.guardarTurno(descripcion)
@@ -115,12 +109,7 @@ def updateTurno(turno_id):
                             }), 400
     descripcion = data['descripcion']
 
-    # Validar si el TURNO está en la lista de TURNOS válidos
-    if descripcion not in TURNOS_VALIDOS:
-            return jsonify({
-                'success': False,
-                'error': 'Turno inválido. Solo se permiten Turnos de "Mañana", "Tarde", "Noche", "Mañana, Tarde y Noche", "Mañana y Tarde", "Tarde y Noche".'
-            }), 400
+    
 
     try:
         if turnodao.updateTurno(turno_id, descripcion.upper()):
