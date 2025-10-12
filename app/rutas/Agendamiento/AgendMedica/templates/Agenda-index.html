@@ -26,20 +26,20 @@ Agenda Médica
       <div class="table-responsive shadow-sm rounded">
         <table class="table table-hover table-bordered align-middle text-center" id="tbl">
           <thead class="bg-info text-white">
-            <tr>
-              <th>Médico</th>
-              <th>Día</th>
-              <th>Turno</th>
-              <th>Especialidad</th>
-              <th>Consultorio</th>
-              <th>Personal</th>
-              <th>Fecha Agenda</th>
-              <th>Horario Disponible</th>
-              <th>Cupos</th>
-              <th>Estado</th>
-              <th>Acciones</th>
-            </tr>
-          </thead>
+  <tr>
+    <th>Personal</th>
+    <th>Consultorio</th>
+    <th>Médico</th>
+    <th>Día</th>
+    <th>Turno</th>
+    <th>Especialidad</th>
+    <th>Fecha Agenda</th>
+    <th>Horario Disponible</th>
+    <th>Cupos</th>
+    <th>Estado</th>
+    <th>Acciones</th>
+  </tr>
+</thead>
           <tbody></tbody>
         </table>
       </div>
@@ -72,79 +72,98 @@ Agenda Médica
         </div>
 
         <!-- Body -->
-        <div class="modal-body">
-          <input type="hidden" id="txtIdAgenda">
+        <!-- Body -->
+          <div class="modal-body">
+            <input type="hidden" id="txtIdAgenda">
 
-          <div class="row">
+            <div class="row">
 
-            <!-- Médico -->
-            <div class="col-md-6 mb-3">
-              <input type="hidden" id="id_medico">
-              <label class="font-weight-bold">Médico:</label>
-              <input type="text" id="txtmedico" class="form-control" placeholder="Click para seleccionar Médico" readonly>
-            </div>
+  <!-- Personal -->
+  <div class="col-md-6 mb-3">
+    <input type="hidden" id="id_personal">
+    <label class="font-weight-bold">
+      <i class="fas fa-user-nurse mr-1"></i> Personal: <span class="text-danger">*</span>
+    </label>
+    <input type="text" id="txtPersonal" class="form-control" placeholder="Click para seleccionar Personal" readonly>
+  </div>
 
-            <!-- Día -->
-            <div class="col-md-6 mb-3">
-              <input type="hidden" id="id_dia">
-              <label class="font-weight-bold">Día:</label>
-              <input type="text" id="txtDia" class="form-control" placeholder="Click para seleccionar día" readonly>
-            </div>
+  <!-- Consultorio -->
+  <div class="col-md-6 mb-3">
+    <input type="hidden" id="codigo" name="codigo">
+    <label class="font-weight-bold">
+      <i class="fas fa-door-open mr-1"></i> Consultorio: <span class="text-danger">*</span>
+    </label>
+    <input type="text" id="txtConsultorio" class="form-control" placeholder="Click para seleccionar Consultorio" readonly>
+  </div>
 
-            <!-- Turno -->
-            <div class="col-md-6 mb-3">
-              <input type="hidden" id="id_turno">
-              <label class="font-weight-bold">Turno:</label>
-              <input type="text" id="txtTurno" class="form-control" placeholder="Click para seleccionar turno" readonly>
-            </div>
+  <!-- Médico -->
+  <div class="col-md-6 mb-3">
+    <input type="hidden" id="id_medico">
+    <label class="font-weight-bold">
+      <i class="fas fa-user-md mr-1"></i> Médico: <span class="text-danger">*</span>
+    </label>
+    <input type="text" id="txtmedico" class="form-control" placeholder="Click para seleccionar Médico" readonly>
+  </div>
 
-            <!-- Especialidad -->
-            <div class="col-md-6 mb-3">
-              <input type="hidden" id="id_especialidad">
-              <label class="font-weight-bold">Especialidad:</label>
-              <input type="text" id="txtEspecialidad" class="form-control" placeholder="Click para seleccionar Especialidad" readonly>
-            </div>
+  <!-- Día -->
+  <div class="col-md-6 mb-3">
+    <input type="hidden" id="id_dia">
+    <label class="font-weight-bold">
+      <i class="fas fa-calendar-day mr-1"></i> Día: <span class="text-danger">*</span>
+    </label>
+    <input type="text" id="txtDia" class="form-control" placeholder="Click para seleccionar día" readonly>
+  </div>
 
-            <!-- Consultorio -->
-            <div class="col-md-6 mb-3">
-              <input type="hidden" id="codigo" name="codigo">
-              <label class="font-weight-bold">Consultorio:</label>
-              <input type="text" id="txtConsultorio" class="form-control" placeholder="Click para seleccionar Consultorio" readonly>
-            </div>
+  <!-- Turno -->
+  <div class="col-md-6 mb-3">
+    <input type="hidden" id="id_turno">
+    <label class="font-weight-bold">
+      <i class="fas fa-clock mr-1"></i> Turno: <span class="text-danger">*</span>
+    </label>
+    <input type="text" id="txtTurno" class="form-control" placeholder="Click para seleccionar turno" readonly>
+  </div>
 
-            <!-- Personal -->
-            <div class="col-md-6 mb-3">
-              <input type="hidden" id="id_personal">
-              <label class="font-weight-bold">Personal:</label>
-              <input type="text" id="txtPersonal" class="form-control" placeholder="Click para seleccionar Personal" readonly>
-            </div>
+  <!-- Especialidad -->
+  <div class="col-md-6 mb-3">
+    <input type="hidden" id="id_especialidad">
+    <label class="font-weight-bold">
+      <i class="fas fa-stethoscope mr-1"></i> Especialidad: <span class="text-danger">*</span>
+    </label>
+    <input type="text" id="txtEspecialidad" class="form-control" placeholder="Click para seleccionar Especialidad" readonly>
+  </div>
 
-            <!-- Horario Disponible -->
-            <div class="col-md-6 mb-3">
-              <label class="font-weight-bold">Horario Disponible:</label>
-              <select id="selectHorario" class="form-control">
-                <option value="">Seleccione médico y fecha</option>
-              </select>
-            </div>
+  <!-- Fecha Agenda -->
+  <div class="col-md-6 mb-3">
+    <label class="font-weight-bold">
+      <i class="fas fa-calendar-plus mr-1"></i> Fecha Agenda: <span class="text-danger">*</span>
+    </label>
+    <input type="date" id="fecha_agenda" class="form-control">
+  </div>
 
-            <!-- Cupos -->
-            <div class="col-md-6 mb-3">
-              <label class="font-weight-bold">Cupos:</label>
-              <input type="number" id="cupos" class="form-control" min="0" value="0" readonly>
-            </div>
+  <!-- Horario Disponible -->
+  <div class="col-md-6 mb-3">
+    <label class="font-weight-bold">
+      <i class="far fa-clock mr-1"></i> Horario Disponible: <span class="text-danger">*</span>
+    </label>
+    <select id="selectHorario" class="form-control">
+      <option value="">Seleccione médico y fecha</option>
+    </select>
+  </div>
 
-            <!-- Fecha Agenda -->
-            <div class="col-md-6 mb-3">
-              <label class="font-weight-bold">Fecha Agenda:</label>
-              <input type="date" id="fecha_agenda" class="form-control">
-            </div>
+  <!-- Cupos -->
+  <div class="col-md-6 mb-3">
+    <label class="font-weight-bold">
+      <i class="fas fa-users mr-1"></i> Cupos: <span class="text-danger">*</span>
+    </label>
+    <input type="number" id="cupos" class="form-control" min="0" value="0" readonly>
+  </div>
 
-            <!-- Hidden inputs -->
-            <input type="hidden" id="id_disponibilidad">
-            <input type="hidden" id="horario_disponible">
+  <!-- Hidden inputs -->
+  <input type="hidden" id="id_disponibilidad">
+  <input type="hidden" id="horario_disponible">
 
+</div>
           </div>
-        </div>
 
         <!-- Footer -->
         <div class="modal-footer bg-light">
@@ -163,159 +182,149 @@ Agenda Médica
   <!-- Modales de selección -->
 
   <!-- Modal Médico -->
-  <div class="modal fade" id="modalBuscarMedico" tabindex="-1" role="dialog">
-    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h4 class="modal-title">Seleccionar Médico</h4>
-          <button type="button" class="close" data-dismiss="modal">&times;</button>
-        </div>
-        <div class="modal-body">
-          <div class="table-responsive">
-            <table class="table table-striped table-bordered w-100" id="tblMedico">
-              <thead>
-                <tr>
-                  <th>Nombre</th>
-                  <th>Apellido</th>
-                  <th>Acciones</th>
-                </tr>
-              </thead>
-              <tbody></tbody>
-            </table>
-          </div>
-        </div>
+  <!-- Modales de selección con mejor diseño -->
+
+<!-- Modal Médico -->
+<div class="modal fade" id="modalBuscarMedico" tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header bg-info text-white">
+        <h4 class="modal-title"><i class="fas fa-user-md mr-2"></i> Seleccionar Médico</h4>
+        <button type="button" class="close text-white" data-dismiss="modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <table class="table table-striped table-bordered w-100" id="tblMedico">
+          <thead class="bg-info text-white">
+            <tr>
+              <th>Nombre</th>
+              <th>Apellido</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
       </div>
     </div>
   </div>
+</div>
 
-  <!-- Modal Día -->
-  <div class="modal fade" id="modalBuscarDia" tabindex="-1" role="dialog">
-    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h4 class="modal-title">Seleccionar Día</h4>
-          <button type="button" class="close" data-dismiss="modal">&times;</button>
-        </div>
-        <div class="modal-body">
-          <div class="table-responsive">
-            <table class="table table-striped table-bordered w-100" id="tblDia">
-              <thead>
-                <tr>
-                  <th>Día</th>
-                  <th>Acciones</th>
-                </tr>
-              </thead>
-              <tbody></tbody>
-            </table>
-          </div>
-        </div>
+<!-- Modal Día -->
+<div class="modal fade" id="modalBuscarDia" tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header bg-info text-white">
+        <h4 class="modal-title"><i class="fas fa-calendar-day mr-2"></i> Seleccionar Día</h4>
+        <button type="button" class="close text-white" data-dismiss="modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <table class="table table-striped table-bordered w-100" id="tblDia">
+          <thead class="bg-info text-white">
+            <tr>
+              <th>Día</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
       </div>
     </div>
   </div>
+</div>
 
-  <!-- Modal Turno -->
-  <div class="modal fade" id="modalBuscarTurno" tabindex="-1" role="dialog">
-    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h4 class="modal-title">Seleccionar Turno</h4>
-          <button type="button" class="close" data-dismiss="modal">&times;</button>
-        </div>
-        <div class="modal-body">
-          <div class="table-responsive">
-            <table class="table table-striped table-bordered w-100" id="tblTurno">
-              <thead>
-                <tr>
-                  <th>Turno</th>
-                  <th>Acciones</th>
-                </tr>
-              </thead>
-              <tbody></tbody>
-            </table>
-          </div>
-        </div>
+<!-- Modal Turno -->
+<div class="modal fade" id="modalBuscarTurno" tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header bg-info text-white">
+        <h4 class="modal-title"><i class="fas fa-clock mr-2"></i> Seleccionar Turno</h4>
+        <button type="button" class="close text-white" data-dismiss="modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <table class="table table-striped table-bordered w-100" id="tblTurno">
+          <thead class="bg-info text-white">
+            <tr>
+              <th>Turno</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
       </div>
     </div>
   </div>
+</div>
 
-  <!-- Modal Especialidad -->
-  <div class="modal fade" id="modalBuscarEspecialidad" tabindex="-1" role="dialog">
-    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h4 class="modal-title">Seleccionar Especialidad</h4>
-          <button type="button" class="close" data-dismiss="modal">&times;</button>
-        </div>
-        <div class="modal-body">
-          <div class="table-responsive">
-            <table class="table table-striped table-bordered w-100" id="tblEspecialidad">
-              <thead>
-                <tr>
-                  <th>Especialidad</th>
-                  <th>Acciones</th>
-                </tr>
-              </thead>
-              <tbody></tbody>
-            </table>
-          </div>
-        </div>
+<!-- Modal Especialidad -->
+<div class="modal fade" id="modalBuscarEspecialidad" tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header bg-info text-white">
+        <h4 class="modal-title"><i class="fas fa-stethoscope mr-2"></i> Seleccionar Especialidad</h4>
+        <button type="button" class="close text-white" data-dismiss="modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <table class="table table-striped table-bordered w-100" id="tblEspecialidad">
+          <thead class="bg-info text-white">
+            <tr>
+              <th>Especialidad</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
       </div>
     </div>
   </div>
+</div>
 
-  <!-- Modal Consultorio -->
-  <div class="modal fade" id="modalBuscarConsultorio" tabindex="-1" role="dialog">
-    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h4 class="modal-title">Seleccionar Consultorio</h4>
-          <button type="button" class="close" data-dismiss="modal">&times;</button>
-        </div>
-        <div class="modal-body">
-          <div class="table-responsive">
-            <table class="table table-striped table-bordered w-100" id="tblConsultorio">
-              <thead>
-                <tr>
-                  <th>Consultorio</th>
-                  <th>Acciones</th>
-                </tr>
-              </thead>
-              <tbody></tbody>
-            </table>
-          </div>
-        </div>
+<!-- Modal Consultorio -->
+<div class="modal fade" id="modalBuscarConsultorio" tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header bg-info text-white">
+        <h4 class="modal-title"><i class="fas fa-door-open mr-2"></i> Seleccionar Consultorio</h4>
+        <button type="button" class="close text-white" data-dismiss="modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <table class="table table-striped table-bordered w-100" id="tblConsultorio">
+          <thead class="bg-info text-white">
+            <tr>
+              <th>Consultorio</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
       </div>
     </div>
   </div>
+</div>
 
-  <!-- Modal Personal -->
-  <div class="modal fade" id="modalBuscarPersonal" tabindex="-1" role="dialog">
-    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h4 class="modal-title">Seleccionar Personal</h4>
-          <button type="button" class="close" data-dismiss="modal">&times;</button>
-        </div>
-        <div class="modal-body">
-          <div class="table-responsive">
-            <table class="table table-striped table-bordered w-100" id="tblPersonal">
-              <thead>
-                <tr>
-                  <th>Nombre</th>
-                  <th>Apellido</th>
-                  <th>Acciones</th>
-                </tr>
-              </thead>
-              <tbody></tbody>
-            </table>
-          </div>
-        </div>
+<!-- Modal Personal -->
+<div class="modal fade" id="modalBuscarPersonal" tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header bg-info text-white">
+        <h4 class="modal-title"><i class="fas fa-user-nurse mr-2"></i> Seleccionar Personal</h4>
+        <button type="button" class="close text-white" data-dismiss="modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <table class="table table-striped table-bordered w-100" id="tblPersonal">
+          <thead class="bg-info text-white">
+            <tr>
+              <th>Nombre</th>
+              <th>Apellido</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
       </div>
     </div>
   </div>
 
 </div>
-
+</div>
 <!-- Librerías necesarias -->
 <link rel="stylesheet" href="https://cdn.datatables.net/1.10.21/css/dataTables.bootstrap4.min.css">
 <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
@@ -340,7 +349,39 @@ function formatDateForInput(fecha) {
   return `${year}-${month}-${day}`;
 }
 
-
+// ==========================================
+// VALIDACIONES
+// ==========================================
+const validarCamposRequeridos = (datos) => {
+  if (!datos.id_medico) {
+    return { valido: false, mensaje: 'Debe seleccionar un médico.' };
+  }
+  if (!datos.id_dia) {
+    return { valido: false, mensaje: 'Debe seleccionar un día.' };
+  }
+  if (!datos.id_turno) {
+    return { valido: false, mensaje: 'Debe seleccionar un turno.' };
+  }
+  if (!datos.id_especialidad) {
+    return { valido: false, mensaje: 'Debe seleccionar una especialidad.' };
+  }
+  if (!datos.codigo) {
+    return { valido: false, mensaje: 'Debe seleccionar un consultorio.' };
+  }
+  if (!datos.id_personal) {
+    return { valido: false, mensaje: 'Debe seleccionar el personal.' };
+  }
+  if (!datos.fecha_agenda) {
+    return { valido: false, mensaje: 'La fecha de agenda es obligatoria.' };
+  }
+  if (!datos.id_disponibilidad) {
+    return { valido: false, mensaje: 'Debe seleccionar un horario disponible.' };
+  }
+  if (!datos.cupos || datos.cupos <= 0) {
+    return { valido: false, mensaje: 'Los cupos deben ser mayor a 0.' };
+  }
+  return { valido: true };
+};
 
 // --- Tabla principal Agenda ---
 const initDatatable = () => {
@@ -348,37 +389,37 @@ const initDatatable = () => {
     language: { url: "{{ url_for('static', filename='vendor/datatables/es-ES.json') }}" },
     ajax: '/api/v1/agenda',
     columns: [
-      { data: 'medico_nombre' },
-      { data: 'dia' },
-      { data: 'turno' },
-      { data: 'especialidad' },
-      { data: 'consultorio_nombre' }, 
-      { data: 'personal_nombre' },    
-      {
-  data: 'fecha_agenda',
-  render: function(data) {
-  if (!data) return '';
-  const d = new Date(data);
-  if (isNaN(d)) return '';
-  const day = String(d.getUTCDate()).padStart(2, '0');
-  const month = String(d.getUTCMonth() + 1).padStart(2, '0');
-  const year = d.getUTCFullYear();
-  return `${day}/${month}/${year}`;
-}
+      { data: 'personal_nombre' },      // Personal
+      { data: 'consultorio_nombre' },   // Consultorio
+      { data: 'medico_nombre' },        // Médico
+      { data: 'dia' },                  // Día
+      { data: 'turno' },                // Turno
+      { data: 'especialidad' },         // Especialidad
+      {                                 // Fecha Agenda
+        data: 'fecha_agenda',
+        render: function(data) {
+          if (!data) return '';
+          const d = new Date(data);
+          if (isNaN(d)) return '';
+          const day = String(d.getUTCDate()).padStart(2, '0');
+          const month = String(d.getUTCMonth() + 1).padStart(2, '0');
+          const year = d.getUTCFullYear();
+          return `${day}/${month}/${year}`;
+        }
       },
-      { data: 'horario_disponible' },
-      { data: 'cupos' },
-      {  
+      { data: 'horario_disponible' },   // Horario Disponible
+      { data: 'cupos' },                // Cupos
+      {                                 // Estado
         data: 'estado',
         render: function(data) {
-        if(data === "Activo") {
-         return '<span style="color: #155724; background-color: #d4edda; padding: 2px 6px; border-radius: 4px;">Activo</span>';
-    } else {
-      return '<span style="color: #721c24; background-color: #f8d7da; padding: 2px 6px; border-radius: 4px;">Inactivo</span>';
-    }
-  }
-},
-      {
+          if(data === "Activo") {
+            return '<span style="color: #155724; background-color: #d4edda; padding: 2px 6px; border-radius: 4px;">Activo</span>';
+          } else {
+            return '<span style="color: #721c24; background-color: #f8d7da; padding: 2px 6px; border-radius: 4px;">Inactivo</span>';
+          }
+        }
+      },
+      {                                 // Acciones
         data: function(row) {
           return `
           <button type="button" name="btn_editar" class="btn btn-info btn-sm" data-id_agenda_medica="${row.id_agenda_medica}" title="Editar">
@@ -401,9 +442,13 @@ const initDatatablem = () => {
     columns: [
       { data: 'nombre' },
       { data: 'apellido'},
-      { data: function(row) {
-        return `<button type="button" name="btn_seleccionar_Medico" class="btn btn-primary" data-id="${row.id_medico}" data-nombre="${row.nombre}" data-apellido="${row.apellido}">Seleccionar</button>`;
-      }}
+      { 
+        data: function(row) {
+          return `<button type="button" name="btn_seleccionar_Medico" class="btn btn-sm btn-warning" data-id="${row.id_medico}" data-nombre="${row.nombre}" data-apellido="${row.apellido}"><i class="fas fa-check mr-1"></i>Seleccionar</button>`;
+        },
+        className: 'text-center',
+        orderable: false
+      }
     ]
   });
 
@@ -423,9 +468,13 @@ const initDatatabled = () => {
     ajax:'/api/v1/dias',
     columns: [
       { data: 'descripcion' },
-      { data: function(row) {
-        return `<button type="button" name="btn_seleccionar_dia" class="btn btn-primary" data-id="${row.id_dia}" data-dia="${row.descripcion}">Seleccionar</button>`;
-      }}
+      { 
+        data: function(row) {
+          return `<button type="button" name="btn_seleccionar_dia" class="btn btn-sm btn-warning" data-id="${row.id_dia}" data-dia="${row.descripcion}"><i class="fas fa-check mr-1"></i>Seleccionar</button>`;
+        },
+        className: 'text-center',
+        orderable: false
+      }
     ]
   });
 
@@ -442,9 +491,13 @@ const initDatatablet = () => {
     ajax:'/api/v1/turnos',
     columns: [
       { data: 'descripcion' },
-      { data: function(row) {
-        return `<button type="button" name="btn_seleccionar_Turno" class="btn btn-primary" data-id="${row.id_turno}" data-turno="${row.descripcion}">Seleccionar</button>`;
-      }}
+      { 
+        data: function(row) {
+          return `<button type="button" name="btn_seleccionar_Turno" class="btn btn-sm btn-warning" data-id="${row.id_turno}" data-turno="${row.descripcion}"><i class="fas fa-check mr-1"></i>Seleccionar</button>`;
+        },
+        className: 'text-center',
+        orderable: false
+      }
     ]
   });
 
@@ -461,9 +514,13 @@ const initDatatableEspecialidad = () => {
     ajax:'/api/v1/especialidades',
     columns: [
       { data: 'descripcion' },
-      { data: function(row) {
-        return `<button type="button" name="btn_seleccionar_especialidad" class="btn btn-primary" data-id="${row.id_especialidad}" data-especialidad="${row.descripcion}">Seleccionar</button>`;
-      }}
+      { 
+        data: function(row) {
+          return `<button type="button" name="btn_seleccionar_especialidad" class="btn btn-sm btn-warning" data-id="${row.id_especialidad}" data-especialidad="${row.descripcion}"><i class="fas fa-check mr-1"></i>Seleccionar</button>`;
+        },
+        className: 'text-center',
+        orderable: false
+      }
     ]
   });
 
@@ -480,9 +537,13 @@ const initDatatableConsultorio = () => {
     ajax:'/api/v1/consultorios',
     columns: [
       { data: 'nombre_consultorio' },
-      { data: function(row) {
-        return `<button type="button" name="btn_seleccionar_consultorio" class="btn btn-primary" data-codigo="${row.codigo}" data-consultorio="${row.nombre_consultorio}">Seleccionar</button>`;
-      }}
+      { 
+        data: function(row) {
+          return `<button type="button" name="btn_seleccionar_consultorio" class="btn btn-sm btn-warning" data-codigo="${row.codigo}" data-consultorio="${row.nombre_consultorio}"><i class="fas fa-check mr-1"></i>Seleccionar</button>`;
+        },
+        className: 'text-center',
+        orderable: false
+      }
     ]
   });
 
@@ -512,8 +573,10 @@ const cargarDisponibilidades = () => {
       .then(result => {
         if (result.success && result.data.length > 0) {
           result.data.forEach(d => {
-            const horaInicio = d.disponibilidad_hora_inicio?.substring(0,5) || '';
-            const horaFin = d.disponibilidad_hora_fin?.substring(0,5) || '';
+            // NO recortar ni formatear, usar las horas completas con a.m./p.m.
+            const horaInicio = d.disponibilidad_hora_inicio || '';
+            const horaFin = d.disponibilidad_hora_fin || '';
+            
             select.append(`
               <option value="${d.id_disponibilidad}"
                       data-cupos="${d.disponibilidad_cupos}"
@@ -542,6 +605,7 @@ const cargarDisponibilidades = () => {
     const horaFin = opt.data('hora_fin') || '';
     const cupos = opt.data('cupos') || 0;
 
+    // Guardar con el formato completo a.m./p.m.
     $('#horario_disponible').val(`${horaInicio} - ${horaFin}`);
     $('#cupos').val(cupos);
   });
@@ -555,9 +619,13 @@ const initDatatablePersonal = () => {
     columns: [
       { data: 'nombre' },
       { data: 'apellido' },
-      { data: function(row) {
-        return `<button type="button" name="btn_seleccionar_personal" class="btn btn-primary" data-id="${row.id_personal}" data-nombre="${row.nombre}" data-apellido="${row.apellido}">Seleccionar</button>`;
-      }}
+      { 
+        data: function(row) {
+          return `<button type="button" name="btn_seleccionar_personal" class="btn btn-sm btn-warning" data-id="${row.id_personal}" data-nombre="${row.nombre}" data-apellido="${row.apellido}"><i class="fas fa-check mr-1"></i>Seleccionar</button>`;
+        },
+        className: 'text-center',
+        orderable: false
+      }
     ]
   });
 
@@ -602,138 +670,250 @@ const agregar = () => {
 };
 
 
+
+
 // --- Guardar ---
-const guardar = () => $('#btnGuardar').on('click', function() {
-  const idAgenda = $('#txtIdAgenda').val();
-  const fecha = $('#fecha_agenda').val();
-  const hora = $('#horario_disponible').val();
+const guardar = () => {
+  $('#btnGuardar').on('click', function() {
+    const idAgenda = $('#txtIdAgenda').val();
 
-  const payload = {
-    id_medico: $('#id_medico').val(),
-    id_dia: $('#id_dia').val(),
-    id_turno: $('#id_turno').val(),
-    id_especialidad: $('#id_especialidad').val(),
-    codigo: $('#codigo').val(),
-    id_personal: $('#id_personal').val(),
-    fecha_agenda: fecha,
-    id_disponibilidad: parseInt($('#id_disponibilidad').val() || 0),
-    horario_disponible: hora,
-    cupos: parseInt($('#cupos').val() || 0),
-    estado: $('#estado').val(),
-  };
+    const datos = {
+      id_medico: $('#id_medico').val(),
+      id_dia: $('#id_dia').val(),
+      id_turno: $('#id_turno').val(),
+      id_especialidad: $('#id_especialidad').val(),
+      codigo: $('#codigo').val(),
+      id_personal: $('#id_personal').val(),
+      fecha_agenda: $('#fecha_agenda').val(),
+      id_disponibilidad: parseInt($('#id_disponibilidad').val() || 0),
+      horario_disponible: $('#horario_disponible').val(),
+      cupos: parseInt($('#cupos').val() || 0),
+      estado: $('#estado').val(),
+    };
 
-  const tabla = $('#tbl').DataTable();
-  const method = idAgenda ? 'PUT' : 'POST';
-  const url = idAgenda ? `/api/v1/agenda/${idAgenda}` : '/api/v1/agenda';
-
-  fetch(url, {
-    method: method,
-    headers: { 'Content-Type': 'application/json', 'X-CSRFToken': CSRFToken },
-    body: JSON.stringify(payload)
-  })
-  .then(resp => resp.json())
-  .then(data => {
-    if (data.success) {
-      tabla.ajax.reload();
-      Swal.fire(idAgenda ? "Actualizado" : "Registrado", "Agenda guardada correctamente.", "success");
-    } else {
-      Swal.fire("Error", data.error, "error");
+    // Validar campos requeridos
+    const validacion = validarCamposRequeridos(datos);
+    if (!validacion.valido) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Campos incompletos',
+        text: validacion.mensaje,
+        confirmButtonColor: '#f39c12'
+      });
+      return;
     }
-  })
-  .catch(err => Swal.fire("Error", "Ocurrió un error al guardar la agenda.", "error"));
 
-  $('#modalFormulario').modal("hide");
-});
+    const tabla = $('#tbl').DataTable();
+    const method = idAgenda ? 'PUT' : 'POST';
+    const url = idAgenda ? `/api/v1/agenda/${idAgenda}` : '/api/v1/agenda';
 
-// --- Editar ---
-// --- Editar ---
+    fetch(url, {
+      method: method,
+      headers: { 
+        'Content-Type': 'application/json', 
+        'X-CSRFToken': CSRFToken 
+      },
+      body: JSON.stringify(datos)
+    })
+    .then(resp => resp.json())
+    .then(result => {
+      if (result && !result.error && result.success) {
+        tabla.ajax.reload();
+        $('#modalFormulario').modal('hide');
+        Swal.fire({
+          icon: 'success',
+          title: idAgenda ? 'Actualizado' : 'Registrado',
+          text: `La agenda ha sido ${idAgenda ? 'actualizada' : 'registrada'} correctamente.`,
+          confirmButtonColor: '#28a745'
+        });
+      } else {
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: result.error || 'No se pudo guardar la agenda.',
+          confirmButtonColor: '#dc3545'
+        });
+      }
+    })
+    .catch(err => {
+      console.error(err);
+      Swal.fire({
+        icon: 'error',
+        title: 'Error de conexión',
+        text: 'Ocurrió un error al guardar. Por favor, intente nuevamente.',
+        confirmButtonColor: '#dc3545'
+      });
+    });
+  });
+};
+
 // --- Editar ---
 const editar = () => {
   $('#tbl').on('click', 'button[name="btn_editar"]', function() {
     const idAgenda = $(this).data('id_agenda_medica');
 
-    fetch(`/api/v1/agenda/${idAgenda}`)
-      .then(resp => resp.json())
-      .then(data => {
-        const d = data.data;
-
-        // --- Datos básicos ---
-        $('#txtIdAgenda').val(d.id_agenda_medica);
-        $('#id_medico').val(d.id_medico); $('#txtmedico').val(d.medico_nombre);
-        $('#id_dia').val(d.id_dia); $('#txtDia').val(d.dia);
-        $('#id_turno').val(d.id_turno); $('#txtTurno').val(d.turno);
-        $('#id_especialidad').val(d.id_especialidad); $('#txtEspecialidad').val(d.especialidad);
-        $('#codigo').val(d.consultorio_id); $('#txtConsultorio').val(d.consultorio_nombre);
-        $('#fecha_agenda').val(formatDateForInput(d.fecha_agenda));
-
-        // --- Personal ---
-        $('#id_personal').val(d.id_personal || "");
-        $('#txtPersonal').val(d.personal_nombre || "");
-
-        // --- Otros ---
-        $('#cupos').val(d.cupos || "");
-        $('#estado').val(d.estado);
-
-        // --- Cargar horarios disponibles ---
-        fetch(`/api/v1/agenda/disponibilidad?id_medico=${d.id_medico}&fecha=${formatDateForInput(d.fecha_agenda)}`)
+    Swal.fire({
+      title: "¿Deseas editar este registro?",
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: "Sí, editar",
+      cancelButtonText: "Cancelar",
+      confirmButtonColor: '#17a2b8',
+      cancelButtonColor: '#6c757d'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        fetch(`/api/v1/agenda/${idAgenda}`)
           .then(resp => resp.json())
-          .then(result => {
-            const select = $('#selectHorario');
-            select.empty(); // eliminamos cualquier opción previa
+          .then(data => {
+            if (data && data.success && data.data) {
+              const d = data.data;
 
-            if (result.success && result.data.length > 0) {
-              result.data.forEach(h => {
-                const horaInicio = h.disponibilidad_hora_inicio?.substring(0,5) || '';
-                const horaFin = h.disponibilidad_hora_fin?.substring(0,5) || '';
-                const selected = h.id_disponibilidad == d.id_disponibilidad ? 'selected' : '';
-                select.append(`
-                  <option value="${h.id_disponibilidad}" 
-                          data-cupos="${h.disponibilidad_cupos}" 
-                          data-hora_inicio="${horaInicio}" 
-                          data-hora_fin="${horaFin}" ${selected}>
-                    ${horaInicio} - ${horaFin} (Cupos: ${h.disponibilidad_cupos})
-                  </option>
-                `);
+              $('#modalTitle').text("Editar Agenda");
+              $('#txtIdAgenda').val(d.id_agenda_medica);
+              $('#id_medico').val(d.id_medico);
+              $('#txtmedico').val(d.medico_nombre);
+              $('#id_dia').val(d.id_dia);
+              $('#txtDia').val(d.dia);
+              $('#id_turno').val(d.id_turno);
+              $('#txtTurno').val(d.turno);
+              $('#id_especialidad').val(d.id_especialidad);
+              $('#txtEspecialidad').val(d.especialidad);
+              $('#codigo').val(d.consultorio_id);
+              $('#txtConsultorio').val(d.consultorio_nombre);
+              $('#fecha_agenda').val(formatDateForInput(d.fecha_agenda));
+              $('#id_personal').val(d.id_personal || "");
+              $('#txtPersonal').val(d.personal_nombre || "");
+              $('#cupos').val(d.cupos || "");
+              $('#estado').val(d.estado);
+
+              // Cargar horarios disponibles
+              fetch(`/api/v1/agenda/disponibilidad?id_medico=${d.id_medico}&fecha=${formatDateForInput(d.fecha_agenda)}`)
+                .then(resp => resp.json())
+                .then(result => {
+                  const select = $('#selectHorario');
+                  select.empty();
+
+                  if (result.success && result.data.length > 0) {
+                    result.data.forEach(h => {
+                      const horaInicio = h.disponibilidad_hora_inicio || '';
+                      const horaFin = h.disponibilidad_hora_fin || '';
+                      const selected = h.id_disponibilidad == d.id_disponibilidad ? 'selected' : '';
+                      
+                      select.append(`
+                        <option value="${h.id_disponibilidad}" 
+                                data-cupos="${h.disponibilidad_cupos}" 
+                                data-hora_inicio="${horaInicio}" 
+                                data-hora_fin="${horaFin}" ${selected}>
+                          ${horaInicio} - ${horaFin} (Cupos: ${h.disponibilidad_cupos})
+                        </option>
+                      `);
+                    });
+
+                    $('#id_disponibilidad').val(d.id_disponibilidad);
+                    $('#horario_disponible').val(d.horario_disponible);
+                    $('#cupos').val(d.cupos);
+                  }
+
+                  $('#modalFormulario').modal('show');
+                });
+            } else {
+              Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'No se pudo cargar la agenda.',
+                confirmButtonColor: '#dc3545'
               });
-
-              // Setear los hidden
-              $('#id_disponibilidad').val(d.id_disponibilidad);
-              $('#horario_disponible').val(d.horario_disponible);
-              $('#cupos').val(d.cupos);
             }
-
-            // abrir modal
-            $('#modalFormulario').modal();
+          })
+          .catch(err => {
+            console.error(err);
+            Swal.fire({
+              icon: 'error',
+              title: 'Error de conexión',
+              text: 'Ocurrió un error al cargar la agenda.',
+              confirmButtonColor: '#dc3545'
+            });
           });
-      });
+      }
+    });
   });
 };
-
-
 
 // --- Eliminar ---
 const eliminar = () => {
   $('#tbl').on('click', 'button[name="btn_eliminar"]', function() {
     const idAgenda = $(this).data('id_agenda_medica');
-    const fila = $(this).closest('tr');
+    const botonEliminar = $(this);
+
     Swal.fire({
       title: "¿Deseas eliminar este registro?",
+      icon: 'warning',
       showCancelButton: true,
-      confirmButtonText: "Si",
-      cancelButtonText: "No"
-    }).then(result => {
+      confirmButtonText: "Sí, eliminar",
+      cancelButtonText: "Cancelar",
+      confirmButtonColor: '#dc3545',
+      cancelButtonColor: '#6c757d'
+    }).then((result) => {
       if (result.isConfirmed) {
         fetch(`/api/v1/agenda/${idAgenda}`, {
-          method:'DELETE',
-          headers:{'Content-Type':'application/json','X-CSRFToken':CSRFToken}
+          method: 'DELETE',
+          headers: { 
+            'Content-Type': 'application/json', 
+            'X-CSRFToken': CSRFToken 
+          }
         })
         .then(resp => resp.json())
-        .then(data => {
-          if(data.success) { $('#tbl').DataTable().row(fila).remove().draw(); Swal.fire("Eliminado","","success"); }
-          else Swal.fire("Error", data.error,"error");
+        .then(result => {
+          if (result && !result.error && result.success) {
+            const fila = botonEliminar.closest('tr');
+            const tabla = $('#tbl').DataTable();
+            tabla.row(fila).remove().draw();
+            Swal.fire({
+              icon: 'success',
+              title: 'Eliminado',
+              text: 'El registro ha sido eliminado correctamente.',
+              confirmButtonColor: '#28a745'
+            });
+          } else {
+            Swal.fire({
+              icon: 'error',
+              title: 'Error al eliminar',
+              text: result.error || 'No se pudo eliminar el registro.',
+              confirmButtonColor: '#dc3545'
+            });
+          }
         })
+        .catch(err => {
+          console.error(err);
+          Swal.fire({
+            icon: 'error',
+            title: 'Error de conexión',
+            text: 'Ocurrió un error al eliminar. Por favor, intente nuevamente.',
+            confirmButtonColor: '#dc3545'
+          });
+        });
       }
     });
+  });
+};
+
+// ==========================================
+// FIX MODAL
+// ==========================================
+const fixModalShift = () => {
+  $.fn.modal.Constructor.prototype._setScrollbar = function() {};
+  $.fn.modal.Constructor.prototype._resetScrollbar = function() {};
+  
+  $(document).on('show.bs.modal', '.modal', function () {
+    setTimeout(() => {
+      $('body').css('padding-right', '0');
+      $('.modal').css('padding-right', '0');
+      $('.navbar-fixed-top, .navbar-fixed-bottom').css('padding-right', '0');
+    }, 0);
+  });
+
+  $(document).on('hidden.bs.modal', '.modal', function () {
+    $('body').css('padding-right', '0');
   });
 };
 
@@ -741,7 +921,7 @@ const eliminar = () => {
 const addEvents = () => {
   agregar(); guardar(); editar(); eliminar();
   buscarMedico(); buscarDia(); buscarTurno();
-  buscarEspecialidad(); buscarConsultorio(); buscarPersonal();
+  buscarEspecialidad(); buscarConsultorio(); buscarPersonal(); fixModalShift();
 };
 
 $(function() {
