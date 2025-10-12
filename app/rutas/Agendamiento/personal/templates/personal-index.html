@@ -1,3 +1,4 @@
+
 {% extends 'base.html' %}
 
 {% block titulo %}
@@ -47,12 +48,17 @@ Personal
   <!-- =========================== -->
   <!-- Modal Formulario Personal -->
   <!-- =========================== -->
-  <div class="modal fade" id="modalFormulario" tabindex="-1" role="dialog">
-    <div class="modal-dialog modal-xl modal-dialog-scrollable" role="document">
+  <div class="modal fade" 
+       id="modalFormulario" 
+       tabindex="-1" 
+       role="dialog"
+       data-backdrop="static"
+       data-keyboard="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable" role="document">
       <div class="modal-content shadow-lg border-0 rounded-lg">
 
         <!-- Header -->
-        <div class="modal-header bg-info text-white rounded-top d-flex justify-content-between align-items-center">
+        <div class="modal-header bg-info text-white rounded-top">
           <h5 class="modal-title font-weight-bold">
             <i class="fas fa-user-tie mr-2"></i> <span id="modalTitle">Nuevo Personal</span>
           </h5>
@@ -68,64 +74,135 @@ Personal
 
               <!-- Nombre -->
               <div class="col-md-6 mb-3">
-                <label class="font-weight-bold">Nombre:</label>
-                <input type="text" id="nombre" class="form-control" placeholder="Ingrese el nombre">
+                <label class="font-weight-bold">
+                  <i class="fas fa-user mr-1"></i> Nombre: <span class="text-danger">*</span>
+                </label>
+                <input type="text" 
+                       id="nombre" 
+                       class="form-control" 
+                       placeholder="Ingrese el nombre"
+                       maxlength="50"
+                       required>
               </div>
 
               <!-- Apellido -->
               <div class="col-md-6 mb-3">
-                <label class="font-weight-bold">Apellido:</label>
-                <input type="text" id="apellido" class="form-control" placeholder="Ingrese el apellido">
+                <label class="font-weight-bold">
+                  <i class="fas fa-user mr-1"></i> Apellido: <span class="text-danger">*</span>
+                </label>
+                <input type="text" 
+                       id="apellido" 
+                       class="form-control" 
+                       placeholder="Ingrese el apellido"
+                       maxlength="50"
+                       required>
               </div>
 
               <!-- Cédula -->
               <div class="col-md-6 mb-3">
-                <label class="font-weight-bold">Cédula:</label>
-                <input type="text" id="cedula" class="form-control" placeholder="Ingrese el número de cédula">
+                <label class="font-weight-bold">
+                  <i class="fas fa-id-card mr-1"></i> Cédula: <span class="text-danger">*</span>
+                </label>
+                <input type="text" 
+                       id="cedula" 
+                       class="form-control" 
+                       placeholder="Ingrese el número de cédula"
+                       maxlength="20"
+                       required>
+                <small class="form-text text-muted">
+                  <i class="fas fa-info-circle"></i> Solo números
+                </small>
               </div>
 
               <!-- Fecha Nacimiento -->
               <div class="col-md-6 mb-3">
-                <label class="font-weight-bold">Fecha Nacimiento:</label>
-                <input type="date" id="fecha_nacimiento" class="form-control">
+                <label class="font-weight-bold">
+                  <i class="fas fa-birthday-cake mr-1"></i> Fecha Nacimiento: <span class="text-danger">*</span>
+                </label>
+                <input type="date" 
+                       id="fecha_nacimiento" 
+                       class="form-control"
+                       required>
               </div>
 
               <!-- Ciudad -->
               <div class="col-md-6 mb-3">
                 <input type="hidden" id="id_ciudad">
-                <label class="font-weight-bold">Ciudad:</label>
-                <input type="text" id="txtCiudad" class="form-control" placeholder="Click para seleccionar ciudad" readonly>
+                <label class="font-weight-bold">
+                  <i class="fas fa-city mr-1"></i> Ciudad: <span class="text-danger">*</span>
+                </label>
+                <input type="text" 
+                       id="txtCiudad" 
+                       class="form-control" 
+                       placeholder="Click para seleccionar ciudad" 
+                       
+                      readonly>
               </div>
 
               <!-- Dirección -->
               <div class="col-md-6 mb-3">
-                <label class="font-weight-bold">Dirección:</label>
-                <input type="text" id="direccion" class="form-control" placeholder="Ingrese la dirección" autocomplete="off">
+                <label class="font-weight-bold">
+                  <i class="fas fa-map-marker-alt mr-1"></i> Dirección:
+                </label>
+                <input type="text" 
+                       id="direccion" 
+                       class="form-control" 
+                       placeholder="Ingrese la dirección" 
+                       autocomplete="off"
+                       maxlength="200">
               </div>
 
               <!-- Teléfono -->
               <div class="col-md-6 mb-3">
-                <label class="font-weight-bold">Teléfono:</label>
-                <input type="text" id="telefono" class="form-control" placeholder="Ingrese el teléfono">
+                <label class="font-weight-bold">
+                  <i class="fas fa-phone mr-1"></i> Teléfono: <span class="text-danger">*</span>
+                </label>
+                <input type="text" 
+                       id="telefono" 
+                       class="form-control" 
+                       placeholder="Ingrese el teléfono"
+                       maxlength="15"
+                       required>
+                <small class="form-text text-muted">
+                  <i class="fas fa-info-circle"></i> Solo números
+                </small>
               </div>
 
               <!-- Correo -->
               <div class="col-md-6 mb-3">
-                <label class="font-weight-bold">Correo:</label>
-                <input type="email" id="correo" class="form-control" placeholder="correo@ejemplo.com" autocomplete="off">
+                <label class="font-weight-bold">
+                  <i class="fas fa-envelope mr-1"></i> Correo:
+                </label>
+                <input type="email" 
+                       id="correo" 
+                       class="form-control" 
+                       placeholder="correo@ejemplo.com" 
+                       autocomplete="off"
+                       maxlength="100">
               </div>
 
               <!-- Cargo -->
               <div class="col-md-6 mb-3">
                 <input type="hidden" id="id_cargo">
-                <label class="font-weight-bold">Cargo:</label>
-                <input type="text" id="txtCargo" class="form-control" placeholder="Click para seleccionar cargo" readonly>
+                <label class="font-weight-bold">
+                  <i class="fas fa-briefcase mr-1"></i> Cargo: <span class="text-danger">*</span>
+                </label>
+                <input type="text" 
+                       id="txtCargo" 
+                       class="form-control" 
+                       placeholder="Click para seleccionar cargo" 
+                       readonly>
               </div>
 
               <!-- Fecha Registro -->
               <div class="col-md-6 mb-3">
-                <label class="font-weight-bold">Fecha Registro:</label>
-                <input type="date" id="fecha_registro" class="form-control">
+                <label class="font-weight-bold">
+                  <i class="fas fa-calendar-plus mr-1"></i> Fecha Registro: <span class="text-danger">*</span>
+                </label>
+                <input type="date" 
+                       id="fecha_registro" 
+                       class="form-control"
+                       required>
               </div>
 
             </div>
@@ -146,59 +223,84 @@ Personal
     </div>
   </div>
 
-  <!-- Modal Ciudad -->
-  <div class="modal fade" id="modalBuscarCiudad" tabindex="-1" role="dialog">
+  <!-- =========================== -->
+  <!-- Modal Buscar Ciudad -->
+  <!-- =========================== -->
+  <div class="modal fade" 
+       id="modalBuscarCiudad" 
+       tabindex="-1" 
+       role="dialog"
+       data-backdrop="static"
+       data-keyboard="true">
     <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h4 class="modal-title">Seleccionar Ciudad</h4>
-          <button type="button" class="close" data-dismiss="modal">&times;</button>
+      <div class="modal-content shadow-lg border-0 rounded-lg">
+        
+        <!-- Header -->
+        <div class="modal-header bg-info text-white rounded-top">
+          <h5 class="modal-title font-weight-bold">
+            <i class="fas fa-search mr-2"></i> Seleccionar Ciudad
+          </h5>
+          <button type="button" class="close text-white" data-dismiss="modal">&times;</button>
         </div>
+
+        <!-- Body -->
         <div class="modal-body">
-          <table class="table table-striped table-bordered w-100" id="tblCiudad">
-            <thead>
-              <tr>
-                <th>Ciudad</th>
-                <th>Acciones</th>
-              </tr>
-            </thead>
-            <tbody></tbody>
-          </table>
+          <div class="table-responsive">
+            <table class="table table-striped table-bordered table-hover w-100" id="tblCiudad">
+              <thead class="bg-info text-white">
+                <tr>
+                  <th>Ciudad</th>
+                  <th class="text-center">Acciones</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
         </div>
+
       </div>
     </div>
   </div>
 
-  <!-- Modal Cargo -->
-<div class="modal fade" id="modalBuscarCargo" tabindex="-1" role="dialog">
-  <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h4 class="modal-title">Seleccionar Cargo</h4>
-        <button type="button" class="close" data-dismiss="modal">&times;</button>
-      </div>
-      <div class="modal-body">
-        <table class="table table-striped table-bordered w-100" id="tblCargo">
-          <thead>
-            <tr>
-              <th>Cargo</th>
-              <th>Acciones</th>
-            </tr>
-          </thead>
-          <tbody></tbody>
-        </table>
+  <!-- =========================== -->
+  <!-- Modal Buscar Cargo -->
+  <!-- =========================== -->
+  <div class="modal fade" 
+       id="modalBuscarCargo" 
+       tabindex="-1" 
+       role="dialog"
+       data-backdrop="static"
+       data-keyboard="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+      <div class="modal-content shadow-lg border-0 rounded-lg">
+        
+        <!-- Header -->
+        <div class="modal-header bg-info text-white rounded-top">
+          <h5 class="modal-title font-weight-bold">
+            <i class="fas fa-search mr-2"></i> Seleccionar Cargo
+          </h5>
+          <button type="button" class="close text-white" data-dismiss="modal">&times;</button>
+        </div>
+
+        <!-- Body -->
+        <div class="modal-body">
+          <div class="table-responsive">
+            <table class="table table-striped table-bordered table-hover w-100" id="tblCargo">
+              <thead class="bg-info text-white">
+                <tr>
+                  <th>Cargo</th>
+                  <th class="text-center">Acciones</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+
       </div>
     </div>
   </div>
-</div>
 
-  <!-- Librerías -->
-  <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap4.min.css">
-  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-  <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
-  <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap4.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
 </div>
 {% endblock %}
 
@@ -206,103 +308,284 @@ Personal
 <script>
 const CSRFToken = "{{ csrf_token() }}" || null;
 
+// ==========================================
+// DATATABLES
+// ==========================================
 const initDatatable = () => {
   $('#tbl').DataTable({
-    language: { url: "{{ url_for('static', filename='vendor/datatables/es-ES.json') }}" },
+    language: { 
+      url: "{{ url_for('static', filename='vendor/datatables/es-ES.json') }}" 
+    },
     ajax: '/api/v1/personal',
     columns: [
       { data: 'nombre' },
       { data: 'apellido' },
       { data: 'cedula' },
-      { data: 'fecha_nacimiento' },
+      { 
+        data: 'fecha_nacimiento',
+        render: function(data) {
+          return formatearFechaDMY(data);
+        }
+      },
       { data: 'ciudad' },
       { data: 'direccion' },
-      { data: 'telefono' },
+      { 
+        data: function(row) {
+          return formatearTelefonoParaMostrar(row.telefono || '');
+        },
+        width: "120px",           
+        className: "text-nowrap"
+      },
       { data: 'correo' },
       { data: 'cargo' },
-      { data: 'fecha_registro' },
+      { 
+        data: 'fecha_registro',
+        render: function(data) {
+          return formatearFechaDMY(data);
+        },
+        width: "120px",           
+        className: "text-nowrap"
+      },
       {
-        data: row => `
-          <button type="button" name="btn_editar" class="btn btn-info btn-sm" data-id_personal="${row.id_personal}">
-            <i class="fas fa-edit"></i>
-          </button>
-          <button type="button" name="btn_eliminar" class="btn btn-danger btn-sm" data-id_personal="${row.id_personal}">
-            <i class="fas fa-trash-alt"></i>
-          </button>`
+        data: function(row) {
+          return `
+            <button type="button" name="btn_editar" class="btn btn-sm btn-info" 
+                    data-id_personal="${row.id_personal}" title="Editar">
+              <i class="fas fa-edit"></i>
+            </button>
+            <button type="button" name="btn_eliminar" class="btn btn-sm btn-danger" 
+                    data-id_personal="${row.id_personal}" title="Eliminar">
+              <i class="fas fa-trash-alt"></i>
+            </button>
+          `;
+        },
+        className: 'text-center',
+        orderable: false
       }
     ]
   });
 };
 
-const initDatatablec= () => {
-    $('#tblCiudad').DataTable({
-      language: {
-        url: "{{ url_for('static', filename='vendor/datatables/es-ES.json') }}",
-      },
-      ajax:'/api/v1/ciudades',
-      columns: [
-        { data: 'descripcion' },
-        { 
-          data: function(row) {
-          return `<button type="button" name="btn_seleccionar_ciudad" class="btn btn-primary" data-id="${row.id_ciudad}" data-ciudad="${row.descripcion}">Seleccionar</button>`;
-          }
-        }
-      ]
-    });
-  
-    $('#tblCiudad').on('click', 'button[name="btn_seleccionar_ciudad"]', function () {
-      const idCiudad = $(this).data('id');
-      const ciudad = $(this).data('ciudad'); 
-      $('#txtCiudad').val(ciudad);  
-      $('#id_ciudad').val(idCiudad); 
-      $('#modalBuscarCiudad').modal('hide');
-    });
-  };
-
-  const buscarCiudad = () => {
-    $('#txtCiudad').on('click', function () {
-      $('#modalCiudadTitle').text("Seleccionar Ciudad");
-      $('#modalBuscarCiudad').modal();
-    });
+const initDatatablec = () => {
+  if ($.fn.DataTable.isDataTable('#tblCiudad')) {
+    $('#tblCiudad').DataTable().destroy();
   }
-
-  const initDatatablecargo= () => {
-    $('#tblCargo').DataTable({
-      language: {
-        url: "{{ url_for('static', filename='vendor/datatables/es-ES.json') }}",
-      },
-      ajax:'/api/v1/cargos',
-      columns: [
-        { data: 'descripcion' },
-        { 
-          data: function(row) {
-          return `<button type="button" name="btn_seleccionar_cargo" class="btn btn-primary" data-id="${row.id_cargo}" data-cargo="${row.descripcion}">Seleccionar</button>`;
-          }
-        }
-      ]
-    });
   
-    $('#tblCargo').on('click', 'button[name="btn_seleccionar_cargo"]', function () {
-      const idCargo = $(this).data('id');
-      const cargo = $(this).data('cargo'); 
-      $('#txtCargo').val(cargo);  
-      $('#id_cargo').val(idCargo); 
-      $('#modalBuscarCargo').modal('hide');
-    });
-  };
+  $('#tblCiudad').DataTable({
+    language: { 
+      url: "{{ url_for('static', filename='vendor/datatables/es-ES.json') }}" 
+    },
+    ajax: '/api/v1/ciudades',
+    columns: [
+      { data: 'descripcion' },
+      { 
+        data: function(row) {
+          return `
+            <button type="button" name="btn_seleccionar_ciudad" 
+                    class="btn btn-sm btn-warning" 
+                    data-id="${row.id_ciudad}" 
+                    data-ciudad="${row.descripcion}">
+              <i class="fas fa-check mr-1"></i> Seleccionar
+            </button>
+          `;
+        },
+        className: 'text-center',
+        orderable: false
+      }
+    ]
+  });
 
-  const buscarCargo = () => {
-    $('#txtCargo').on('click', function () {
-      $('#modalCargoTitle').text("Seleccionar Cargo");
-      $('#modalBuscarCargo').modal();
-    });
+  $('#tblCiudad').off('click', 'button[name="btn_seleccionar_ciudad"]').on('click', 'button[name="btn_seleccionar_ciudad"]', function() {
+    const idCiudad = $(this).data('id');
+    const nombreCiudad = $(this).data('ciudad');
+    $('#txtCiudad').val(nombreCiudad);
+    $('#id_ciudad').val(idCiudad);
+    $('#modalBuscarCiudad').modal('hide');
+  });
+};
+
+const initDatatablecargo = () => {
+  if ($.fn.DataTable.isDataTable('#tblCargo')) {
+    $('#tblCargo').DataTable().destroy();
   }
+  
+  $('#tblCargo').DataTable({
+    language: { 
+      url: "{{ url_for('static', filename='vendor/datatables/es-ES.json') }}" 
+    },
+    ajax: '/api/v1/cargos',
+    columns: [
+      { data: 'descripcion' },
+      { 
+        data: function(row) {
+          return `
+            <button type="button" name="btn_seleccionar_cargo" 
+                    class="btn btn-sm btn-warning" 
+                    data-id="${row.id_cargo}" 
+                    data-cargo="${row.descripcion}">
+              <i class="fas fa-check mr-1"></i> Seleccionar
+            </button>
+          `;
+        },
+        className: 'text-center',
+        orderable: false
+      }
+    ]
+  });
 
+  $('#tblCargo').off('click', 'button[name="btn_seleccionar_cargo"]').on('click', 'button[name="btn_seleccionar_cargo"]', function() {
+    const idCargo = $(this).data('id');
+    const nombreCargo = $(this).data('cargo');
+    $('#txtCargo').val(nombreCargo);
+    $('#id_cargo').val(idCargo);
+    $('#modalBuscarCargo').modal('hide');
+  });
+};
+
+const formatearFechaDMY = (fecha) => {
+  if (!fecha) return '-';
+  const d = new Date(fecha);
+  if (isNaN(d)) return fecha;
+  const dia = String(d.getDate()).padStart(2, '0');
+  const mes = String(d.getMonth() + 1).padStart(2, '0');
+  const anio = d.getFullYear();
+  return `${dia}-${mes}-${anio}`;
+};
+
+// ==========================================
+// FORMATO DE TELÉFONO
+// ==========================================
+const formatearTelefonoParaMostrar = (telefono) => {
+  let limpio = telefono.replace(/\D/g, '');
+  
+  if (limpio.startsWith('595')) {
+    limpio = limpio.substring(3);
+  }
+  
+  if (limpio.length > 3) {
+    return limpio.substring(0, 3) + ' ' + limpio.substring(3);
+  }
+  return limpio;
+};
+
+const formatearTelefonoParaGuardar = (telefono) => {
+  let limpio = telefono.replace(/\D/g, '');
+  
+  if (limpio.startsWith('595')) {
+    return limpio;
+  }
+  
+  if (limpio.startsWith('0')) {
+    limpio = limpio.substring(1);
+  }
+  
+  return '595' + limpio;
+};
+
+// ==========================================
+// VALIDACIONES
+// ==========================================
+const validarCamposRequeridos = (datos) => {
+  if (!datos.nombre || datos.nombre.trim() === '') {
+    return { valido: false, mensaje: 'El nombre es obligatorio.' };
+  }
+  if (!datos.apellido || datos.apellido.trim() === '') {
+    return { valido: false, mensaje: 'El apellido es obligatorio.' };
+  }
+  if (!datos.cedula || datos.cedula.trim() === '') {
+    return { valido: false, mensaje: 'La cédula es obligatoria.' };
+  }
+  if (!datos.fecha_nacimiento) {
+    return { valido: false, mensaje: 'La fecha de nacimiento es obligatoria.' };
+  }
+  if (!datos.id_ciudad) {
+    return { valido: false, mensaje: 'Debe seleccionar una ciudad.' };
+  }
+  if (!datos.telefono || datos.telefono.trim() === '') {
+    return { valido: false, mensaje: 'El teléfono es obligatorio.' };
+  }
+  if (!datos.id_cargo) {
+    return { valido: false, mensaje: 'Debe seleccionar un cargo.' };
+  }
+  if (!datos.fecha_registro) {
+    return { valido: false, mensaje: 'La fecha de registro es obligatoria.' };
+  }
+  return { valido: true };
+};
+
+const validarEmail = (email) => {
+  if (!email || email.trim() === '') return { valido: true };
+  
+  const patron = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!patron.test(email)) {
+    return { valido: false, mensaje: 'El formato del correo electrónico no es válido.' };
+  }
+  return { valido: true };
+};
+
+const validarTelefono = () => {
+  $('#telefono').on('keypress', function(e) {
+    if ([8, 9, 27, 13, 46].indexOf(e.keyCode) !== -1 ||
+        (e.keyCode === 65 && e.ctrlKey === true) ||
+        (e.keyCode === 67 && e.ctrlKey === true) ||
+        (e.keyCode === 86 && e.ctrlKey === true) ||
+        (e.keyCode === 88 && e.ctrlKey === true)) {
+      return;
+    }
+    if ((e.which < 48 || e.which > 57)) {
+      e.preventDefault();
+    }
+  });
+
+  $('#telefono').on('input', function(e) {
+    const input = e.target;
+    let valor = input.value.replace(/\D/g, '');
+    
+    if (valor.length > 9) {
+      valor = valor.substring(0, 9);
+    }
+    
+    if (valor.length > 3) {
+      input.value = valor.substring(0, 3) + ' ' + valor.substring(3);
+    } else {
+      input.value = valor;
+    }
+  });
+
+  $('#telefono').on('paste', function(e) {
+    setTimeout(() => {
+      let valor = this.value.replace(/\D/g, '');
+      if (valor.length > 9) valor = valor.substring(0, 9);
+      if (valor.length > 3) {
+        this.value = valor.substring(0, 3) + ' ' + valor.substring(3);
+      } else {
+        this.value = valor;
+      }
+    }, 0);
+  });
+};
+
+const validarCedula = () => {
+  $('#cedula').on('input', function() {
+    this.value = this.value.replace(/[^0-9]/g, '');
+  });
+};
+
+// ==========================================
+// CRUD
+// ==========================================
 const agregar = () => {
   $('#btnAgregar').on('click', function() {
-    $('#modalTitle').text("Agregar Personal");
+    $('#modalTitle').text("Nuevo Personal");
     $('#formPersonal')[0].reset();
     $('#txtIdPersonal').val("");
+    $('#id_ciudad').val("");
+    $('#id_cargo').val("");
+    $('#txtCiudad').val("");
+    $('#txtCargo').val("");
+    
+    
+    
     $('#modalFormulario').modal('show');
   });
 };
@@ -311,129 +594,256 @@ const guardar = () => {
   $('#btnGuardar').on('click', function() {
     const idPersonal = $('#txtIdPersonal').val();
     const datos = {
-      nombre: $('#nombre').val(),
-      apellido: $('#apellido').val(),
-      cedula: $('#cedula').val(),
+      nombre: $('#nombre').val().trim(),
+      apellido: $('#apellido').val().trim(),
+      cedula: $('#cedula').val().trim(),
       fecha_nacimiento: $('#fecha_nacimiento').val(),
       fecha_registro: $('#fecha_registro').val(),
-      telefono: $('#telefono').val(),
-      direccion: $('#direccion').val(),
-      correo: $('#correo').val(),
+      telefono: formatearTelefonoParaGuardar($('#telefono').val().trim()),
+      direccion: $('#direccion').val().trim(),
+      correo: $('#correo').val().trim(),
       id_cargo: $('#id_cargo').val(),
       id_ciudad: $('#id_ciudad').val()
     };
 
+    const validacionCampos = validarCamposRequeridos(datos);
+    if (!validacionCampos.valido) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Campos incompletos',
+        text: validacionCampos.mensaje,
+        confirmButtonColor: '#f39c12'
+      });
+      return;
+    }
+
+    if (datos.correo) {
+      const validacionEmail = validarEmail(datos.correo);
+      if (!validacionEmail.valido) {
+        Swal.fire({
+          icon: 'warning',
+          title: 'Correo inválido',
+          text: validacionEmail.mensaje,
+          confirmButtonColor: '#f39c12'
+        });
+        return;
+      }
+    }
+
     const url = idPersonal ? `/api/v1/personal/${idPersonal}` : '/api/v1/personal';
     const method = idPersonal ? 'PUT' : 'POST';
+    const tabla = $('#tbl').DataTable();
 
     fetch(url, {
-      method,
-      headers: { 'Content-Type': 'application/json', 'X-CSRFToken': CSRFToken },
+      method: method,
+      headers: { 
+        'Content-Type': 'application/json', 
+        'X-CSRFToken': CSRFToken 
+      },
       body: JSON.stringify(datos)
     })
     .then(resp => resp.json())
-    .then(data => {
-      if (data.success) {
-        $('#tbl').DataTable().ajax.reload();
-        Swal.fire("Éxito", idPersonal ? "Personal actualizado" : "Personal registrado", "success");
+    .then(result => {
+      if (result && !result.error && result.success) {
+        tabla.ajax.reload();
+        $('#modalFormulario').modal('hide');
+        Swal.fire({
+          icon: 'success',
+          title: idPersonal ? 'Actualizado' : 'Registrado',
+          text: `El personal ha sido ${idPersonal ? 'actualizado' : 'registrado'} correctamente.`,
+          confirmButtonColor: '#28a745'
+        });
       } else {
-        Swal.fire("Error", data.error, "error");
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: result.error || 'No se pudo guardar el personal.',
+          confirmButtonColor: '#dc3545'
+        });
       }
     })
-    .catch(() => Swal.fire("Error", "Ocurrió un error al guardar", "error"));
-
-    $('#modalFormulario').modal('hide');
+    .catch(err => {
+      console.error(err);
+      Swal.fire({
+        icon: 'error',
+        title: 'Error de conexión',
+        text: 'Ocurrió un error al guardar. Por favor, intente nuevamente.',
+        confirmButtonColor: '#dc3545'
+      });
+    });
   });
 };
 
 const editar = () => {
   $('#tbl').on('click', 'button[name="btn_editar"]', function() {
     const idPersonal = $(this).data('id_personal');
-    fetch(`/api/v1/personal/${idPersonal}`)
-      .then(resp => resp.json())
-      .then(data => {
-        const p = data.data;
-        $('#modalTitle').text("Editar Personal");
-        $('#txtIdPersonal').val(p.id_personal);
-        $('#nombre').val(p.nombre);
-        $('#apellido').val(p.apellido);
-        $('#cedula').val(p.cedula);
-        $('#fecha_nacimiento').val(p.fecha_nacimiento);
-        $('#fecha_registro').val(p.fecha_registro);
-        $('#telefono').val(p.telefono);
-        $('#direccion').val(p.direccion);
-        $('#correo').val(p.correo);
-        $('#id_cargo').val(p.id_cargo);
-        $('#id_ciudad').val(p.id_ciudad);
-        $('#txtCiudad').val(p.ciudad);
-        $('#modalFormulario').modal('show');
-      });
-  });
-};
 
-const eliminar = () => {
-  $('#tbl').on('click', 'button[name="btn_eliminar"]', function() {
-    const idPersonal = $(this).data('id_personal');
     Swal.fire({
-      title: "¿Deseas eliminar este registro?",
+      title: "¿Deseas editar este registro?",
+      icon: 'question',
       showCancelButton: true,
-      confirmButtonText: "Sí",
-      cancelButtonText: "No"
-    }).then(result => {
+      confirmButtonText: "Sí, editar",
+      cancelButtonText: "Cancelar",
+      confirmButtonColor: '#17a2b8',
+      cancelButtonColor: '#6c757d'
+    }).then((result) => {
       if (result.isConfirmed) {
-        fetch(`/api/v1/personal/${idPersonal}`, {
-          method: 'DELETE',
-          headers: { 'Content-Type': 'application/json', 'X-CSRFToken': CSRFToken }
-        })
+        fetch(`/api/v1/personal/${idPersonal}`)
         .then(resp => resp.json())
         .then(data => {
-          if (data.success) {
-            $('#tbl').DataTable().ajax.reload();
-            Swal.fire("Eliminado", "El registro ha sido eliminado", "success");
+          if (data && data.success && data.data) {
+            const p = data.data;
+            $('#modalTitle').text("Editar Personal");
+            $('#txtIdPersonal').val(p.id_personal);
+            $('#nombre').val(p.nombre);
+            $('#apellido').val(p.apellido);
+            $('#cedula').val(p.cedula);
+            $('#fecha_nacimiento').val(p.fecha_nacimiento);
+            $('#fecha_registro').val(p.fecha_registro);
+            $('#telefono').val(formatearTelefonoParaMostrar(p.telefono || ''));
+            $('#direccion').val(p.direccion);
+            $('#correo').val(p.correo);
+            $('#id_cargo').val(p.id_cargo);
+            $('#txtCargo').val(p.cargo);
+            $('#id_ciudad').val(p.id_ciudad);
+            $('#txtCiudad').val(p.ciudad);
+            $('#modalFormulario').modal('show');
           } else {
-            Swal.fire("Error", data.error, "error");
+            Swal.fire({
+              icon: 'error',
+              title: 'Error',
+              text: 'No se pudo cargar el personal.',
+              confirmButtonColor: '#dc3545'
+            });
           }
+        })
+        .catch(err => {
+          console.error(err);
+          Swal.fire({
+            icon: 'error',
+            title: 'Error de conexión',
+            text: 'Ocurrió un error al cargar el personal.',
+            confirmButtonColor: '#dc3545'
+          });
         });
       }
     });
   });
 };
 
-const addEvents = () => {
-  agregar();
-  guardar();
-  editar();
-  buscarCiudad();
-  buscarCargo();
-  eliminar();
+const eliminar = () => {
+  $('#tbl').on('click', 'button[name="btn_eliminar"]', function() {
+    const idPersonal = $(this).data('id_personal');
+    const botonEliminar = $(this);
 
-  $('#txtCargo').on('click', () => {
-    $('#modalBuscarCargo').modal('show');
-    initCargoDatatable();
-  });
-
-  $('#txtCiudad').on('click', () => {
-    $('#modalBuscarCiudad').modal('show');
-    initCiudadDatatable();
+    Swal.fire({
+      title: "¿Deseas eliminar este registro?",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: "Sí, eliminar",
+      cancelButtonText: "Cancelar",
+      confirmButtonColor: '#dc3545',
+      cancelButtonColor: '#6c757d'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        fetch(`/api/v1/personal/${idPersonal}`, {
+          method: 'DELETE',
+          headers: { 
+            'Content-Type': 'application/json', 
+            'X-CSRFToken': CSRFToken 
+          }
+        })
+        .then(resp => resp.json())
+        .then(result => {
+          if (result && !result.error && result.success) {
+            const fila = botonEliminar.closest('tr');
+            const tabla = $('#tbl').DataTable();
+            tabla.row(fila).remove().draw();
+            Swal.fire({
+              icon: 'success',
+              title: 'Eliminado',
+              text: 'El registro ha sido eliminado correctamente.',
+              confirmButtonColor: '#28a745'
+            });
+          } else {
+            Swal.fire({
+              icon: 'error',
+              title: 'Error al eliminar',
+              text: result.error || 'No se pudo eliminar el registro.',
+              confirmButtonColor: '#dc3545'
+            });
+          }
+        })
+        .catch(err => {
+          console.error(err);
+          Swal.fire({
+            icon: 'error',
+            title: 'Error de conexión',
+            text: 'Ocurrió un error al eliminar. Por favor, intente nuevamente.',
+            confirmButtonColor: '#dc3545'
+          });
+        });
+      }
+    });
   });
 };
 
-// Validación del campo de telefono para que solo acepte números
-  $('#telefono').on('input', function() {
-    this.value = this.value.replace(/[^0-9]/g, '');  // Solo permite números
+// ==========================================
+// EVENTOS ADICIONALES
+// ==========================================
+const buscarCiudad = () => {
+  $('#txtCiudad').on('click', function() {
+    $('#modalBuscarCiudad').modal('show');
+    initDatatablec();
+  });
+};
+
+const buscarCargo = () => {
+  $('#txtCargo').on('click', function() {
+    $('#modalBuscarCargo').modal('show');
+    initDatatablecargo();
+  });
+};
+
+// ==========================================
+// FIX MODAL
+// ==========================================
+const fixModalShift = () => {
+  $.fn.modal.Constructor.prototype._setScrollbar = function() {};
+  $.fn.modal.Constructor.prototype._resetScrollbar = function() {};
+  
+  $(document).on('show.bs.modal', '.modal', function () {
+    setTimeout(() => {
+      $('body').css('padding-right', '0');
+      $('.modal').css('padding-right', '0');
+      $('.navbar-fixed-top, .navbar-fixed-bottom').css('padding-right', '0');
+    }, 0);
   });
 
-  // Validación del campo de cédula para que solo acepte números
-  $('#cedula').on('input', function() {
-    this.value = this.value.replace(/[^0-9]/g, '');  // Solo permite números
+  $(document).on('hidden.bs.modal', '.modal', function () {
+    $('body').css('padding-right', '0');
   });
+};
 
+// ==========================================
+// INICIALIZACIÓN
+// ==========================================
 $(function() {
+  // Inicializar tablas
   initDatatable();
-   initDatatablec();
-   initDatatablecargo();
-   
-  addEvents();
+  initDatatablec();
+  initDatatablecargo();
+  
+  // Registrar eventos
+  agregar();
+  guardar();
+  editar();
+  eliminar();
+  buscarCiudad();
+  buscarCargo();
+  validarTelefono();
+  validarCedula();
+  fixModalShift();
 });
 </script>
 {% endblock %}

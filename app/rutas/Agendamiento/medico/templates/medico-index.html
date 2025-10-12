@@ -69,70 +69,151 @@ Médicos
 
               <!-- Nombre -->
               <div class="col-md-6 mb-3">
-                <label class="font-weight-bold">Nombre:</label>
-                <input type="text" id="nombre" class="form-control" placeholder="Ingrese el nombre">
+                <label class="font-weight-bold">
+                  <i class="fas fa-user mr-1"></i> Nombre: <span class="text-danger">*</span>
+                </label>
+                <input type="text" 
+                       id="nombre" 
+                       class="form-control" 
+                       placeholder="Ingrese el nombre"
+                       maxlength="50"
+                       required>
               </div>
 
               <!-- Apellido -->
               <div class="col-md-6 mb-3">
-                <label class="font-weight-bold">Apellido:</label>
-                <input type="text" id="apellido" class="form-control" placeholder="Ingrese el apellido">
+                <label class="font-weight-bold">
+                  <i class="fas fa-user mr-1"></i> Apellido: <span class="text-danger">*</span>
+                </label>
+                <input type="text" 
+                       id="apellido" 
+                       class="form-control" 
+                       placeholder="Ingrese el apellido"
+                       maxlength="50"
+                       required>
               </div>
 
               <!-- Cédula -->
               <div class="col-md-6 mb-3">
-                <label class="font-weight-bold">Cédula:</label>
-                <input type="text" id="cedula" class="form-control" placeholder="Ingrese el número de cédula">
+                <label class="font-weight-bold">
+                  <i class="fas fa-id-card mr-1"></i> Cédula: <span class="text-danger">*</span>
+                </label>
+                <input type="text" 
+                       id="cedula" 
+                       class="form-control" 
+                       placeholder="Ingrese el número de cédula"
+                       maxlength="20"
+                       required>
+                <small class="form-text text-muted">
+                  <i class="fas fa-info-circle"></i> Solo números
+                </small>
               </div>
 
               <!-- Fecha Nacimiento -->
               <div class="col-md-6 mb-3">
-                <label class="font-weight-bold">Fecha Nacimiento:</label>
-                <input type="date" id="fecha_nacimiento" class="form-control">
+                <label class="font-weight-bold">
+                  <i class="fas fa-birthday-cake mr-1"></i> Fecha Nacimiento: <span class="text-danger">*</span>
+                </label>
+                <input type="date" 
+                       id="fecha_nacimiento" 
+                       class="form-control"
+                       required>
               </div>
 
               <!-- Ciudad -->
               <div class="col-md-6 mb-3">
                 <input type="hidden" id="id_ciudad">
-                <label class="font-weight-bold">Ciudad:</label>
-                <input type="text" id="txtCiudad" class="form-control" placeholder="Click para seleccionar ciudad" readonly>
+                <label class="font-weight-bold">
+                  <i class="fas fa-city mr-1"></i> Ciudad: <span class="text-danger">*</span>
+                </label>
+                <input type="text" 
+                       id="txtCiudad" 
+                       class="form-control" 
+                       placeholder="Click para seleccionar ciudad" 
+                       readonly
+                      
+                       required>
               </div>
 
               <!-- Dirección -->
               <div class="col-md-6 mb-3">
-                <label class="font-weight-bold">Dirección:</label>
-                <input type="text" id="direccion" class="form-control" placeholder="Ingrese la dirección" autocomplete="off">
+                <label class="font-weight-bold">
+                  <i class="fas fa-map-marker-alt mr-1"></i> Dirección:
+                </label>
+                <input type="text" 
+                       id="direccion" 
+                       class="form-control" 
+                       placeholder="Ingrese la dirección" 
+                       autocomplete="off"
+                       maxlength="200">
               </div>
 
               <!-- Teléfono -->
               <div class="col-md-6 mb-3">
-                <label class="font-weight-bold">Teléfono:</label>
-                <input type="text" id="telefono" class="form-control" placeholder="Ingrese el teléfono">
+                <label class="font-weight-bold">
+                  <i class="fas fa-phone mr-1"></i> Teléfono: <span class="text-danger">*</span>
+                </label>
+                <input type="text" 
+                       id="telefono" 
+                       class="form-control" 
+                       placeholder="Ingrese el teléfono"
+                       maxlength="15"
+                       required>
+                <small class="form-text text-muted">
+                  <i class="fas fa-info-circle"></i> Solo números
+                </small>
               </div>
 
               <!-- Correo -->
               <div class="col-md-6 mb-3">
-                <label class="font-weight-bold">Correo:</label>
-                <input type="email" id="correo" class="form-control" placeholder="correo@ejemplo.com" autocomplete="off">
+                <label class="font-weight-bold">
+                  <i class="fas fa-envelope mr-1"></i> Correo:
+                </label>
+                <input type="email" 
+                       id="correo" 
+                       class="form-control" 
+                       placeholder="correo@ejemplo.com" 
+                       autocomplete="off"
+                       maxlength="100">
               </div>
 
               <!-- Especialidad -->
               <div class="col-md-6 mb-3">
                 <input type="hidden" id="id_especialidad">
-                <label class="font-weight-bold">Especialidad:</label>
-                <input type="text" id="txtEspecialidad" class="form-control" placeholder="Click para seleccionar especialidad" readonly>
+                <label class="font-weight-bold">
+                  <i class="fas fa-stethoscope mr-1"></i> Especialidad: <span class="text-danger">*</span>
+                </label>
+                <input type="text" 
+                       id="txtEspecialidad" 
+                       class="form-control" 
+                       placeholder="Click para seleccionar especialidad" 
+                       readonly
+                    
+                       required>
               </div>
 
               <!-- N° de Registro -->
               <div class="col-md-6 mb-3">
-                <label class="font-weight-bold">N° de Matrícula:</label>
-                <input type="text" id="txtregistro" class="form-control" placeholder="Ingrese el número de matrícula">
+                <label class="font-weight-bold">
+                  <i class="fas fa-id-badge mr-1"></i> N° de Matrícula: <span class="text-danger">*</span>
+                </label>
+                <input type="text" 
+                       id="txtregistro" 
+                       class="form-control" 
+                       placeholder="Ingrese el número de matrícula"
+                       maxlength="50"
+                       required>
               </div>
 
               <!-- Fecha Registro -->
               <div class="col-md-6 mb-3">
-                <label class="font-weight-bold">Fecha Registro:</label>
-                <input type="date" id="fecha_registro" class="form-control">
+                <label class="font-weight-bold">
+                  <i class="fas fa-calendar-plus mr-1"></i> Fecha Registro: <span class="text-danger">*</span>
+                </label>
+                <input type="date" 
+                       id="fecha_registro" 
+                       class="form-control"
+                       required>
               </div>
 
             </div>
@@ -165,7 +246,7 @@ Médicos
         </div>
         <div class="modal-body">
           <table class="table table-striped table-bordered w-100" id="tblEspecialidad">
-            <thead>
+            <thead class="bg-info text-white">
               <tr>
                 <th>Especialidad</th>
                 <th>Acciones</th>
@@ -188,7 +269,7 @@ Médicos
         </div>
         <div class="modal-body">
           <table class="table table-striped table-bordered w-100" id="tblCiudad">
-            <thead>
+            <thead class="bg-info text-white">
               <tr>
                 <th>Ciudad</th>
                 <th>Acciones</th>
@@ -215,90 +296,298 @@ Médicos
 <script>
 const CSRFToken = "{{ csrf_token() }}" || null;
 
+// ==========================================
+// FUNCIÓN PARA FORMATEAR FECHAS
+// ==========================================
+const formatearFechaDMY = (fecha) => {
+  if (!fecha) return '-';
+  // Si la fecha viene en formato YYYY-MM-DD, la parseamos correctamente
+  const partes = fecha.split('-');
+  if (partes.length === 3) {
+    const dia = partes[2].padStart(2, '0');
+    const mes = partes[1].padStart(2, '0');
+    const anio = partes[0];
+    return `${dia}/${mes}/${anio}`;
+  }
+  // Fallback si viene en otro formato
+  const d = new Date(fecha);
+  if (isNaN(d)) return fecha;
+  const dia = String(d.getDate()).padStart(2, '0');
+  const mes = String(d.getMonth() + 1).padStart(2, '0');
+  const anio = d.getFullYear();
+  return `${dia}/${mes}/${anio}`;
+};
+
+// ==========================================
+// FORMATO DE TELÉFONO
+// ==========================================
+const formatearTelefonoParaMostrar = (telefono) => {
+  let limpio = telefono.replace(/\D/g, '');
+  
+  if (limpio.startsWith('595')) {
+    limpio = limpio.substring(3);
+  }
+  
+  if (limpio.length > 3) {
+    return limpio.substring(0, 3) + ' ' + limpio.substring(3);
+  }
+  return limpio;
+};
+
+const formatearTelefonoParaGuardar = (telefono) => {
+  let limpio = telefono.replace(/\D/g, '');
+  
+  if (limpio.startsWith('595')) {
+    return limpio;
+  }
+  
+  if (limpio.startsWith('0')) {
+    limpio = limpio.substring(1);
+  }
+  
+  return '595' + limpio;
+};
+
+// ==========================================
+// DATATABLES
+// ==========================================
 const initDatatable = () => {
   $('#tbl').DataTable({
-    language: { url: "{{ url_for('static', filename='vendor/datatables/es-ES.json') }}" },
+    language: { 
+      url: "{{ url_for('static', filename='vendor/datatables/es-ES.json') }}" 
+    },
     ajax: '/api/v1/medico',
     columns: [
       { data: 'nombre' },
       { data: 'apellido' },
       { data: 'cedula' },
-      { data: 'fecha_nacimiento' },
+      { 
+        data: 'fecha_nacimiento',
+        render: function(data) {
+          return formatearFechaDMY(data);
+        }
+      },
       { data: 'ciudad' },
       { data: 'direccion' },
-      { data: 'telefono' },
+      { 
+        data: function(row) {
+          return formatearTelefonoParaMostrar(row.telefono || '');
+        },
+        width: "120px",           
+        className: "text-nowrap"
+      },
       { data: 'correo' },
       { data: 'especialidad' },
       { data: 'num_registro' },
-      { data: 'fecha_registro' },
+      { 
+        data: 'fecha_registro',
+        render: function(data) {
+          return formatearFechaDMY(data);
+        },
+        width: "120px",           
+        className: "text-nowrap"
+      },
       {
-        data: row => `
-          <button type="button" name="btn_editar" class="btn btn-info btn-sm" data-id_medico="${row.id_medico}">
-            <i class="fas fa-edit"></i>
-          </button>
-          <button type="button" name="btn_eliminar" class="btn btn-danger btn-sm" data-id_medico="${row.id_medico}">
-            <i class="fas fa-trash-alt"></i>
-          </button>`
+        data: function(row) {
+          return `
+            <button type="button" name="btn_editar" class="btn btn-sm btn-info" 
+                    data-id_medico="${row.id_medico}" title="Editar">
+              <i class="fas fa-edit"></i>
+            </button>
+            <button type="button" name="btn_eliminar" class="btn btn-sm btn-danger" 
+                    data-id_medico="${row.id_medico}" title="Eliminar">
+              <i class="fas fa-trash-alt"></i>
+            </button>
+          `;
+        },
+        className: 'text-center',
+        orderable: false
       }
     ]
   });
 };
 
 const initEspecialidadesDatatable = () => {
+  if ($.fn.DataTable.isDataTable('#tblEspecialidad')) {
+    $('#tblEspecialidad').DataTable().destroy();
+  }
+  
   $('#tblEspecialidad').DataTable({
-    language: { url: "{{ url_for('static', filename='vendor/datatables/es-ES.json') }}" },
+    language: { 
+      url: "{{ url_for('static', filename='vendor/datatables/es-ES.json') }}" 
+    },
     ajax: '/api/v1/especialidades',
     columns: [
       { data: 'descripcion' },
-      { data: row => `<button type="button" name="btn_seleccionar_especialidad" class="btn btn-primary" data-id="${row.id_especialidad}" data-especialidad="${row.descripcion}">Seleccionar</button>` }
-    ],
-    destroy: true
+      { 
+        data: function(row) {
+          return `
+            <button type="button" name="btn_seleccionar_especialidad" 
+                    class="btn btn-sm btn-warning" 
+                    data-id="${row.id_especialidad}" 
+                    data-especialidad="${row.descripcion}">
+              <i class="fas fa-check mr-1"></i> Seleccionar
+            </button>
+          `;
+        },
+        className: 'text-center',
+        orderable: false
+      }
+    ]
   });
 
-  $('#tblEspecialidad').off('click').on('click', 'button[name="btn_seleccionar_especialidad"]', function() {
-    $('#txtEspecialidad').val($(this).data('especialidad'));
-    $('#id_especialidad').val($(this).data('id'));
+  $('#tblEspecialidad').off('click', 'button[name="btn_seleccionar_especialidad"]').on('click', 'button[name="btn_seleccionar_especialidad"]', function() {
+    const idEspecialidad = $(this).data('id');
+    const nombreEspecialidad = $(this).data('especialidad');
+    $('#txtEspecialidad').val(nombreEspecialidad);
+    $('#id_especialidad').val(idEspecialidad);
     $('#modalBuscarEspecialidad').modal('hide');
   });
 };
 
-const initDatatablec= () => {
-    $('#tblCiudad').DataTable({
-      language: {
-        url: "{{ url_for('static', filename='vendor/datatables/es-ES.json') }}",
-      },
-      ajax:'/api/v1/ciudades',
-      columns: [
-        { data: 'descripcion' },
-        { 
-          data: function(row) {
-          return `<button type="button" name="btn_seleccionar_ciudad" class="btn btn-primary" data-id="${row.id_ciudad}" data-ciudad="${row.descripcion}">Seleccionar</button>`;
-          }
-        }
-      ]
-    });
-  
-    $('#tblCiudad').on('click', 'button[name="btn_seleccionar_ciudad"]', function () {
-      const idCiudad = $(this).data('id');
-      const ciudad = $(this).data('ciudad'); 
-      $('#txtCiudad').val(ciudad);  
-      $('#id_ciudad').val(idCiudad); 
-      $('#modalBuscarCiudad').modal('hide');
-    });
-  };
-
-  const buscarCiudad = () => {
-    $('#txtCiudad').on('click', function () {
-      $('#modalCiudadTitle').text("Seleccionar Ciudad");
-      $('#modalBuscarCiudad').modal();
-    });
+const initDatatablec = () => {
+  if ($.fn.DataTable.isDataTable('#tblCiudad')) {
+    $('#tblCiudad').DataTable().destroy();
   }
+  
+  $('#tblCiudad').DataTable({
+    language: { 
+      url: "{{ url_for('static', filename='vendor/datatables/es-ES.json') }}" 
+    },
+    ajax: '/api/v1/ciudades',
+    columns: [
+      { data: 'descripcion' },
+      { 
+        data: function(row) {
+          return `
+            <button type="button" name="btn_seleccionar_ciudad" 
+                    class="btn btn-sm btn-warning" 
+                    data-id="${row.id_ciudad}" 
+                    data-ciudad="${row.descripcion}">
+              <i class="fas fa-check mr-1"></i> Seleccionar
+            </button>
+          `;
+        },
+        className: 'text-center',
+        orderable: false
+      }
+    ]
+  });
 
+  $('#tblCiudad').off('click', 'button[name="btn_seleccionar_ciudad"]').on('click', 'button[name="btn_seleccionar_ciudad"]', function() {
+    const idCiudad = $(this).data('id');
+    const nombreCiudad = $(this).data('ciudad');
+    $('#txtCiudad').val(nombreCiudad);
+    $('#id_ciudad').val(idCiudad);
+    $('#modalBuscarCiudad').modal('hide');
+  });
+};
+
+// ==========================================
+// VALIDACIONES
+// ==========================================
+const validarCamposRequeridos = (datos) => {
+  if (!datos.nombre || datos.nombre.trim() === '') {
+    return { valido: false, mensaje: 'El nombre es obligatorio.' };
+  }
+  if (!datos.apellido || datos.apellido.trim() === '') {
+    return { valido: false, mensaje: 'El apellido es obligatorio.' };
+  }
+  if (!datos.cedula || datos.cedula.trim() === '') {
+    return { valido: false, mensaje: 'La cédula es obligatoria.' };
+  }
+  if (!datos.fecha_nacimiento) {
+    return { valido: false, mensaje: 'La fecha de nacimiento es obligatoria.' };
+  }
+  if (!datos.id_ciudad) {
+    return { valido: false, mensaje: 'Debe seleccionar una ciudad.' };
+  }
+  if (!datos.telefono || datos.telefono.trim() === '') {
+    return { valido: false, mensaje: 'El teléfono es obligatorio.' };
+  }
+  if (!datos.id_especialidad) {
+    return { valido: false, mensaje: 'Debe seleccionar una especialidad.' };
+  }
+  if (!datos.num_registro || datos.num_registro.trim() === '') {
+    return { valido: false, mensaje: 'El número de registro es obligatorio.' };
+  }
+  if (!datos.fecha_registro) {
+    return { valido: false, mensaje: 'La fecha de registro es obligatoria.' };
+  }
+  return { valido: true };
+};
+
+const validarEmail = (email) => {
+  if (!email || email.trim() === '') return { valido: true };
+  
+  const patron = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!patron.test(email)) {
+    return { valido: false, mensaje: 'El formato del correo electrónico no es válido.' };
+  }
+  return { valido: true };
+};
+
+const validarTelefono = () => {
+  $('#telefono').on('keypress', function(e) {
+    if ([8, 9, 27, 13, 46].indexOf(e.keyCode) !== -1 ||
+        (e.keyCode === 65 && e.ctrlKey === true) ||
+        (e.keyCode === 67 && e.ctrlKey === true) ||
+        (e.keyCode === 86 && e.ctrlKey === true) ||
+        (e.keyCode === 88 && e.ctrlKey === true)) {
+      return;
+    }
+    if ((e.which < 48 || e.which > 57)) {
+      e.preventDefault();
+    }
+  });
+
+  $('#telefono').on('input', function(e) {
+    const input = e.target;
+    let valor = input.value.replace(/\D/g, '');
+    
+    if (valor.length > 9) {
+      valor = valor.substring(0, 9);
+    }
+    
+    if (valor.length > 3) {
+      input.value = valor.substring(0, 3) + ' ' + valor.substring(3);
+    } else {
+      input.value = valor;
+    }
+  });
+
+  $('#telefono').on('paste', function(e) {
+    setTimeout(() => {
+      let valor = this.value.replace(/\D/g, '');
+      if (valor.length > 9) valor = valor.substring(0, 9);
+      if (valor.length > 3) {
+        this.value = valor.substring(0, 3) + ' ' + valor.substring(3);
+      } else {
+        this.value = valor;
+      }
+    }, 0);
+  });
+};
+
+const validarCedula = () => {
+  $('#cedula').on('input', function() {
+    this.value = this.value.replace(/[^0-9]/g, '');
+  });
+};
+
+// ==========================================
+// CRUD
+// ==========================================
 const agregar = () => {
   $('#btnAgregar').on('click', function() {
-    $('#modalTitle').text("Agregar Médico");
+    $('#modalTitle').text("Nuevo Médico");
     $('#formMedico')[0].reset();
     $('#txtIdMedico').val("");
+    $('#id_ciudad').val("");
+    $('#id_especialidad').val("");
+    $('#txtCiudad').val("");
+    $('#txtEspecialidad').val("");
+    
     $('#modalFormulario').modal('show');
   });
 };
@@ -307,130 +596,256 @@ const guardar = () => {
   $('#btnGuardar').on('click', function() {
     const idMedico = $('#txtIdMedico').val();
     const datos = {
-      nombre: $('#nombre').val(),
-      apellido: $('#apellido').val(),
-      cedula: $('#cedula').val(),
+      nombre: $('#nombre').val().trim(),
+      apellido: $('#apellido').val().trim(),
+      cedula: $('#cedula').val().trim(),
       fecha_nacimiento: $('#fecha_nacimiento').val(),
       fecha_registro: $('#fecha_registro').val(),
-      telefono: $('#telefono').val(),
-      direccion: $('#direccion').val(),
-      correo: $('#correo').val(),
+      telefono: formatearTelefonoParaGuardar($('#telefono').val().trim()),
+      direccion: $('#direccion').val().trim(),
+      correo: $('#correo').val().trim(),
       id_ciudad: $('#id_ciudad').val(),
       id_especialidad: $('#id_especialidad').val(),
-      num_registro: $('#txtregistro').val()
+      num_registro: $('#txtregistro').val().trim()
     };
+
+    const validacionCampos = validarCamposRequeridos(datos);
+    if (!validacionCampos.valido) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Campos incompletos',
+        text: validacionCampos.mensaje,
+        confirmButtonColor: '#f39c12'
+      });
+      return;
+    }
+
+    if (datos.correo) {
+      const validacionEmail = validarEmail(datos.correo);
+      if (!validacionEmail.valido) {
+        Swal.fire({
+          icon: 'warning',
+          title: 'Correo inválido',
+          text: validacionEmail.mensaje,
+          confirmButtonColor: '#f39c12'
+        });
+        return;
+      }
+    }
 
     const url = idMedico ? `/api/v1/medico/${idMedico}` : '/api/v1/medico';
     const method = idMedico ? 'PUT' : 'POST';
+    const tabla = $('#tbl').DataTable();
 
     fetch(url, {
-      method,
-      headers: { 'Content-Type': 'application/json', 'X-CSRFToken': CSRFToken },
+      method: method,
+      headers: { 
+        'Content-Type': 'application/json', 
+        'X-CSRFToken': CSRFToken 
+      },
       body: JSON.stringify(datos)
     })
     .then(resp => resp.json())
-    .then(data => {
-      if (data.success) {
-        $('#tbl').DataTable().ajax.reload();
-        Swal.fire("Éxito", idMedico ? "Médico actualizado" : "Médico registrado", "success");
+    .then(result => {
+      if (result && !result.error && result.success) {
+        tabla.ajax.reload();
+        $('#modalFormulario').modal('hide');
+        Swal.fire({
+          icon: 'success',
+          title: idMedico ? 'Actualizado' : 'Registrado',
+          text: `El médico ha sido ${idMedico ? 'actualizado' : 'registrado'} correctamente.`,
+          confirmButtonColor: '#28a745'
+        });
       } else {
-        Swal.fire("Error", data.error, "error");
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: result.error || 'No se pudo guardar el médico.',
+          confirmButtonColor: '#dc3545'
+        });
       }
     })
-    .catch(() => Swal.fire("Error", "Ocurrió un error al guardar", "error"));
-
-    $('#modalFormulario').modal('hide');
+    .catch(err => {
+      console.error(err);
+      Swal.fire({
+        icon: 'error',
+        title: 'Error de conexión',
+        text: 'Ocurrió un error al guardar. Por favor, intente nuevamente.',
+        confirmButtonColor: '#dc3545'
+      });
+    });
   });
 };
 
 const editar = () => {
   $('#tbl').on('click', 'button[name="btn_editar"]', function() {
     const idMedico = $(this).data('id_medico');
-    fetch(`/api/v1/medico/${idMedico}`)
-      .then(resp => resp.json())
-      .then(data => {
-        const m = data.data;
-        $('#modalTitle').text("Editar Médico");
-        $('#txtIdMedico').val(m.id_medico);
-        $('#nombre').val(m.nombre);
-        $('#apellido').val(m.apellido);
-        $('#cedula').val(m.cedula);
-        $('#fecha_nacimiento').val(m.fecha_nacimiento);
-        $('#fecha_registro').val(m.fecha_registro);
-        $('#telefono').val(m.telefono);
-        $('#direccion').val(m.direccion);
-        $('#correo').val(m.correo);
-        $('#id_ciudad').val(m.id_ciudad);
-        $('#txtCiudad').val(m.ciudad);
-        $('#id_especialidad').val(m.id_especialidad);
-        $('#txtEspecialidad').val(m.especialidad);
-        $('#txtregistro').val(m.num_registro);
-        $('#modalFormulario').modal('show');
-      });
-  });
-};
 
-const eliminar = () => {
-  $('#tbl').on('click', 'button[name="btn_eliminar"]', function() {
-    const idMedico = $(this).data('id_medico');
     Swal.fire({
-      title: "¿Deseas eliminar este médico?",
+      title: "¿Deseas editar este registro?",
+      icon: 'question',
       showCancelButton: true,
-      confirmButtonText: "Sí",
-      cancelButtonText: "No"
-    }).then(result => {
+      confirmButtonText: "Sí, editar",
+      cancelButtonText: "Cancelar",
+      confirmButtonColor: '#17a2b8',
+      cancelButtonColor: '#6c757d'
+    }).then((result) => {
       if (result.isConfirmed) {
-        fetch(`/api/v1/medico/${idMedico}`, {
-          method: 'DELETE',
-          headers: { 'Content-Type': 'application/json', 'X-CSRFToken': CSRFToken }
-        })
+        fetch(`/api/v1/medico/${idMedico}`)
         .then(resp => resp.json())
         .then(data => {
-          if (data.success) {
-            $('#tbl').DataTable().ajax.reload();
-            Swal.fire("Eliminado", "El médico ha sido eliminado", "success");
+          if (data && data.success && data.data) {
+            const m = data.data;
+            $('#modalTitle').text("Editar Médico");
+            $('#txtIdMedico').val(m.id_medico);
+            $('#nombre').val(m.nombre);
+            $('#apellido').val(m.apellido);
+            $('#cedula').val(m.cedula);
+            $('#fecha_nacimiento').val(m.fecha_nacimiento);
+            $('#fecha_registro').val(m.fecha_registro);
+            $('#telefono').val(formatearTelefonoParaMostrar(m.telefono || ''));
+            $('#direccion').val(m.direccion);
+            $('#correo').val(m.correo);
+            $('#id_ciudad').val(m.id_ciudad);
+            $('#txtCiudad').val(m.ciudad);
+            $('#id_especialidad').val(m.id_especialidad);
+            $('#txtEspecialidad').val(m.especialidad);
+            $('#txtregistro').val(m.num_registro);
+            $('#modalFormulario').modal('show');
           } else {
-            Swal.fire("Error", data.error, "error");
+            Swal.fire({
+              icon: 'error',
+              title: 'Error',
+              text: 'No se pudo cargar el médico.',
+              confirmButtonColor: '#dc3545'
+            });
           }
+        })
+        .catch(err => {
+          console.error(err);
+          Swal.fire({
+            icon: 'error',
+            title: 'Error de conexión',
+            text: 'Ocurrió un error al cargar el médico.',
+            confirmButtonColor: '#dc3545'
+          });
         });
       }
     });
   });
 };
 
-const addEvents = () => {
-  agregar();
-  guardar();
-  editar();
-  buscarCiudad();
-  eliminar();
+const eliminar = () => {
+  $('#tbl').on('click', 'button[name="btn_eliminar"]', function() {
+    const idMedico = $(this).data('id_medico');
+    const botonEliminar = $(this);
 
-  $('#txtEspecialidad').on('click', () => {
-    $('#modalBuscarEspecialidad').modal('show');
-    initEspecialidadesDatatable();
-  });
-
-  $('#txtCiudad').on('click', () => {
-    $('#modalBuscarCiudad').modal('show');
-    initCiudadDatatable();
+    Swal.fire({
+      title: "¿Deseas eliminar este registro?",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: "Sí, eliminar",
+      cancelButtonText: "Cancelar",
+      confirmButtonColor: '#dc3545',
+      cancelButtonColor: '#6c757d'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        fetch(`/api/v1/medico/${idMedico}`, {
+          method: 'DELETE',
+          headers: { 
+            'Content-Type': 'application/json', 
+            'X-CSRFToken': CSRFToken 
+          }
+        })
+        .then(resp => resp.json())
+        .then(result => {
+          if (result && !result.error && result.success) {
+            const fila = botonEliminar.closest('tr');
+            const tabla = $('#tbl').DataTable();
+            tabla.row(fila).remove().draw();
+            Swal.fire({
+              icon: 'success',
+              title: 'Eliminado',
+              text: 'El registro ha sido eliminado correctamente.',
+              confirmButtonColor: '#28a745'
+            });
+          } else {
+            Swal.fire({
+              icon: 'error',
+              title: 'Error al eliminar',
+              text: result.error || 'No se pudo eliminar el registro.',
+              confirmButtonColor: '#dc3545'
+            });
+          }
+        })
+        .catch(err => {
+          console.error(err);
+          Swal.fire({
+            icon: 'error',
+            title: 'Error de conexión',
+            text: 'Ocurrió un error al eliminar. Por favor, intente nuevamente.',
+            confirmButtonColor: '#dc3545'
+          });
+        });
+      }
+    });
   });
 };
 
-// Validación del campo de telefono para que solo acepte números
-  $('#telefono').on('input', function() {
-    this.value = this.value.replace(/[^0-9]/g, '');  // Solo permite números
+// ==========================================
+// EVENTOS ADICIONALES
+// ==========================================
+const buscarCiudad = () => {
+  $('#txtCiudad').on('click', function() {
+    $('#modalBuscarCiudad').modal('show');
+    initDatatablec();
+  });
+};
+
+const buscarEspecialidad = () => {
+  $('#txtEspecialidad').on('click', function() {
+    $('#modalBuscarEspecialidad').modal('show');
+    initEspecialidadesDatatable();
+  });
+};
+
+// ==========================================
+// FIX MODAL
+// ==========================================
+const fixModalShift = () => {
+  $.fn.modal.Constructor.prototype._setScrollbar = function() {};
+  $.fn.modal.Constructor.prototype._resetScrollbar = function() {};
+  
+  $(document).on('show.bs.modal', '.modal', function () {
+    setTimeout(() => {
+      $('body').css('padding-right', '0');
+      $('.modal').css('padding-right', '0');
+      $('.navbar-fixed-top, .navbar-fixed-bottom').css('padding-right', '0');
+    }, 0);
   });
 
-  // Validación del campo de cédula para que solo acepte números
-  $('#cedula').on('input', function() {
-    this.value = this.value.replace(/[^0-9]/g, '');  // Solo permite números
+  $(document).on('hidden.bs.modal', '.modal', function () {
+    $('body').css('padding-right', '0');
   });
+};
 
+// ==========================================
+// INICIALIZACIÓN
+// ==========================================
 $(function() {
   initDatatable();
-   initDatatablec();
-   initEspecialidadesDatatable();
-  addEvents();
+  initDatatablec();
+  initEspecialidadesDatatable();
+  
+  agregar();
+  guardar();
+  editar();
+  eliminar();
+  buscarCiudad();
+  buscarEspecialidad();
+  validarTelefono();
+  validarCedula();
+  fixModalShift();
 });
 </script>
 {% endblock %}

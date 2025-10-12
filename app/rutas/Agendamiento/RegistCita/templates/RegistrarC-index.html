@@ -501,7 +501,7 @@ const buscarEspecialidad = () => $('#txtespecialidad').on('click', () => $('#mod
 const initDatatableestado = () => {
   $('#tblEstado').DataTable({
     language: { url: "{{ url_for('static', filename='vendor/datatables/es-ES.json') }}" },
-    ajax:'/api/v1/estadocita',
+    ajax:'/api/v1/estadoscitas',
     columns: [
       { data: 'descripcion' },
       { data: null, render: (row) => `

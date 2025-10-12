@@ -66,7 +66,7 @@ def addPersonal():
         if personaldao.existeDuplicado(data['cedula'], data['correo']):
             return jsonify({
                 'success': False,
-                'error': 'El personal ya está registrado con esa cédula o correo.'
+                'error': 'El personal ya está registrado.'
             }), 409
 
         personal_id = personaldao.guardarPersonal(
