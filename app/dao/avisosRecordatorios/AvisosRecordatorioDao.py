@@ -5,22 +5,68 @@ from datetime import datetime
 class AvisoRecordatorioDao:
 
     # ==============================
+    #   HELPER: SANITIZAR ENTEROS
+    # ==============================
+    @staticmethod
+    def sanitize_int(value):
+        """Convierte a int o retorna None si es inválido"""
+        if value in (None, "", "undefined", "null"):
+            return None
+        try:
+            return int(value)
+        except (ValueError, TypeError):
+            return None
+
+    # ==============================
+    #   HELPER: VALIDAR FECHA/HORA
+    # ==============================
+    @staticmethod
+    def validar_fecha_hora_futura(fecha_cita, hora_cita):
+        """Valida que la fecha y hora de la cita sean futuras"""
+        from datetime import datetime, date, time
+        
+        if not fecha_cita or not hora_cita:
+            return False, "Fecha y hora son obligatorias"
+        
+        # Convertir a objetos date/time si vienen como strings
+        if isinstance(fecha_cita, str):
+            try:
+                fecha_cita = datetime.strptime(fecha_cita, "%Y-%m-%d").date()
+            except:
+                return False, "Formato de fecha inválido"
+        
+        if isinstance(hora_cita, str):
+            try:
+                hora_cita = datetime.strptime(hora_cita, "%H:%M").time()
+            except:
+                return False, "Formato de hora inválido"
+        
+        # Combinar fecha y hora
+        fecha_hora_cita = datetime.combine(fecha_cita, hora_cita)
+        ahora = datetime.now()
+        
+        if fecha_hora_cita < ahora:
+            return False, "La fecha de la cita deben ser futuras"
+        
+        return True, None
+
+    # ==============================
     #   LISTAR TODOS LOS AVISOS
     # ==============================
     def getAvisos(self):
         sql = """
         SELECT a.id_aviso,
-               p.nombre || ' ' || p.apellido AS paciente,
-               p.telefono AS telefono_paciente,
-               per.nombre || ' ' || per.apellido AS personal,
-               m.nombre || ' ' || m.apellido AS medico,
-               c.nombre_consultorio,
-               a.fecha_cita,
-               a.hora_cita,
-               a.forma_envio,
-               a.mensaje,
-               a.estado_envio,
-               a.estado_confirmacion
+            p.nombre || ' ' || p.apellido AS paciente,
+            p.telefono AS telefono_paciente,
+            per.nombre || ' ' || per.apellido AS personal,
+            m.nombre || ' ' || m.apellido AS medico,
+            c.nombre_consultorio,
+            a.fecha_cita,
+            a.hora_cita,
+            a.forma_envio,
+            a.mensaje,
+            a.estado_envio,
+            a.estado_confirmacion
         FROM avisos_recordatorios a
         JOIN paciente p ON a.id_paciente = p.id_paciente
         JOIN personal per ON a.id_personal = per.id_personal
@@ -53,18 +99,50 @@ class AvisoRecordatorioDao:
             con.close()
 
     # ==============================
+#   VERIFICAR DUPLICADO
+# ==============================
+    def existeDuplicado(self, id_paciente, id_medico, fecha_cita, hora_cita, id_aviso_excluir=None):
+        """
+        Verifica si existe un aviso duplicado.
+        :param id_aviso_excluir: ID del aviso a excluir de la validación (útil en updates)
+        """
+        sql = """
+        SELECT COUNT(*) 
+        FROM avisos_recordatorios
+        WHERE id_paciente = %s 
+        AND COALESCE(id_medico, 0) = COALESCE(%s, 0)
+        AND fecha_cita = %s
+        AND hora_cita = %s
+        AND (%s IS NULL OR id_aviso != %s);
+        """
+        conexion = Conexion()
+        con = conexion.getConexion()
+        cur = con.cursor()
+        try:
+            cur.execute(sql, (id_paciente, id_medico, fecha_cita, hora_cita, id_aviso_excluir, id_aviso_excluir))
+            count = cur.fetchone()[0]
+            return count > 0
+        except Exception as e:
+            app.logger.error(f"Error en AvisoRecordatorioDao.existeDuplicado: {e}")
+            return False
+        finally:
+            cur.close()
+            con.close()
+
+
+    # ==============================
     #   OBTENER UN AVISO POR ID
     # ==============================
     def getAvisoById(self, id_aviso):
         sql = """
         SELECT a.id_aviso,
             p.id_paciente,
-            p.nombre || ' ' || p.apellido AS paciente,
+            p.nombre || ' ' || p.apellido AS paciente_nombre,
             p.telefono AS telefono_paciente,
             per.id_personal,
-            per.nombre || ' ' || per.apellido AS personal,
+            per.nombre || ' ' || per.apellido AS personal_nombre,
             a.id_medico,
-            m.nombre || ' ' || m.apellido AS medico,
+            m.nombre || ' ' || m.apellido AS medico_nombre,
             c.codigo,
             c.nombre_consultorio,
             a.fecha_cita,
@@ -121,67 +199,89 @@ class AvisoRecordatorioDao:
         con = conexion.getConexion()
         cur = con.cursor()
         try:
+            # Procesar fecha_cita
             fecha_cita = aviso.get("fecha_cita")
             if fecha_cita:
                 fecha_cita = datetime.strptime(fecha_cita, "%Y-%m-%d").date()
-
+            
+            # Procesar hora_cita
             hora_cita = aviso.get("hora_cita")
             if hora_cita:
                 hora_cita = datetime.strptime(hora_cita, "%H:%M").time()
 
-            # ✅ Sanitizar codigo
-            codigo = aviso.get("codigo")
-            if codigo in ("", None):
-                codigo = None
-            else:
-                codigo = int(codigo)
+            # ✅ VALIDAR QUE LA FECHA/HORA SEAN FUTURAS
+            es_valida, mensaje_error = self.validar_fecha_hora_futura(fecha_cita, hora_cita)
+            if not es_valida:
+                raise ValueError(mensaje_error)
 
-            # ✅ Sanitizar id_medico
-            id_medico = aviso.get("id_medico")
-            if id_medico in ("", None):
-                id_medico = None
-            else:
-                id_medico = int(id_medico)
+            # ✅ Sanitizar todos los campos numéricos
+            id_paciente = self.sanitize_int(aviso.get("id_paciente"))
+            id_personal = self.sanitize_int(aviso.get("id_personal"))
+            id_medico = self.sanitize_int(aviso.get("id_medico"))
+            codigo = self.sanitize_int(aviso.get("codigo"))
+
+            # ✅ Validar campos obligatorios
+            if not id_paciente:
+                raise ValueError("id_paciente es requerido y debe ser un número válido")
+            if not id_personal:
+                raise ValueError("id_personal es requerido y debe ser un número válido")
+            if not codigo:
+                raise ValueError("codigo (consultorio) es requerido y debe ser un número válido")
+
+            # ✅ Validar duplicado antes de insertar
+            if self.existeDuplicado(id_paciente, id_medico, fecha_cita, hora_cita):
+                raise ValueError(
+                    "Ya existe un aviso para este paciente, médico, fecha y hora. No se puede duplicar."
+                )
+
+            # ✅ Procesar mensaje (puede ser vacío o None)
+            mensaje = aviso.get("mensaje", "")
+            if mensaje is None:
+                mensaje = ""
 
             cur.execute(sql, (
-                aviso["id_paciente"],
-                aviso["id_personal"],
+                id_paciente,
+                id_personal,
                 id_medico,
                 codigo,
                 fecha_cita,
                 hora_cita,
                 aviso["forma_envio"],
-                aviso["mensaje"],
+                mensaje,
                 aviso.get("estado_envio", "Pendiente"),
                 aviso.get("estado_confirmacion", "Pendiente")
             ))
             id_aviso = cur.fetchone()[0]
             con.commit()
+            app.logger.info(f"✅ Aviso {id_aviso} creado exitosamente")
             return id_aviso
+        except ValueError as ve:
+            con.rollback()
+            app.logger.error(f"Error de validación en addAviso: {ve}")
+            return None
         except Exception as e:
             con.rollback()
             app.logger.error(f"Error en AvisoRecordatorioDao.addAviso: {e}")
+            import traceback
+            app.logger.error(traceback.format_exc())
             return None
         finally:
             cur.close()
             con.close()
 
     # ==============================
-#   ACTUALIZAR AVISO
-# ==============================
+    #   ACTUALIZAR AVISO
+    # ==============================
     def updateAviso(self, id_aviso, aviso):
         # ✅ DEBUG: Ver qué mensaje está llegando
-        print(f"\n[DAO] Actualizando aviso {id_aviso}")
+        app.logger.info(f"[DAO] Actualizando aviso {id_aviso}")
         mensaje_recibido = aviso.get('mensaje', '')
-        print(f"[DAO] Mensaje recibido: '{mensaje_recibido[:100] if mensaje_recibido else 'VACÍO'}'...")
-        print(f"[DAO] Tipo de mensaje: {type(mensaje_recibido)}")
-        print(f"[DAO] Longitud del mensaje: {len(mensaje_recibido) if mensaje_recibido else 0}")
-        print(f"[DAO] Estado envío: {aviso.get('estado_envio')}")
+        app.logger.info(f"[DAO] Mensaje recibido: '{mensaje_recibido[:100] if mensaje_recibido else 'VACÍO'}'...")
         
         # ✅ Primero obtenemos el aviso actual para preservar campos
         aviso_actual = self.getAvisoById(id_aviso)
         if not aviso_actual:
-            print(f"[DAO] ❌ No se encontró el aviso {id_aviso}")
+            app.logger.error(f"[DAO] ❌ No se encontró el aviso {id_aviso}")
             return False
         
         # ✅ Usar valores del aviso actual como fallback
@@ -196,13 +296,12 @@ class AvisoRecordatorioDao:
         estado_confirmacion = aviso.get("estado_confirmacion", aviso_actual.get("estado_confirmacion", "Pendiente"))
         
         # ✅ CRÍTICO: El mensaje puede venir como string vacío '' o None
-        # Debemos preservar el que venga, incluso si es vacío
         if 'mensaje' in aviso:
             mensaje = aviso['mensaje'] if aviso['mensaje'] is not None else ''
         else:
             mensaje = aviso_actual.get('mensaje', '')
         
-        print(f"[DAO] Mensaje final a guardar: '{mensaje[:100] if mensaje else 'VACÍO'}'...")
+        app.logger.info(f"[DAO] Mensaje final a guardar: '{mensaje[:100] if mensaje else 'VACÍO'}'...")
         
         sql = """
         UPDATE avisos_recordatorios SET
@@ -232,20 +331,30 @@ class AvisoRecordatorioDao:
                 if isinstance(hora_cita, str):
                     hora_cita = datetime.strptime(hora_cita, "%H:%M").time()
 
-            # Sanitizar codigo
-            if codigo in ("", None):
-                codigo = None
-            else:
-                codigo = int(codigo)
+        
 
-            # Sanitizar id_medico
-            if id_medico in ("", None):
-                id_medico = None
-            else:
-                id_medico = int(id_medico)
+            # ✅ Sanitizar con la función helper
+            id_paciente = self.sanitize_int(id_paciente)
+            id_personal = self.sanitize_int(id_personal)
+            id_medico = self.sanitize_int(id_medico)
+            codigo = self.sanitize_int(codigo)
 
-            print(f"[DAO] Ejecutando UPDATE...")
-            print(f"[DAO] Parámetros: id_paciente={id_paciente}, id_personal={id_personal}, mensaje_len={len(mensaje) if mensaje else 0}")
+            # ✅ Validar campos obligatorios en update también
+            if not id_paciente:
+                raise ValueError("id_paciente es requerido")
+            if not id_personal:
+                raise ValueError("id_personal es requerido")
+            if not codigo:
+                raise ValueError("codigo (consultorio) es requerido")
+
+            # ✅ Validar duplicado antes de insertar
+            if self.existeDuplicado(id_paciente, id_medico, fecha_cita, hora_cita, id_aviso_excluir=id_aviso):
+                raise ValueError(
+                    "Ya existe un aviso para este paciente, médico, fecha y hora. No se puede duplicar."
+                )
+
+            app.logger.info(f"[DAO] Ejecutando UPDATE...")
+            app.logger.info(f"[DAO] Parámetros: id_paciente={id_paciente}, id_personal={id_personal}, mensaje_len={len(mensaje) if mensaje else 0}")
 
             cur.execute(sql, (
                 id_paciente,
@@ -255,7 +364,7 @@ class AvisoRecordatorioDao:
                 fecha_cita,
                 hora_cita,
                 forma_envio,
-                mensaje,  # ✅ Aquí va el mensaje (puede ser '' o con contenido)
+                mensaje,
                 estado_envio,
                 estado_confirmacion,
                 id_aviso
@@ -264,21 +373,24 @@ class AvisoRecordatorioDao:
             filas_afectadas = cur.rowcount
             con.commit()
             
-            print(f"[DAO] ✅ UPDATE ejecutado correctamente. Filas afectadas: {filas_afectadas}")
+            app.logger.info(f"[DAO] ✅ UPDATE ejecutado correctamente. Filas afectadas: {filas_afectadas}")
             
             # ✅ VERIFICACIÓN ADICIONAL: Leer de nuevo el registro para confirmar
             cur.execute("SELECT mensaje FROM avisos_recordatorios WHERE id_aviso = %s", (id_aviso,))
             verificacion = cur.fetchone()
             if verificacion:
-                print(f"[DAO] 🔍 Verificación - Mensaje en BD: '{verificacion[0][:100] if verificacion[0] else 'VACÍO'}'...")
+                app.logger.info(f"[DAO] 🔍 Verificación - Mensaje en BD: '{verificacion[0][:100] if verificacion[0] else 'VACÍO'}'...")
             
             return True
+        except ValueError as ve:
+            con.rollback()
+            app.logger.error(f"[DAO] ❌ Error de validación en UPDATE: {ve}")
+            return False
         except Exception as e:
             con.rollback()
-            print(f"[DAO] ❌ Error en UPDATE: {e}")
+            app.logger.error(f"[DAO] ❌ Error en UPDATE: {e}")
             import traceback
-            traceback.print_exc()
-            app.logger.error(f"Error en AvisoRecordatorioDao.updateAviso {id_aviso}: {e}")
+            app.logger.error(traceback.format_exc())
             return False
         finally:
             cur.close()
@@ -295,6 +407,7 @@ class AvisoRecordatorioDao:
         try:
             cur.execute(sql, (id_aviso,))
             con.commit()
+            app.logger.info(f"✅ Aviso {id_aviso} eliminado exitosamente")
             return True
         except Exception as e:
             con.rollback()

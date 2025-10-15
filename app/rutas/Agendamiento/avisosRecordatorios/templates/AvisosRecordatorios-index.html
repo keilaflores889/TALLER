@@ -15,9 +15,9 @@ Avisos Recordatorios
         <button type="button" class="btn btn-light btn-sm" id="btnAgregar">
           <i class="fas fa-plus-circle mr-1"></i> Agregar
         </button>
-        <button type="button" class="btn btn-success btn-sm" id="btnEnviarWhatsApp">
+        <!--<button type="button" class="btn btn-success btn-sm" id="btnEnviarWhatsApp">
           <i class="fab fa-whatsapp mr-1"></i> Enviar WhatsApp
-        </button>
+        </button> -->
         <button type="button" class="btn btn-warning btn-sm" id="btnEstadisticas">
           <i class="fas fa-chart-bar mr-1"></i> Estadísticas
         </button>
@@ -53,8 +53,7 @@ Avisos Recordatorios
     </div>
   </div>
 
-  <!-- =========================== -->
-  <!-- Modal Aviso -->
+ <!-- Modal Aviso -->
   <!-- =========================== -->
   <div class="modal fade" id="modalAviso" tabindex="-1" role="dialog">
     <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable" role="document">
@@ -74,9 +73,11 @@ Avisos Recordatorios
             <input type="hidden" id="id_aviso_modal">
 
             <div class="row">
-              <!-- Personal -->
+          <!-- Personal -->
             <div class="col-md-6 mb-3">
-              <label class="font-weight-bold">Personal <span class="text-danger">*</span></label>
+              <label class="font-weight-bold">
+                <i class="fas fa-user-nurse mr-1"></i> Personal <span class="text-danger">*</span>
+              </label>
               <div class="input-group">
                 <input type="text" id="txtPersonal" class="form-control" placeholder="Click para seleccionar personal" readonly required>
                 <button type="button" class="btn btn-info" onclick="$('#modalBuscarPersonal').modal('show')">
@@ -86,9 +87,11 @@ Avisos Recordatorios
               <input type="hidden" id="id_personal_modal">
             </div>
 
-              <!-- Consultorio -->
+            <!-- Consultorio -->
             <div class="col-md-6 mb-3">
-              <label class="font-weight-bold">Consultorio <span class="text-danger">*</span></label>
+              <label class="font-weight-bold">
+                <i class="fas fa-door-open mr-1"></i> Consultorio <span class="text-danger">*</span>
+              </label>
               <div class="input-group">
                 <input type="text" id="txtConsultorio" class="form-control" placeholder="Click para seleccionar consultorio" readonly required>
                 <button type="button" class="btn btn-info" onclick="$('#modalBuscarConsultorio').modal('show')">
@@ -99,9 +102,11 @@ Avisos Recordatorios
               <input type="hidden" id="id_consultorio_modal">
             </div>
 
-              <!-- Paciente -->
+            <!-- Paciente -->
             <div class="col-md-6 mb-3">
-              <label class="font-weight-bold">Paciente <span class="text-danger">*</span></label>
+              <label class="font-weight-bold">
+                <i class="fas fa-user-injured mr-1"></i> Paciente <span class="text-danger">*</span>
+              </label>
               <div class="input-group">
                 <input type="text" id="txtpaciente" class="form-control" placeholder="Click para seleccionar paciente" readonly required>
                 <button type="button" class="btn btn-info" onclick="$('#modalBuscarPaciente').modal('show')">
@@ -111,56 +116,78 @@ Avisos Recordatorios
               <input type="hidden" id="id_paciente">
             </div>
 
-              <!-- Médico -->
-              <div class="col-md-6 mb-3">
-                <label class="font-weight-bold">Médico <span class="text-danger">*</span></label>
-                <div class="input-group">
-                  <input type="text" id="txtMedico" class="form-control" placeholder="Click para seleccionar médico" readonly>
-                  <button type="button" class="btn btn-info" onclick="$('#modalBuscarMedico').modal('show')">
-                    <i class="fas fa-search"></i>
-                  </button>
-                </div>
-                <input type="hidden" id="id_medico">
+            <!-- Médico -->
+            <div class="col-md-6 mb-3">
+              <label class="font-weight-bold">
+                <i class="fas fa-user-md mr-1"></i> Médico <span class="text-danger">*</span>
+              </label>
+              <div class="input-group">
+                <input type="text" id="txtMedico" class="form-control" placeholder="Click para seleccionar médico" readonly>
+                <button type="button" class="btn btn-info" onclick="$('#modalBuscarMedico').modal('show')">
+                  <i class="fas fa-search"></i>
+                </button>
               </div>
-
-              <!-- Fecha y hora de cita -->
-              <div class="col-md-4 mb-3">
-                <label class="font-weight-bold">Fecha Cita <span class="text-danger">*</span></label>
-                <input type="date" id="fecha_cita_modal" class="form-control text-center" required>
-              </div>
-              <div class="col-md-4 mb-3">
-                <label class="font-weight-bold">Hora Cita <span class="text-danger">*</span></label>
-                <input type="time" id="hora_cita_modal" class="form-control text-center" required>
-              </div>
-
-              <!-- Estado Confirmación -->
-              <div class="col-md-4 mb-3">
-                <label class="font-weight-bold">Estado Confirmación</label>
-                <select id="estado_confirmacion_modal" class="form-control">
-                  <option value="Pendiente">Pendiente</option>
-                  <option value="Confirmado">Confirmado</option>
-                  <option value="Cancelado">Cancelado</option>
-                </select>
-              </div>
-
-              <!-- Forma de envío -->
-              <div class="col-md-12 mb-3">
-                <label class="font-weight-bold">Forma de Envío <span class="text-danger">*</span></label>
-                <select id="forma_envio_modal" class="form-control" required>
-                  <option value="" disabled selected>Seleccione</option>
-                  <option value="Gmail">Gmail</option>
-                  <option value="SMS">SMS</option>
-                  <option value="WhatsApp">WhatsApp</option>
-                </select>
-              </div>
-
-              <!-- Mensaje -->
-              <div class="col-12 mb-3">
-                <label class="font-weight-bold">Mensaje</label>
-                <textarea id="mensaje_modal" class="form-control" rows="4"
-                  placeholder="Deje vacío para usar mensaje automático"></textarea>
-              </div>
+              <input type="hidden" id="id_medico">
             </div>
+
+            <!-- Fecha y hora de cita -->
+            <div class="col-md-4 mb-3">
+              <label class="font-weight-bold">
+                <i class="fas fa-calendar-alt mr-1"></i> Fecha Cita <span class="text-danger">*</span>
+              </label>
+              <input type="date" id="fecha_cita_modal" class="form-control text-center" required>
+            </div>
+            
+            <div class="col-md-4 mb-3">
+              <label class="font-weight-bold">
+                <i class="far fa-clock mr-1"></i> Hora Cita <span class="text-danger">*</span>
+              </label>
+              <div class="input-group">
+                <input type="number" id="hora_cita_horas" class="form-control" placeholder="HH" min="1" max="12" style="flex: 0 0 25%;">
+                <span class="input-group-text">:</span>
+                <input type="number" id="hora_cita_minutos" class="form-control" placeholder="MM" min="0" max="59" style="flex: 0 0 25%;">
+                <select id="hora_cita_periodo" class="form-control" style="flex: 0 0 40%;">
+                  <option value="a.m.">a.m.</option>
+                  <option value="p.m.">p.m.</option>
+                </select>
+              </div>
+              <input type="hidden" id="hora_cita_modal">
+            </div>
+
+            <!-- Estado Confirmación -->
+            <div class="col-md-4 mb-3">
+              <label class="font-weight-bold">
+                <i class="fas fa-check-circle mr-1"></i> Estado Confirmación
+              </label>
+              <select id="estado_confirmacion_modal" class="form-control">
+                <option value="Pendiente">Pendiente</option>
+                <option value="Confirmado">Confirmado</option>
+                <option value="Cancelado">Cancelado</option>
+              </select>
+            </div>
+
+            <!-- Forma de envío -->
+            <div class="col-md-12 mb-3">
+              <label class="font-weight-bold">
+                <i class="fas fa-paper-plane mr-1"></i> Forma de Envío <span class="text-danger">*</span>
+              </label>
+              <select id="forma_envio_modal" class="form-control" required>
+                <option value="" disabled selected>Seleccione</option>
+                <option value="Gmail">Gmail</option>
+                <option value="SMS">SMS</option>
+                <option value="WhatsApp">WhatsApp</option>
+              </select>
+            </div>
+
+            <!-- Mensaje -->
+            <div class="col-12 mb-3">
+              <label class="font-weight-bold">
+                <i class="fas fa-comment-dots mr-1"></i> Mensaje
+              </label>
+              <textarea id="mensaje_modal" class="form-control" rows="4"
+                placeholder="Deje vacío para usar mensaje automático"></textarea>
+            </div>
+          </div>
           </form>
         </div>
 
@@ -178,16 +205,23 @@ Avisos Recordatorios
     </div>
   </div>
 
+  <!-- =========================== -->
   <!-- Modal Estadísticas -->
-  <div class="modal fade" id="modalEstadisticas" tabindex="-1">
-    <div class="modal-dialog modal-lg">
+  <!-- =========================== -->
+  <div class="modal fade" id="modalEstadisticas" tabindex="-1" role="dialog" aria-labelledby="modalEstadisticasLabel">
+    <div class="modal-dialog modal-lg" role="document">
       <div class="modal-content">
         <div class="modal-header bg-info text-white">
-          <h5 class="modal-title">Estadísticas de Avisos</h5>
-          <button type="button" class="close text-white" data-dismiss="modal">&times;</button>
+          <h5 class="modal-title" id="modalEstadisticasLabel">
+            <i class="fas fa-chart-bar mr-2"></i>Estadísticas de Avisos
+          </h5>
+          <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
         </div>
         <div class="modal-body">
           <div class="row">
+            <!-- Por Estado -->
             <div class="col-md-4">
               <div class="card border-primary mb-3">
                 <div class="card-header bg-primary text-white">Por Estado</div>
@@ -198,6 +232,8 @@ Avisos Recordatorios
                 </div>
               </div>
             </div>
+            
+            <!-- Por Forma de Envío -->
             <div class="col-md-4">
               <div class="card border-info mb-3">
                 <div class="card-header bg-info text-white">Por Forma de Envío</div>
@@ -208,6 +244,8 @@ Avisos Recordatorios
                 </div>
               </div>
             </div>
+            
+            <!-- Por Confirmación -->
             <div class="col-md-4">
               <div class="card border-success mb-3">
                 <div class="card-header bg-success text-white">Por Confirmación</div>
@@ -219,9 +257,16 @@ Avisos Recordatorios
               </div>
             </div>
           </div>
+          
+          <!-- Total -->
           <div class="alert alert-info">
             <strong>Total de Avisos:</strong> <span id="statTotal">0</span>
           </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-danger" data-dismiss="modal">
+            <i class="fas fa-times mr-1"></i>Cerrar
+          </button>
         </div>
       </div>
     </div>
@@ -231,17 +276,17 @@ Avisos Recordatorios
   <!-- Modales Selección Paciente, Personal, Médico, Consultorio -->
   <!-- ========================= -->
   <!-- Modal Paciente -->
-  <div class="modal fade" id="modalBuscarPaciente" tabindex="-1">
+  <div class="modal fade" id="modalBuscarPaciente" tabindex="-1"data-backdrop="static" data-keyboard="false">
     <div class="modal-dialog modal-dialog-centered modal-lg">
       <div class="modal-content">
-        <div class="modal-header">
+        <div class="modal-header bg-info text-white">
           <h4 class="modal-title">Seleccionar Paciente</h4>
-          <button type="button" class="close" data-dismiss="modal">&times;</button>
+          <button type="button" class="close text-white" onclick="$('#modalBuscarPaciente').modal('hide');">&times;</button>
         </div>
         <div class="modal-body">
           <div class="table-responsive">
             <table class="table table-striped table-bordered w-100" id="tblPaciente">
-              <thead>
+              <thead class="bg-info text-white">
                 <tr>
                   <th>Nombre</th>
                   <th>Apellido</th>
@@ -257,16 +302,16 @@ Avisos Recordatorios
   </div>
 
   <!-- Modal Personal -->
-  <div class="modal fade" id="modalBuscarPersonal" tabindex="-1">
+  <div class="modal fade" id="modalBuscarPersonal" tabindex="-1" data-backdrop="static" data-keyboard="false">
     <div class="modal-dialog modal-lg">
       <div class="modal-content">
-        <div class="modal-header">
+        <div class="modal-header bg-info text-white">
           <h5 class="modal-title">Buscar Personal</h5>
-          <button type="button" class="close" data-dismiss="modal">&times;</button>
+          <button type="button" class="close text-white" onclick="$('#modalBuscarPersonal').modal('hide');">&times;</button>
         </div>
         <div class="modal-body">
           <table id="tblPersonal" class="table table-bordered w-100">
-            <thead>
+            <thead class="bg-info text-white">
               <tr>
                 <th>Nombre</th>
                 <th>Apellido</th>
@@ -280,16 +325,16 @@ Avisos Recordatorios
   </div>
 
   <!-- Modal Médico -->
-  <div class="modal fade" id="modalBuscarMedico" tabindex="-1">
+  <div class="modal fade" id="modalBuscarMedico" tabindex="-1" data-backdrop="static" data-keyboard="false">>
     <div class="modal-dialog modal-lg">
       <div class="modal-content">
-        <div class="modal-header">
+        <div class="modal-header bg-info text-white">
           <h5 class="modal-title">Buscar Médico</h5>
-          <button type="button" class="close" data-dismiss="modal">&times;</button>
+          <button type="button" class="close text-white" onclick="$('#modalBuscarMedico').modal('hide');">&times;</button>
         </div>
         <div class="modal-body">
           <table id="tblMedico" class="table table-bordered w-100">
-            <thead>
+            <thead class="bg-info text-white">
               <tr>
                 <th>Nombre</th>
                 <th>Apellido</th>
@@ -303,17 +348,17 @@ Avisos Recordatorios
   </div>
 
   <!-- Modal Consultorio -->
-  <div class="modal fade" id="modalBuscarConsultorio" tabindex="-1">
+  <div class="modal fade" id="modalBuscarConsultorio" tabindex="-1" data-backdrop="static" data-keyboard="false">
     <div class="modal-dialog modal-dialog-centered modal-lg">
       <div class="modal-content">
-        <div class="modal-header">
+        <div class="modal-header bg-info text-white">
           <h4 class="modal-title">Seleccionar Consultorio</h4>
-          <button type="button" class="close" data-dismiss="modal">&times;</button>
+          <button type="button" class="close text-white" onclick="$('#modalBuscarConsultorio').modal('hide');">&times;</button>
         </div>
         <div class="modal-body">
           <div class="table-responsive">
             <table class="table table-striped table-bordered w-100" id="tblConsultorio">
-              <thead>
+              <thead class="bg-info text-white">
                 <tr>
                   <th>Consultorio</th>
                   <th>Acciones</th>
@@ -326,9 +371,9 @@ Avisos Recordatorios
       </div>
     </div>
   </div>
-
 </div>
-
+</div>
+</div>
 <!-- Librerías necesarias -->
 <link rel="stylesheet" href="https://cdn.datatables.net/1.10.21/css/dataTables.bootstrap4.min.css">
 <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
@@ -342,6 +387,271 @@ Avisos Recordatorios
 {% block js %}
 <script>
 const CSRFToken = "{{ csrf_token() }}" || null;
+
+
+// ==========================================
+// FORMATO DE HORA AM/PM
+// ==========================================
+// 👉 Construir hora en formato AM/PM desde los inputs
+function construirHoraAMPM() {
+  let horas = parseInt($('#hora_cita_horas').val());
+  let minutos = parseInt($('#hora_cita_minutos').val());
+  const periodo = $('#hora_cita_periodo').val();
+  
+  console.log("🔍 Construir hora - Horas:", horas, "Minutos:", minutos, "Periodo:", periodo);
+  
+  if (isNaN(horas) || isNaN(minutos)) {
+    console.log("⚠️ Falta horas o minutos válidos");
+    return '';
+  }
+  
+  if (horas < 1 || horas > 12) {
+    console.log("⚠️ Horas fuera de rango (1-12):", horas);
+    Swal.fire({
+      icon: 'warning',
+      title: 'Hora inválida',
+      text: 'Las horas deben estar entre 1 y 12.',
+      confirmButtonColor: '#f39c12'
+    });
+    return '';
+  }
+  
+  if (minutos < 0 || minutos > 59) {
+    console.log("⚠️ Minutos fuera de rango (0-59):", minutos);
+    Swal.fire({
+      icon: 'warning',
+      title: 'Minutos inválidos',
+      text: 'Los minutos deben estar entre 0 y 59.',
+      confirmButtonColor: '#f39c12'
+    });
+    return '';
+  }
+  
+  const horasFormat = String(horas).padStart(2, '0');
+  const minutosFormat = String(minutos).padStart(2, '0');
+  
+  const resultado = `${horasFormat}:${minutosFormat} ${periodo}`;
+  console.log("✅ Hora construida:", resultado);
+  
+  return resultado;
+}
+
+// 👉 Convertir hora 12h AM/PM a formato 24h para la BD
+function convertirAFormato24h(horaAMPM) {
+  console.log("🔍 Entrada a convertirAFormato24h:", horaAMPM);
+  
+  if (!horaAMPM) {
+    console.log("⚠️ Hora vacía");
+    return '';
+  }
+  
+  const match = horaAMPM.match(/(\d+):(\d+)\s*(a\.m\.|p\.m\.)/i);
+  console.log("🔍 Match resultado:", match);
+  
+  if (!match) {
+    console.log("⚠️ No coincide el formato, devolviendo tal cual:", horaAMPM);
+    return horaAMPM;
+  }
+  
+  let horas = parseInt(match[1]);
+  const minutos = match[2];
+  const periodo = match[3].toLowerCase();
+  
+  console.log("📊 Horas originales:", horas, "Minutos:", minutos, "Periodo:", periodo);
+  
+  // Convertir a formato 24 horas
+  if (periodo === 'p.m.') {
+    if (horas !== 12) {
+      horas += 12;
+    }
+  } else { // a.m.
+    if (horas === 12) {
+      horas = 0;
+    }
+  }
+  
+  const resultado = `${String(horas).padStart(2, '0')}:${minutos}`;
+  console.log("✅ Hora convertida a 24h:", resultado);
+  
+  return resultado;
+}
+
+// 👉 Separar hora en componentes para edición
+function separarHoraAMPM(hora24h) {
+  console.log("🔍 Entrada a separarHoraAMPM:", hora24h);
+  
+  if (!hora24h) {
+    return { horas: '', minutos: '', periodo: 'a.m.' };
+  }
+  
+  // Si ya viene en formato AM/PM
+  const matchAMPM = hora24h.match(/(\d+):(\d+)\s*(a\.m\.|p\.m\.)/i);
+  if (matchAMPM) {
+    return {
+      horas: parseInt(matchAMPM[1]),
+      minutos: matchAMPM[2],
+      periodo: matchAMPM[3].toLowerCase()
+    };
+  }
+  
+  // Si viene en formato 24h (HH:MM:SS o HH:MM)
+  const match24h = hora24h.match(/(\d+):(\d+)/);
+  if (!match24h) {
+    return { horas: '', minutos: '', periodo: 'a.m.' };
+  }
+  
+  let horas = parseInt(match24h[1]);
+  const minutos = match24h[2];
+  let periodo = 'a.m.';
+  
+  console.log("📊 Horas 24h:", horas, "Minutos:", minutos);
+  
+  // Convertir de 24h a 12h
+  if (horas >= 12) {
+    periodo = 'p.m.';
+    if (horas > 12) {
+      horas = horas - 12;
+    }
+  } else if (horas === 0) {
+    horas = 12;
+  }
+  
+  const resultado = {
+    horas: horas,
+    minutos: minutos,
+    periodo: periodo
+  };
+  
+  console.log("✅ Hora separada:", resultado);
+  
+  return resultado;
+}
+
+// 👉 Formatear hora de 24h a AM/PM para mostrar en tabla
+function formatTimeToAMPM(hora24h) {
+  if (!hora24h) return '';
+  
+  // Si ya viene en formato AM/PM, devolverlo tal cual
+  if (hora24h.includes('a.m.') || hora24h.includes('p.m.')) {
+    return hora24h;
+  }
+  
+  const match = hora24h.match(/(\d+):(\d+)/);
+  if (!match) return hora24h;
+  
+  let horas = parseInt(match[1]);
+  const minutos = match[2];
+  let periodo = 'a.m.';
+  
+  if (horas >= 12) {
+    periodo = 'p.m.';
+    if (horas > 12) {
+      horas = horas - 12;
+    }
+  } else if (horas === 0) {
+    horas = 12;
+  }
+  
+  return `${horas}:${minutos} ${periodo}`;
+}
+
+// ==========================================
+// VALIDACIÓN DE DUPLICADOS
+// ==========================================
+async function verificarDuplicado(id_paciente, id_medico, fecha_cita, hora_cita, id_aviso_actual = null) {
+  try {
+    const response = await fetch('/api/v1/avisos/verificar-duplicado', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': CSRFToken
+      },
+      body: JSON.stringify({
+        id_paciente: id_paciente,
+        id_medico: id_medico,
+        fecha_cita: fecha_cita,
+        hora_cita: hora_cita,
+        id_aviso_excluir: id_aviso_actual
+      })
+    });
+    
+    const result = await response.json();
+    return result.duplicado || false;
+  } catch (error) {
+    console.error('Error al verificar duplicado:', error);
+    return false;
+  }
+}
+
+// ==========================================
+// VALIDACIÓN DE FECHA Y HORA FUTURAS
+// ==========================================
+function validarFechaHoraFutura(fecha, hora24h) {
+  if (!fecha || !hora24h) {
+    return { valido: false, mensaje: 'Fecha y hora son obligatorias' };
+  }
+  
+  // Construir fecha y hora completa de la cita
+  const fechaHoraCita = new Date(fecha + 'T' + hora24h + ':00');
+  const ahora = new Date();
+  
+  console.log("🔍 Validación de fecha/hora:");
+  console.log("   Fecha cita:", fechaHoraCita.toLocaleString('es-PY'));
+  console.log("   Ahora:", ahora.toLocaleString('es-PY'));
+  console.log("   Diferencia (ms):", fechaHoraCita - ahora);
+  
+  // ✅ Permitir fechas de HOY si la hora es futura
+  // ❌ NO permitir fechas pasadas ni horas pasadas de hoy
+  if (fechaHoraCita <= ahora) {
+    const esFechaHoy = fecha === ahora.toISOString().split('T')[0];
+    
+    if (esFechaHoy) {
+      return { 
+        valido: false, 
+        mensaje: 'La hora seleccionada ya pasó. Debe seleccionar una hora futura del día de hoy.' 
+      };
+    } else {
+      return { 
+        valido: false, 
+        mensaje: 'No puede crear avisos para fechas pasadas. Seleccione una fecha desde hoy en adelante.' 
+      };
+    }
+  }
+  
+  return { valido: true };
+}
+
+// ==========================================
+// FORMATO DE TELÉFONO
+// ==========================================
+const formatearTelefonoParaMostrar = (telefono) => {
+  if (!telefono) return 'Sin teléfono';
+  let limpio = telefono.replace(/\D/g, '');
+  
+  if (limpio.startsWith('595')) {
+    limpio = limpio.substring(3);
+  }
+  
+  if (limpio.length > 3) {
+    return limpio.substring(0, 3) + ' ' + limpio.substring(3);
+  }
+  return limpio;
+};
+
+const formatearTelefonoParaGuardar = (telefono) => {
+  let limpio = telefono.replace(/\D/g, '');
+  
+  if (limpio.startsWith('595')) {
+    return limpio;
+  }
+  
+  if (limpio.startsWith('0')) {
+    limpio = limpio.substring(1);
+  }
+  
+  return '595' + limpio;
+};
+
 
 function formatDateForInput(fecha) {
   if (!fecha) return '';
@@ -372,10 +682,18 @@ const initDatatableAvisos = () => {
       { data: 'personal' },
       { data: 'nombre_consultorio' },
       { data: 'paciente' },
-      { data: 'telefono_paciente', render: data => data || 'Sin teléfono' },
+      { 
+  data: 'telefono_paciente', 
+  render: data => formatearTelefonoParaMostrar(data),
+  width: "120px",           
+  className: "text-nowrap"
+},
       { data: 'medico', render: data => data || 'Sin médico' },
       { data: 'fecha_cita', render: data => formatDateForDisplay(data) },
-      { data: 'hora_cita' },
+      { 
+        data: 'hora_cita',
+        render: data => formatTimeToAMPM(data)  // ✅ Mostrar en formato AM/PM
+      },
       { 
         data: 'forma_envio',
         render: function(data) {
@@ -401,9 +719,9 @@ const initDatatableAvisos = () => {
           } else {
             // Si tiene mensaje personalizado
             const mensajeCorto = data.length > 30 ? data.substring(0, 30) + '...' : data;
-            return `<span title="${data}">${mensajeCorto}</span>
-                    <button type="button" class="btn btn-sm btn-link p-0 ml-1" 
-                            onclick="verMensajeCompleto('${data.replace(/'/g, "\\'")}', 'Personalizado')" 
+            return `<span title="Click en el ojo para ver completo">${mensajeCorto}</span>
+                    <button type="button" class="btn btn-sm btn-link p-0 ml-1 btn-ver-mensaje" 
+                            data-id="${row.id_aviso}"
                             title="Ver completo">
                       <i class="fas fa-eye"></i>
                     </button>`;
@@ -455,6 +773,37 @@ const initDatatableAvisos = () => {
         }
       }
     ]
+  });
+};
+
+
+const validarTelefonoAviso = () => {
+  $('#telefono_aviso').on('keypress', function(e) {
+    if ([8, 9, 27, 13, 46].indexOf(e.keyCode) !== -1 ||
+        (e.keyCode === 65 && e.ctrlKey === true) ||
+        (e.keyCode === 67 && e.ctrlKey === true) ||
+        (e.keyCode === 86 && e.ctrlKey === true) ||
+        (e.keyCode === 88 && e.ctrlKey === true)) {
+      return;
+    }
+    if ((e.which < 48 || e.which > 57)) {
+      e.preventDefault();
+    }
+  });
+
+  $('#telefono_aviso').on('input', function(e) {
+    const input = e.target;
+    let valor = input.value.replace(/\D/g, '');
+    
+    if (valor.length > 9) {
+      valor = valor.substring(0, 9);
+    }
+    
+    if (valor.length > 3) {
+      input.value = valor.substring(0, 3) + ' ' + valor.substring(3);
+    } else {
+      input.value = valor;
+    }
   });
 };
 
@@ -543,19 +892,16 @@ $('#tblAvisos').on('click', 'button[name="btn_editar"]', async function() {
       const aviso = result.data;
       $('#id_aviso_modal').val(aviso.id_aviso);
       
-      // ✅ CAMBIAR: usar paciente_nombre en lugar de paciente
       if (aviso.paciente_nombre) {
         $('#txtpaciente').val(aviso.paciente_nombre);
         $('#id_paciente').val(aviso.id_paciente);
       }
       
-      // ✅ CAMBIAR: usar personal_nombre en lugar de personal
       if (aviso.personal_nombre) {
         $('#txtPersonal').val(aviso.personal_nombre);
         $('#id_personal_modal').val(aviso.id_personal);
       }
       
-      // ✅ CAMBIAR: usar medico_nombre en lugar de medico
       if (aviso.medico_nombre) {
         $('#txtMedico').val(aviso.medico_nombre);
         $('#id_medico').val(aviso.id_medico);
@@ -567,7 +913,13 @@ $('#tblAvisos').on('click', 'button[name="btn_editar"]', async function() {
       }
       
       $('#fecha_cita_modal').val(formatDateForInput(aviso.fecha_cita));
-      $('#hora_cita_modal').val(aviso.hora_cita);
+      
+      // ✅ Separar hora en componentes
+      const horaPartes = separarHoraAMPM(aviso.hora_cita);
+      $('#hora_cita_horas').val(horaPartes.horas);
+      $('#hora_cita_minutos').val(horaPartes.minutos);
+      $('#hora_cita_periodo').val(horaPartes.periodo);
+      
       $('#forma_envio_modal').val(aviso.forma_envio);
       $('#mensaje_modal').val(aviso.mensaje || '');
       $('#estado_confirmacion_modal').val(aviso.estado_confirmacion || 'Pendiente');
@@ -582,25 +934,132 @@ $('#tblAvisos').on('click', 'button[name="btn_editar"]', async function() {
 });
 
 $('#btnEstadisticas').on('click', function() {
+  console.log('🔵 Click en botón estadísticas');
+  
+  // Mostrar loading
+  Swal.fire({
+    title: 'Cargando estadísticas...',
+    allowOutsideClick: false,
+    didOpen: () => {
+      Swal.showLoading();
+    }
+  });
+
   fetch('/api/v1/avisos/estadisticas')
-    .then(resp => resp.json())
-    .then(result => {
-      if (result.success) {
-        const data = result.data;
-        $('#statTotal').text(data.total);
-        $('#statPendientes').text(data.por_estado.pendientes);
-        $('#statEnviados').text(data.por_estado.enviados);
-        $('#statErrores').text(data.por_estado.errores);
-        $('#statWhatsApp').text(data.por_forma_envio.whatsapp);
-        $('#statGmail').text(data.por_forma_envio.gmail);
-        $('#statSMS').text(data.por_forma_envio.sms);
-        $('#statConfirmados').text(data.por_confirmacion.confirmados);
-        $('#statPendientesConf').text(data.por_confirmacion.pendientes);
-        $('#statCancelados').text(data.por_confirmacion.cancelados);
-        $('#modalEstadisticas').modal('show');
+    .then(resp => {
+      console.log('🔵 Respuesta recibida, status:', resp.status);
+      if (!resp.ok) {
+        throw new Error(`HTTP error! status: ${resp.status}`);
       }
+      return resp.json();
+    })
+    .then(result => {
+      console.log('📊 Datos completos recibidos:', result);
+      console.log('📊 result.success:', result.success);
+      console.log('📊 result.data:', result.data);
+      
+      Swal.close(); // Cerrar el loading
+      
+      if (result.success && result.data) {
+        const data = result.data;
+        
+        console.log('📊 Actualizando valores...');
+        console.log('   Total:', data.total);
+        console.log('   Pendientes:', data.por_estado?.pendientes);
+        console.log('   WhatsApp:', data.por_forma_envio?.whatsapp);
+        
+        // Actualizar valores
+        $('#statTotal').text(data.total || 0);
+        $('#statPendientes').text(data.por_estado?.pendientes || 0);
+        $('#statEnviados').text(data.por_estado?.enviados || 0);
+        $('#statErrores').text(data.por_estado?.errores || 0);
+        $('#statWhatsApp').text(data.por_forma_envio?.whatsapp || 0);
+        $('#statGmail').text(data.por_forma_envio?.gmail || 0);
+        $('#statSMS').text(data.por_forma_envio?.sms || 0);
+        $('#statConfirmados').text(data.por_confirmacion?.confirmados || 0);
+        $('#statPendientesConf').text(data.por_confirmacion?.pendientes || 0);
+        $('#statCancelados').text(data.por_confirmacion?.cancelados || 0);
+        
+        console.log('✅ Valores actualizados, abriendo modal...');
+        
+        // Verificar que el modal existe
+        if ($('#modalEstadisticas').length === 0) {
+          console.error('❌ El modal #modalEstadisticas NO existe en el DOM');
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'El modal de estadísticas no se encontró en la página'
+          });
+          return;
+        }
+        
+        // Mostrar modal
+        $('#modalEstadisticas').modal('show');
+        
+        console.log('✅ Modal mostrado');
+        
+      } else {
+        console.error('❌ result.success es false o data no existe');
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: result.error || 'No se pudieron cargar las estadísticas'
+        });
+      }
+    })
+    .catch(error => {
+      console.error('❌ Error al cargar estadísticas:', error);
+      Swal.close();
+      Swal.fire({
+        icon: 'error',
+        title: 'Error de conexión',
+        text: 'No se pudo conectar con el servidor: ' + error.message
+      });
     });
 });
+
+// Agregar DESPUÉS del manejador de btn_editar
+$('#tblAvisos').on('click', 'button[name="btn_eliminar"]', function() {
+  const idAviso = $(this).data('id_aviso');
+  
+  Swal.fire({
+    title: '¿Está seguro?',
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#d33',
+    cancelButtonColor: '#3085d6',
+    confirmButtonText: 'Sí, eliminar',
+    cancelButtonText: 'Cancelar'
+  }).then((result) => {
+    if (result.isConfirmed) {
+      fetch(`/api/v1/avisos/${idAviso}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': CSRFToken
+        }
+      })
+      .then(response => response.json())
+      .then(result => {
+        if (result.success) {
+          Swal.fire({
+            icon: 'success',
+            title: 'Eliminado',
+            text: 'El aviso ha sido eliminado correctamente',
+            confirmButtonColor: '#17a2b8'
+          });
+          $('#tblAvisos').DataTable().ajax.reload();
+        } else {
+          Swal.fire('Error', result.error || 'Error al eliminar el aviso', 'error');
+        }
+      })
+      .catch(error => {
+        Swal.fire('Error', 'Error de conexión: ' + error, 'error');
+      });
+    }
+  });
+});
+
 
 const initDatatablePaciente = () => {
   $('#tblPaciente').DataTable({
@@ -611,7 +1070,7 @@ const initDatatablePaciente = () => {
       { data: 'nombre' },
       { data: 'apellido' },
       { data: function(row) {
-        return `<button type="button" name="btn_sel_paciente" class="btn btn-primary btn-sm" data-id="${row.id_paciente}" data-nombre="${row.nombre}" data-apellido="${row.apellido}">Seleccionar</button>`;
+        return `<button type="button" name="btn_sel_paciente" class="btn btn-sm btn-warning" data-id="${row.id_paciente}" data-nombre="${row.nombre}" data-apellido="${row.apellido}"><i class="fas fa-check mr-1"></i>Seleccionar</button>`;
       }}
     ]
   });
@@ -631,7 +1090,7 @@ const initDatatablePersonal = () => {
       { data: 'nombre' },
       { data: 'apellido' },
       { data: function(row) {
-        return `<button type="button" name="btn_sel_personal" class="btn btn-primary btn-sm" data-id="${row.id_personal}" data-nombre="${row.nombre}" data-apellido="${row.apellido}">Seleccionar</button>`;
+        return `<button type="button" name="btn_sel_personal" class="btn btn-sm btn-warning" data-id="${row.id_personal}" data-nombre="${row.nombre}" data-apellido="${row.apellido}"><i class="fas fa-check mr-1"></i>Seleccionar</button>`;
       }}
     ]
   });
@@ -651,7 +1110,7 @@ const initDatatableMedico = () => {
       { data: 'nombre' },
       { data: 'apellido' },
       { data: function(row) {
-        return `<button type="button" name="btn_sel_medico" class="btn btn-primary btn-sm" data-id="${row.id_medico}" data-nombre="${row.nombre}" data-apellido="${row.apellido}">Seleccionar</button>`;
+        return `<button type="button" name="btn_sel_medico" class="btn btn-sm btn-warning" data-id="${row.id_medico}" data-nombre="${row.nombre}" data-apellido="${row.apellido}"><i class="fas fa-check mr-1"></i>Seleccionar</button>`;
       }}
     ]
   });
@@ -669,7 +1128,7 @@ const initDatatableConsultorio = () => {
     columns: [
       { data: 'nombre_consultorio' },
       { data: function(row) {
-        return `<button type="button" name="btn_seleccionar_consultorio" class="btn btn-primary" data-codigo="${row.codigo}" data-consultorio="${row.nombre_consultorio}">Seleccionar</button>`;
+        return `<button type="button" name="btn_seleccionar_consultorio" class="btn btn-sm btn-warning" data-codigo="${row.codigo}" data-consultorio="${row.nombre_consultorio}"><i class="fas fa-check mr-1"></i>Seleccionar</button>`;
       }}
     ]
   });
@@ -686,6 +1145,7 @@ const agregarAviso = () => {
     $('#id_aviso_modal').val('');
     $('#estado_confirmacion_modal').val('Pendiente');
     $('#modalTitle').text("Agregar Aviso");
+    configurarFechaMinima();
     $('#modalAviso').modal('show');
   });
 };
@@ -694,19 +1154,106 @@ $('#formAvisoModal').on('submit', async function(e) {
   e.preventDefault();
   const idAviso = $('#id_aviso_modal').val();
   
+  // ✅ Construir hora en formato AM/PM desde los inputs
+  const horaAMPM = construirHoraAMPM();
+  
+  console.log("⏰ Hora AM/PM construida:", horaAMPM);
+  
+  if (!horaAMPM) {
+    Swal.fire({
+      icon: 'warning',
+      title: 'Campo incompleto',
+      text: 'Debe ingresar la hora de la cita (horas y minutos).',
+      confirmButtonColor: '#f39c12'
+    });
+    return;
+  }
+  
+  // ✅ Convertir a formato 24h para la base de datos
+  const hora24h = convertirAFormato24h(horaAMPM);
+  
+  console.log("⏰ Hora 24h convertida:", hora24h);
+  
+  // ✅ Obtener valores antes de construir el objeto
+  const id_paciente = $('#id_paciente').val();
+  const id_personal = $('#id_personal_modal').val();
+  const id_medico = $('#id_medico').val();
+  const codigo = $('#codigo').val();
+  const fecha_cita = $('#fecha_cita_modal').val();
+  const forma_envio = $('#forma_envio_modal').val();
+  
+  // Validaciones tempranas
+  if (!id_paciente) {
+    Swal.fire('Error', 'Debe seleccionar un paciente', 'error');
+    return;
+  }
+  if (!id_personal) {
+    Swal.fire('Error', 'Debe seleccionar un personal', 'error');
+    return;
+  }
+  if (!codigo) {
+    Swal.fire('Error', 'Debe seleccionar un consultorio', 'error');
+    return;
+  }
+  if (!fecha_cita) {
+    Swal.fire('Error', 'Debe ingresar una fecha de cita', 'error');
+    return;
+  }
+  if (!forma_envio) {
+    Swal.fire('Error', 'Debe seleccionar una forma de envío', 'error');
+    return;
+  }
+  
+  // ⚠️ VALIDAR QUE LA FECHA/HORA SEAN FUTURAS (PRIMERO)
+  const validacionFecha = validarFechaHoraFutura(fecha_cita, hora24h);
+  if (!validacionFecha.valido) {
+    Swal.fire({
+      icon: 'error',
+      title: '❌ Fecha/Hora Inválida',
+      text: validacionFecha.mensaje,
+      confirmButtonColor: '#d33'
+    });
+    return;
+  }
+
+  // ⚠️ VALIDACIÓN DE DUPLICADO (UNA SOLA VEZ)
+  const esDuplicado = await verificarDuplicado(
+    parseInt(id_paciente),
+    id_medico ? parseInt(id_medico) : null,
+    fecha_cita,
+    hora24h,
+    idAviso || null
+  );
+  
+  if (esDuplicado) {
+    Swal.fire({
+      icon: 'warning',
+      title: '⚠️ Aviso Duplicado',
+      html: `
+        Ya existe un aviso para:<br>
+        <strong>Este paciente</strong><br>
+        <strong>Este médico</strong><br>
+        <strong>Esta fecha y hora</strong><br><br>
+      `,
+      confirmButtonColor: '#f39c12'
+    });
+    return;
+  }
+  
   // ✅ Obtener el mensaje y limpiarlo
   const mensajeTexto = $('#mensaje_modal').val();
   const mensajeLimpio = mensajeTexto ? mensajeTexto.trim() : '';
-  
+
+  // ✅ Construir el objeto data con hora24h
   const data = {
-    id_paciente: $('#id_paciente').val(),
-    id_personal: $('#id_personal_modal').val(),
-    id_medico: $('#id_medico').val() || null,
-    codigo: $('#codigo').val() ? parseInt($('#codigo').val()) : null,
-    fecha_cita: $('#fecha_cita_modal').val(),
-    hora_cita: $('#hora_cita_modal').val(),
-    forma_envio: $('#forma_envio_modal').val(),
-    mensaje: mensajeLimpio,  // ✅ Envía "" si está vacío (no null)
+    id_paciente: parseInt(id_paciente),
+    id_personal: parseInt(id_personal),
+    id_medico: id_medico ? parseInt(id_medico) : null,
+    codigo: parseInt(codigo),
+    fecha_cita: fecha_cita,
+    hora_cita: hora24h,
+    forma_envio: forma_envio,
+    mensaje: mensajeLimpio,
     estado_confirmacion: $('#estado_confirmacion_modal').val()
   };
 
@@ -715,27 +1262,7 @@ $('#formAvisoModal').on('submit', async function(e) {
     data.estado_envio = 'Pendiente';
   }
 
-  // Validaciones
-  if (!data.id_paciente) {
-    Swal.fire('Error', 'Debe seleccionar un paciente', 'error');
-    return;
-  }
-  if (!data.id_personal) {
-    Swal.fire('Error', 'Debe seleccionar un personal', 'error');
-    return;
-  }
-  if (!data.fecha_cita) {
-    Swal.fire('Error', 'Debe ingresar una fecha de cita', 'error');
-    return;
-  }
-  if (!data.hora_cita) {
-    Swal.fire('Error', 'Debe ingresar una hora de cita', 'error');
-    return;
-  }
-  if (!data.forma_envio) {
-    Swal.fire('Error', 'Debe seleccionar una forma de envío', 'error');
-    return;
-  }
+  console.log("📦 Datos a enviar:", data);
   
   try {
     const url = idAviso ? `/api/v1/avisos/${idAviso}` : '/api/v1/avisos';
@@ -749,6 +1276,9 @@ $('#formAvisoModal').on('submit', async function(e) {
       body: JSON.stringify(data)
     });
     const result = await response.json();
+    
+    console.log("📥 Respuesta del servidor:", result);
+    
     if (result.success) {
       Swal.fire({
         icon: 'success',
@@ -762,72 +1292,227 @@ $('#formAvisoModal').on('submit', async function(e) {
       Swal.fire('Error', result.error || 'Error al guardar el aviso', 'error');
     }
   } catch (error) {
+    console.error('❌ Error completo:', error);
     Swal.fire('Error', 'Error de conexión: ' + error, 'error');
   }
 });
 
-// --- Enviar aviso individual ---
-$('#tblAvisos').on('click', 'button[name="btn_enviar_individual"]', function() {
-  const id = $(this).data('id_aviso');
-  
-  console.log('Click en botón WhatsApp, ID:', id);  // ✅ Para debug
-  
-  Swal.fire({
-    title: '¿Enviar este aviso?',
-    text: 'Se abrirá WhatsApp Web en una nueva ventana',
-    icon: 'question',
-    showCancelButton: true,
-    confirmButtonText: 'Sí, enviar',
-    cancelButtonText: 'Cancelar',
-    confirmButtonColor: '#25D366'
-  }).then((result) => {
-    if(result.isConfirmed) {
-      console.log('Enviando aviso:', id);  // ✅ Para debug
-      
-      fetch(`/api/v1/avisos/${id}/enviar-whatsapp`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-CSRFToken': CSRFToken
-        }
-      })
-      .then(response => {
-        console.log('Respuesta del servidor:', response);  // ✅ Para debug
-        return response.json();
-      })
-      .then(data => {
-        console.log('Datos recibidos:', data);  // ✅ Para debug
-        
-        if (data.success) {
-          Swal.fire({
-            icon: 'info',
-            title: 'Proceso iniciado',
-            html: `
-              Se abrió WhatsApp Web.<br><br>
-              <strong>Pasos:</strong><br>
-              1. Escanea el código QR si es necesario<br>
-              2. Espera a que envíe el mensaje<br>
-              3. Recarga la página para ver el estado actualizado
-            `,
-            confirmButtonColor: '#25D366',
-            confirmButtonText: 'Entendido'
-          }).then(() => {
-            // Recargar después de 20 segundos para ver el estado
-            setTimeout(() => {
-              $('#tblAvisos').DataTable().ajax.reload();
-            }, 20000);
-          });
-        } else {
-          Swal.fire('Error', data.error, 'error');
-        }
-      })
-      .catch(error => {
-        console.error('Error en fetch:', error);  // ✅ Para debug
-        Swal.fire('Error', 'Error de conexión: ' + error, 'error');
-      });
+// 2. Agregar la función faltante validarHoraAMPM
+const validarHoraAMPM = () => {
+  // Validar horas (1-12)
+  $('#hora_cita_horas').on('input', function() {
+    let valor = parseInt($(this).val());
+    if (valor > 12) {
+      $(this).val(12);
+    } else if (valor < 1 && $(this).val() !== '') {
+      $(this).val(1);
     }
   });
+  
+  // Validar minutos (0-59)
+  $('#hora_cita_minutos').on('input', function() {
+    let valor = parseInt($(this).val());
+    if (valor > 59) {
+      $(this).val(59);
+    } else if (valor < 0 && $(this).val() !== '') {
+      $(this).val(0);
+    }
+  });
+  
+  // Solo permitir números
+  $('#hora_cita_horas, #hora_cita_minutos').on('keypress', function(e) {
+    if ([8, 9, 27, 13, 46].indexOf(e.keyCode) !== -1 ||
+        (e.keyCode === 65 && e.ctrlKey === true) ||
+        (e.keyCode === 67 && e.ctrlKey === true) ||
+        (e.keyCode === 86 && e.ctrlKey === true) ||
+        (e.keyCode === 88 && e.ctrlKey === true)) {
+      return;
+    }
+    if ((e.which < 48 || e.which > 57)) {
+      e.preventDefault();
+    }
+  });
+};
+
+// ==========================================
+// CONFIGURAR FECHA MÍNIMA EN EL INPUT
+// ==========================================
+function configurarFechaMinima() {
+  const hoy = new Date();
+  const año = hoy.getFullYear();
+  const mes = String(hoy.getMonth() + 1).padStart(2, '0');
+  const dia = String(hoy.getDate()).padStart(2, '0');
+  const fechaMinima = `${año}-${mes}-${dia}`;
+  
+  $('#fecha_cita_modal').attr('min', fechaMinima);
+  console.log("📅 Fecha mínima establecida:", fechaMinima);
+}
+
+// ==========================================
+// VALIDACIÓN DE CAMBIO DE FECHA
+// ==========================================
+const validarCambioFecha = () => {
+  $('#fecha_cita_modal').on('change', function() {
+    const fechaSeleccionada = $(this).val();
+    const hoy = new Date().toISOString().split('T')[0];
+    
+    if (fechaSeleccionada < hoy) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Fecha no válida',
+        text: 'No puede seleccionar una fecha anterior a hoy.',
+        confirmButtonColor: '#f39c12'
+      });
+      $(this).val('');
+    }
+  });
+};
+
+// ==========================================
+// VALIDACIÓN DE CAMBIO DE HORA
+// ==========================================
+const validarCambioHora = () => {
+  $('#hora_cita_horas, #hora_cita_minutos, #hora_cita_periodo').on('change', function() {
+    const fechaSeleccionada = $('#fecha_cita_modal').val();
+    if (!fechaSeleccionada) return;
+    
+    const hoy = new Date().toISOString().split('T')[0];
+    
+    // Solo validar si es fecha de hoy
+    if (fechaSeleccionada === hoy) {
+      const horaAMPM = construirHoraAMPM();
+      if (!horaAMPM) return;
+      
+      const hora24h = convertirAFormato24h(horaAMPM);
+      const ahora = new Date();
+      const horaActual = `${String(ahora.getHours()).padStart(2, '0')}:${String(ahora.getMinutes()).padStart(2, '0')}`;
+      
+      console.log("⏰ Comparando horas:");
+      console.log("   Hora seleccionada:", hora24h);
+      console.log("   Hora actual:", horaActual);
+      
+      if (hora24h <= horaActual) {
+        Swal.fire({
+          icon: 'warning',
+          title: 'Hora no válida',
+          text: 'La hora seleccionada ya pasó. Seleccione una hora futura.',
+          confirmButtonColor: '#f39c12'
+        });
+        
+        $('#hora_cita_horas').val('');
+        $('#hora_cita_minutos').val('');
+      }
+    }
+  });
+};
+
+
+// --- Enviar aviso individual ---
+ // Manejador para envío individual de WhatsApp
+  $('#tblAvisos').on('click', 'button[name="btn_enviar_individual"]', function() {
+    const id = $(this).data('id_aviso');
+    
+    console.log('Click en botón WhatsApp, ID:', id);
+    
+    Swal.fire({
+      title: '¿Enviar este aviso?',
+      text: 'Se abrirá WhatsApp Web en una nueva ventana',
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: 'Sí, enviar',
+      cancelButtonText: 'Cancelar',
+      confirmButtonColor: '#25D366'
+    }).then((result) => {
+      if(result.isConfirmed) {
+        console.log('Enviando aviso:', id);
+        
+        fetch(`/api/v1/avisos/${id}/enviar-whatsapp`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': CSRFToken
+          }
+        })
+        .then(response => {
+          console.log('Respuesta del servidor:', response);
+          return response.json();
+        })
+        .then(data => {
+          console.log('Datos recibidos:', data);
+          
+          if (data.success) {
+            Swal.fire({
+              icon: 'info',
+              title: 'Proceso iniciado',
+              html: `
+                Se abrió WhatsApp Web.<br><br>
+                <strong>Pasos:</strong><br>
+                1. Escanea el código QR si es necesario<br>
+                2. Espera a que envíe el mensaje<br>
+                3. Recarga la página para ver el estado actualizado
+              `,
+              confirmButtonColor: '#25D366',
+              confirmButtonText: 'Entendido'
+            }).then(() => {
+              setTimeout(() => {
+                $('#tblAvisos').DataTable().ajax.reload();
+              }, 20000);
+            });
+          } else {
+            Swal.fire('Error', data.error, 'error');
+          }
+        })
+        .catch(error => {
+          console.error('Error en fetch:', error);
+          Swal.fire('Error', 'Error de conexión: ' + error, 'error');
+        });
+      }
+    });
 });
+
+// Manejador para ver mensajes personalizados (ya guardados)
+$('#tblAvisos').on('click', '.btn-ver-mensaje', function() {
+  const idAviso = $(this).data('id');
+  
+  fetch(`/api/v1/avisos/${idAviso}`)
+    .then(response => response.json())
+    .then(result => {
+      if (result.success && result.data.mensaje) {
+        Swal.fire({
+          title: 'Mensaje Enviado',
+          html: `<pre style="text-align: left; white-space: pre-wrap; max-height: 400px; overflow-y: auto;">${result.data.mensaje}</pre>`,
+          icon: 'info',
+          width: '600px',
+          confirmButtonColor: '#17a2b8'
+        });
+      } else {
+        Swal.fire('Error', 'No se pudo cargar el mensaje', 'error');
+      }
+    })
+    .catch(error => {
+      Swal.fire('Error', 'Error de conexión: ' + error, 'error');
+    });
+});
+
+// ==========================================
+// FIX MODAL SHIFT
+// ==========================================
+const fixModalShift = () => {
+  $.fn.modal.Constructor.prototype._setScrollbar = function() {};
+  $.fn.modal.Constructor.prototype._resetScrollbar = function() {};
+  
+  $(document).on('show.bs.modal', '.modal', function () {
+    setTimeout(() => {
+      $('body').css('padding-right', '0');
+      $('.modal').css('padding-right', '0');
+      $('.navbar-fixed-top, .navbar-fixed-bottom').css('padding-right', '0');
+    }, 0);
+  });
+
+  $(document).on('hidden.bs.modal', '.modal', function () {
+    $('body').css('padding-right', '0');
+  });
+};
 
 $(document).ready(function() {
   initDatatableAvisos();
@@ -836,6 +1521,12 @@ $(document).ready(function() {
   initDatatableMedico();
   initDatatableConsultorio();
   agregarAviso();
+  fixModalShift();
+  validarTelefonoAviso(); 
+  validarHoraAMPM();
+  configurarFechaMinima(); 
+  validarCambioFecha();      
+  validarCambioHora(); 
 });
 </script>
 {% endblock %}

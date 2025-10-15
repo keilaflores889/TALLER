@@ -45,23 +45,23 @@ Registrar Cita
   <!-- =========================== -->
   <!-- Modal Formulario Cita -->
   <!-- =========================== -->
-  <div class="modal fade" id="modalFormulario" tabindex="-1" role="dialog">
-    <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable" role="document">
+   <div class="modal fade" id="modalFormulario" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable" role="document">
       <div class="modal-content shadow-lg border-0 rounded-lg">
 
         <!-- Header -->
-        <div class="modal-header bg-info text-white d-flex justify-content-between align-items-center">
+        <div class="modal-header bg-info text-white rounded-top d-flex justify-content-between align-items-center">
           <h5 class="modal-title font-weight-bold">
             <i class="fas fa-calendar-check mr-2"></i> <span id="modalTitle">Nueva Cita</span>
           </h5>
 
-          <!-- Estado en el encabezado -->
-          <div class="form-group mb-0 d-flex align-items-center">
-            <label for="txtestado" class="mr-2 mb-0 text-white">Estado:</label>
-            <input type="hidden" id="id_estado">
-            <input type="text" id="txtestado" class="form-control form-control-sm" 
-                   placeholder="Click para seleccionar estado" readonly>
-          </div>
+          <!-- Estado arriba a la derecha -->
+            <div class="form-group mb-0 d-flex align-items-center">
+              <label for="txtestado" class="mr-2 mb-0 text-white font-weight-bold">Estado:</label>
+              <input type="hidden" id="id_estado">
+              <input type="text" id="txtestado" class="form-control form-control-sm" 
+                    placeholder="Click para seleccionar" readonly>
+            </div>
 
           <button type="button" class="close text-white ml-2" data-dismiss="modal">&times;</button>
         </div>
@@ -73,52 +73,81 @@ Registrar Cita
 
           <!-- Agenda Médica -->
           <div class="mb-3">
-            <label class="font-weight-bold">Agenda Médica:</label>
-            <input type="text" id="txtagenda" class="form-control" 
-                   placeholder="Click para seleccionar agenda" readonly>
+              <label class="font-weight-bold">
+                <i class="fas fa-calendar-alt mr-1"></i> Agenda Médica: <span class="text-danger">*</span>
+              </label>
+              <input type="text" id="txtagenda" class="form-control" 
+                    placeholder="Click para seleccionar agenda" readonly>
           </div>
 
           <!-- Campos en dos columnas -->
           <div class="row">
             <!-- Columna izquierda -->
             <div class="col-md-6 mb-3">
-              <label class="font-weight-bold">Fecha de la Cita:</label>
-              <input type="date" id="fecha" class="form-control">
+               <input type="hidden" id="id_paciente">
+              <label class="font-weight-bold">
+                <i class="fas fa-user mr-1"></i> Paciente: <span class="text-danger">*</span>
+              </label>
+              <input type="text" id="txtpaciente" class="form-control" 
+                     placeholder="Click para seleccionar paciente" readonly>
             </div>
 
             <div class="col-md-6 mb-3">
-              <label class="font-weight-bold">Hora de la Cita:</label>
-              <input type="time" id="hora" class="form-control">
-            </div>
-
-            <div class="col-md-6 mb-3">
-              <input type="hidden" id="id_medico">
-              <label class="font-weight-bold">Médico:</label>
-              <input type="text" id="txtmedico" class="form-control" placeholder="Click para seleccionar médico" readonly>
+               <input type="hidden" id="id_medico">
+              <label class="font-weight-bold">
+                <i class="fas fa-user-md mr-1"></i> Médico: <span class="text-danger">*</span>
+              </label>
+              <input type="text" id="txtmedico" class="form-control" 
+                     placeholder="Click para seleccionar médico" readonly>
             </div>
 
             <div class="col-md-6 mb-3">
               <input type="hidden" id="id_especialidad">
-              <label class="font-weight-bold">Especialidad:</label>
-              <input type="text" id="txtespecialidad" class="form-control" placeholder="Click para seleccionar especialidad" readonly>
-            </div>
-
-            <div class="col-md-6 mb-3">
-              <input type="hidden" id="id_paciente">
-              <label class="font-weight-bold">Paciente:</label>
-              <input type="text" id="txtpaciente" class="form-control" placeholder="Click para seleccionar paciente" readonly>
+              <label class="font-weight-bold">
+                <i class="fas fa-stethoscope mr-1"></i> Especialidad: <span class="text-danger">*</span>
+              </label>
+              <input type="text" id="txtespecialidad" class="form-control" 
+                     placeholder="Click para seleccionar especialidad" readonly>
             </div>
 
             <div class="col-md-6 mb-3">
               <input type="hidden" id="id_turno">
-              <label class="font-weight-bold">Turno:</label>
-              <input type="text" id="txtturno" class="form-control" placeholder="Click para seleccionar turno" readonly>
+              <label class="font-weight-bold">
+                <i class="fas fa-clock mr-1"></i> Turno: <span class="text-danger">*</span>
+              </label>
+              <input type="text" id="txtturno" class="form-control" 
+                     placeholder="Click para seleccionar turno" readonly>
             </div>
 
-            <div class="col-12 mb-3">
-              <label class="font-weight-bold">Motivo de la Consulta:</label>
-              <textarea id="txtmotivo" class="form-control" rows="3" placeholder="Describa el motivo de la consulta"></textarea>
+            <div class="col-md-6 mb-3">
+               <label class="font-weight-bold">
+                <i class="fas fa-calendar-plus mr-1"></i> Fecha de la Cita: <span class="text-danger">*</span>
+              </label>
+              <input type="date" id="fecha" class="form-control">
             </div>
+
+            <div class="col-md-6 mb-3">
+               <label class="font-weight-bold">
+                  <i class="far fa-clock mr-1"></i> Hora de la Cita: <span class="text-danger">*</span>
+                </label>
+                <div class="input-group">
+                  <input type="number" id="hora_horas" class="form-control" placeholder="HH" min="1" max="12" style="flex: 0 0 25%;">
+                  <span class="input-group-text">:</span>
+                  <input type="number" id="hora_minutos" class="form-control" placeholder="MM" min="0" max="59" style="flex: 0 0 25%;">
+                  <select id="hora_periodo" class="form-control" style="flex: 0 0 40%;">
+                    <option value="a.m.">a.m.</option>
+                    <option value="p.m.">p.m.</option>
+                  </select>
+                </div>
+                <input type="hidden" id="hora">
+              </div>
+
+            <div class="col-12 mb-3">
+              <label class="font-weight-bold">
+                <i class="fas fa-comment-medical mr-1"></i> Motivo de la Consulta: <span class="text-danger">*</span>
+              </label>
+              <textarea id="txtmotivo" class="form-control" rows="3" 
+                        placeholder="Describa el motivo de la consulta"></textarea>
           </div>
         </div>
 
@@ -127,52 +156,54 @@ Registrar Cita
           <button type="button" class="btn btn-info" id="btnGuardarCita">
             <i class="fas fa-save mr-1"></i> Guardar
           </button>
-          <button type="button" class="btn btn-secondary" data-dismiss="modal">
+          <button type="button" class="btn btn-danger" data-dismiss="modal">
             <i class="fas fa-times mr-1"></i> Cerrar
           </button>
         </div>
+
       </div>
     </div>
   </div>
   
-<!-- Modal Buscar Agenda -->
-<div class="modal fade" id="modalBuscarAgenda" tabindex="-1" role="dialog">
-  <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">Buscar Agenda</h5>
-        <button type="button" class="close" data-dismiss="modal">&times;</button>
-      </div>
-      <div class="modal-body">
-        <table id="tblAgenda" class="table table-striped table-bordered w-100">
-          <thead>
-            <tr>
-              <th>Médico</th>
-              <th>Especialidad</th>
-              <th>Fecha</th>
-              <th>Turno</th>
-              <th>Acción</th>
-            </tr>
-          </thead>
-        </table>
+<!-- Modales de selección -->
+  
+  <!-- Modal Buscar Agenda -->
+  <div class="modal fade" id="modalBuscarAgenda" tabindex="-1" role="dialog" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+      <div class="modal-content">
+        <div class="modal-header bg-info text-white">
+          <h4 class="modal-title"><i class="fas fa-calendar-alt mr-2"></i> Seleccionar Agenda</h4>
+          <button type="button" class="close text-white" onclick="$('#modalBuscarAgenda').modal('hide');">&times;</button>
+        </div>
+        <div class="modal-body">
+          <table class="table table-striped table-bordered w-100" id="tblAgenda">
+            <thead class="bg-info text-white">
+              <tr>
+                <th>Médico</th>
+                <th>Especialidad</th>
+                <th>Fecha</th>
+                <th>Turno</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
       </div>
     </div>
   </div>
-</div>
 
-
-<!-- Modal de selección de Medico -->
-<div class="modal fade" id="modalBuscarMedico" tabindex="-1" role="dialog">
-  <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h4 class="modal-title" id="modalMedicoTitle">Seleccionar Medico</h4>
-        <button type="button" class="close" data-dismiss="modal">&times;</button>
-      </div>
-      <div class="modal-body">
-        <div class="table-responsive">
+  <!-- Modal Médico -->
+  <div class="modal fade" id="modalBuscarMedico" tabindex="-1" role="dialog" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+      <div class="modal-content">
+        <div class="modal-header bg-info text-white">
+          <h4 class="modal-title"><i class="fas fa-user-md mr-2"></i> Seleccionar Médico</h4>
+          <button type="button" class="close text-white" onclick="$('#modalBuscarMedico').modal('hide');">&times;</button>
+        </div>
+        <div class="modal-body">
           <table class="table table-striped table-bordered w-100" id="tblMedico">
-            <thead>
+            <thead class="bg-info text-white">
               <tr>
                 <th>Nombre</th>
                 <th>Apellido</th>
@@ -185,45 +216,41 @@ Registrar Cita
       </div>
     </div>
   </div>
-</div>
 
-<!-- Modal Especialidad -->
-  <div class="modal fade" id="modalBuscarEspecialidad" tabindex="-1" role="dialog">
+  <!-- Modal Especialidad -->
+  <div class="modal fade" id="modalBuscarEspecialidad" tabindex="-1" role="dialog" data-backdrop="static" data-keyboard="false">
     <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
       <div class="modal-content">
-        <div class="modal-header">
-          <h4 class="modal-title">Seleccionar Especialidad</h4>
-          <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <div class="modal-header bg-info text-white">
+          <h4 class="modal-title"><i class="fas fa-stethoscope mr-2"></i> Seleccionar Especialidad</h4>
+          <button type="button" class="close text-white" onclick="$('#modalBuscarEspecialidad').modal('hide');">&times;</button>
         </div>
         <div class="modal-body">
-          <div class="table-responsive">
-            <table class="table table-striped table-bordered w-100" id="tblEspecialidad">
-              <thead>
-                <tr>
-                  <th>Especialidad</th>
-                  <th>Acciones</th>
-                </tr>
-              </thead>
-              <tbody></tbody>
-            </table>
-          </div>
+          <table class="table table-striped table-bordered w-100" id="tblEspecialidad">
+            <thead class="bg-info text-white">
+              <tr>
+                <th>Especialidad</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
         </div>
       </div>
     </div>
   </div>
 
-<!-- Modal de selección de Paciente -->
-<div class="modal fade" id="modalBuscarPaciente" tabindex="-1" role="dialog">
+  <!-- Modal Paciente -->
+  <div class="modal fade" id="modalBuscarPaciente" tabindex="-1" role="dialog" data-backdrop="static" data-keyboard="false">
   <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
     <div class="modal-content">
-      <div class="modal-header">
-        <h4 class="modal-title" id="modalPacienteTitle">Seleccionar Paciente</h4>
-        <button type="button" class="close" data-dismiss="modal">&times;</button>
-      </div>
-      <div class="modal-body">
-        <div class="table-responsive">
+      <div class="modal-header bg-info text-white">
+        <h4 class="modal-title"><i class="fas fa-user mr-2"></i> Seleccionar Paciente</h4>
+        <button type="button" class="close text-white" onclick="$('#modalBuscarPaciente').modal('hide');">&times;</button>
+        </div>
+        <div class="modal-body">
           <table class="table table-striped table-bordered w-100" id="tblPaciente">
-            <thead>
+            <thead class="bg-info text-white">
               <tr>
                 <th>Nombre</th>
                 <th>Apellido</th>
@@ -235,46 +262,42 @@ Registrar Cita
         </div>
       </div>
     </div>
- </div>
-</div>
+  </div>
 
-<!-- Modal Turno -->
-  <div class="modal fade" id="modalBuscarTurno" tabindex="-1" role="dialog">
+  <!-- Modal Turno -->
+  <div class="modal fade" id="modalBuscarTurno" tabindex="-1" role="dialog" data-backdrop="static" data-keyboard="false">
     <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
       <div class="modal-content">
-        <div class="modal-header">
-          <h4 class="modal-title">Seleccionar Turno</h4>
-          <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <div class="modal-header bg-info text-white">
+          <h4 class="modal-title"><i class="fas fa-clock mr-2"></i> Seleccionar Turno</h4>
+          <button type="button" class="close text-white" onclick="$('#modalBuscarTurno').modal('hide');">&times;</button>
         </div>
         <div class="modal-body">
-          <div class="table-responsive">
-            <table class="table table-striped table-bordered w-100" id="tblTurno">
-              <thead>
-                <tr>
-                  <th>Turno</th>
-                  <th>Acciones</th>
-                </tr>
-              </thead>
-              <tbody></tbody>
-            </table>
-          </div>
+          <table class="table table-striped table-bordered w-100" id="tblTurno">
+            <thead class="bg-info text-white">
+              <tr>
+                <th>Turno</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
         </div>
       </div>
     </div>
   </div>
 
-<!-- Modal de selección de estado -->
- <div class="modal fade" id="modalBuscarEstado" tabindex="-1" role="dialog">
-  <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h4 class="modal-title" id="modalEstadoCitaTitle">Seleccionar Estado</h4>
-        <button type="button" class="close" data-dismiss="modal">&times;</button>
-      </div>
-      <div class="modal-body">
-        <div class="table-responsive">
+  <!-- Modal Estado -->
+  <div class="modal fade" id="modalBuscarEstado" tabindex="-1" role="dialog" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+      <div class="modal-content">
+        <div class="modal-header bg-info text-white">
+          <h4 class="modal-title"><i class="fas fa-info-circle mr-2"></i> Seleccionar Estado</h4>
+          <button type="button" class="close text-white" onclick="$('#modalBuscarEstado').modal('hide');">&times;</button>
+        </div>
+        <div class="modal-body">
           <table class="table table-striped table-bordered w-100" id="tblEstado">
-            <thead>
+            <thead class="bg-info text-white">
               <tr>
                 <th>Estado</th>
                 <th>Acciones</th>
@@ -317,6 +340,176 @@ function formatDateForInput(fecha) {
   return `${year}-${month}-${day}`;
 }
 
+
+// 👉 Convertir hora 12h AM/PM a formato 24h para la BD
+function convertirAFormato24h(horaAMPM) {
+  console.log("🔍 Entrada a convertirAFormato24h:", horaAMPM);
+  
+  if (!horaAMPM) {
+    console.log("⚠️ Hora vacía");
+    return '';
+  }
+  
+  const match = horaAMPM.match(/(\d+):(\d+)\s*(a\.m\.|p\.m\.)/i);
+  console.log("🔍 Match resultado:", match);
+  
+  if (!match) {
+    console.log("⚠️ No coincide el formato, devolviendo tal cual:", horaAMPM);
+    return horaAMPM;
+  }
+  
+  let horas = parseInt(match[1]);
+  const minutos = match[2];
+  const periodo = match[3].toLowerCase();
+  
+  console.log("📊 Horas originales:", horas, "Minutos:", minutos, "Periodo:", periodo);
+  
+  // Convertir a formato 24 horas
+  if (periodo === 'p.m.') {
+    if (horas !== 12) {
+      horas += 12;
+    }
+  } else { // a.m.
+    if (horas === 12) {
+      horas = 0;
+    }
+  }
+  
+  // 👉 CAMBIO AQUÍ: Sin los :00 al final
+  const resultado = `${String(horas).padStart(2, '0')}:${minutos}`;
+  console.log("✅ Hora convertida a 24h:", resultado);
+  
+  return resultado;
+}
+
+// 👉 Construir hora en formato AM/PM desde los inputs
+function construirHoraAMPM() {
+  let horas = parseInt($('#hora_horas').val());
+  let minutos = parseInt($('#hora_minutos').val());
+  const periodo = $('#hora_periodo').val();
+  
+  console.log("🔍 Construir hora - Horas:", horas, "Minutos:", minutos, "Periodo:", periodo);
+  
+  if (isNaN(horas) || isNaN(minutos)) {
+    console.log("⚠️ Falta horas o minutos válidos");
+    return '';
+  }
+  
+  if (horas < 1 || horas > 12) {
+    console.log("⚠️ Horas fuera de rango (1-12):", horas);
+    Swal.fire({
+      icon: 'warning',
+      title: 'Hora inválida',
+      text: 'Las horas deben estar entre 1 y 12.',
+      confirmButtonColor: '#f39c12'
+    });
+    return '';
+  }
+  
+  if (minutos < 0 || minutos > 59) {
+    console.log("⚠️ Minutos fuera de rango (0-59):", minutos);
+    Swal.fire({
+      icon: 'warning',
+      title: 'Minutos inválidos',
+      text: 'Los minutos deben estar entre 0 y 59.',
+      confirmButtonColor: '#f39c12'
+    });
+    return '';
+  }
+  
+  const horasFormat = String(horas).padStart(2, '0');
+  const minutosFormat = String(minutos).padStart(2, '0');
+  
+  const resultado = `${horasFormat}:${minutosFormat} ${periodo}`;
+  console.log("✅ Hora construida:", resultado);
+  
+  return resultado;
+}
+
+// 👉 AGREGAR ESTAS DOS FUNCIONES AQUÍ 👇
+
+// 👉 Separar hora en componentes para edición
+function separarHoraAMPM(hora24h) {
+  console.log("🔍 Entrada a separarHoraAMPM:", hora24h);
+  
+  if (!hora24h) {
+    return { horas: '', minutos: '', periodo: 'a.m.' };
+  }
+  
+  // Si ya viene en formato AM/PM
+  const matchAMPM = hora24h.match(/(\d+):(\d+)\s*(a\.m\.|p\.m\.)/i);
+  if (matchAMPM) {
+    return {
+      horas: parseInt(matchAMPM[1]),
+      minutos: matchAMPM[2],
+      periodo: matchAMPM[3].toLowerCase()
+    };
+  }
+  
+  // Si viene en formato 24h (HH:MM:SS o HH:MM)
+  const match24h = hora24h.match(/(\d+):(\d+)/);
+  if (!match24h) {
+    return { horas: '', minutos: '', periodo: 'a.m.' };
+  }
+  
+  let horas = parseInt(match24h[1]);
+  const minutos = match24h[2];
+  let periodo = 'a.m.';
+  
+  console.log("📊 Horas 24h:", horas, "Minutos:", minutos);
+  
+  // Convertir de 24h a 12h
+  if (horas >= 12) {
+    periodo = 'p.m.';
+    if (horas > 12) {
+      horas = horas - 12;
+    }
+  } else if (horas === 0) {
+    horas = 12;
+  }
+  
+  const resultado = {
+    horas: horas,
+    minutos: minutos,
+    periodo: periodo
+  };
+  
+  console.log("✅ Hora separada:", resultado);
+  
+  return resultado;
+}
+
+// 👉 Formatear hora de 24h a AM/PM para mostrar en tabla
+function formatTimeToAMPM(hora24h) {
+  if (!hora24h) return '';
+  
+  // Si ya viene en formato AM/PM, devolverlo tal cual
+  if (hora24h.includes('a.m.') || hora24h.includes('p.m.')) {
+    return hora24h;
+  }
+  
+  const match = hora24h.match(/(\d+):(\d+)/);
+  if (!match) return hora24h;
+  
+  let horas = parseInt(match[1]);
+  const minutos = match[2];
+  let periodo = 'a.m.';
+  
+  if (horas >= 12) {
+    periodo = 'p.m.';
+    if (horas > 12) {
+      horas = horas - 12;
+    }
+  } else if (horas === 0) {
+    horas = 12;
+  }
+  
+  return `${horas}:${minutos} ${periodo}`;
+}
+
+
+
+
 // ------------------------ DATATABLE PRINCIPAL ------------------------
 const initDatatable = () => {
   $('#tbl').DataTable({
@@ -336,9 +529,29 @@ const initDatatable = () => {
       { data: 'especialidad' },
       { data: row => `${row.paciente_nombre} ${row.paciente_apellido}` },
       { data: 'turno' },
-      { data: row => row.hora ? row.hora.slice(0,5) : "" }, // HH:MM
+      { 
+        data: 'hora',
+        render: function(data) {
+          if (!data) return '';
+          // Mostrar hora con formato AM/PM
+          return formatTimeToAMPM(data);
+        }
+      },
       { data: 'motivo_consulta' },
-      { data: 'estado' },
+      { 
+        data: 'estado',
+        render: function(data) {
+          const colores = {
+            'Programada': { color: '#004085', bg: '#cce5ff' },
+            'Confirmada': { color: '#155724', bg: '#d4edda' },
+            'Cancelada': { color: '#721c24', bg: '#c15861ff' },
+            'Completada': { color: '#0c5460', bg: '#d1ecf1' },
+            'Pendiente': { color: '#856404', bg: '#fff3cd' }
+          };
+          const est = colores[data] || { color: '#383d41', bg: '#e2e3e5' };
+          return `<span style="color: ${est.color}; background-color: ${est.bg}; padding: 2px 6px; border-radius: 4px;">${data}</span>`;
+        }
+      },
       { data: null, render: (row) => `
         <button type="button" name="btn_editar" class="btn btn-info btn-sm" data-id_cita="${row.id_cita}">
           <i class="fas fa-edit"></i>
@@ -391,13 +604,15 @@ const initDatatableAgenda = () => {
         }
       }
       return `
-  <button type="button" name="btn_seleccionar_Agenda" class="btn btn-sm btn-primary"
+  <button type="button" name="btn_seleccionar_Agenda" class="btn btn-sm btn-warning"
     data-id="${row.id_agenda_medica}" 
-    data-label="${nombre} ${apellido} - ${row.especialidad || ''} - ${fechaLabel} (${turno})">
+    data-label="${nombre} ${apellido} - ${row.especialidad || ''} - ${fechaLabel} (${turno})"><i class="fas fa-check mr-1"></i>
     Seleccionar
   </button>`;
+    },
+        className: 'text-center',
+        orderable: false
 
-    }
   }
 ]
 
@@ -428,14 +643,20 @@ const buscarAgenda = () =>
 const initDatatablep = () => {
   $('#tblPaciente').DataTable({
     language: { url: "{{ url_for('static', filename='vendor/datatables/es-ES.json') }}" },
-    ajax:'/api/v1/paciente',
+    ajax: '/api/v1/paciente',
     columns: [
-      { data: 'nombre' }, { data: 'apellido' },
-      { data: null, render: (row) => `
-        <button type="button" name="btn_seleccionar_Paciente" class="btn btn-primary" 
-          data-id="${row.id_paciente}" data-nombre="${row.nombre}" data-apellido="${row.apellido}">
-          Seleccionar
-        </button>` }
+      { data: 'nombre' },
+      { data: 'apellido' },
+      { 
+        data: null,
+        render: (row) => `
+          <button type="button" name="btn_seleccionar_Paciente" class="btn btn-sm btn-warning" 
+            data-id="${row.id_paciente}" data-nombre="${row.nombre}" data-apellido="${row.apellido}">
+            <i class="fas fa-check mr-1"></i>Seleccionar
+          </button>`,
+        className: 'text-center',
+        orderable: false
+      }
     ]
   });
 
@@ -448,20 +669,26 @@ const initDatatablep = () => {
     $('#modalBuscarPaciente').modal('hide');
   });
 };
-const buscarPaciente = () => $('#txtpaciente').on('click', () => $('#modalBuscarPaciente').modal());
+const buscarPaciente = () => $('#txtpaciente').on('click', () => $('#modalBuscarPaciente').modal('show'));
 
 // ------------------------ MEDICO ------------------------
 const initDatatablem = () => {
   $('#tblMedico').DataTable({
     language: { url: "{{ url_for('static', filename='vendor/datatables/es-ES.json') }}" },
-    ajax:'/api/v1/medico',
+    ajax: '/api/v1/medico',
     columns: [
-      { data: 'nombre' }, { data: 'apellido' },
-      { data: null, render: (row) => `
-        <button type="button" name="btn_seleccionar_Medico" class="btn btn-primary" 
-          data-id="${row.id_medico}" data-nombre="${row.nombre}" data-apellido="${row.apellido}">
-          Seleccionar
-        </button>` }
+      { data: 'nombre' },
+      { data: 'apellido' },
+      { 
+        data: null,
+        render: (row) => `
+          <button type="button" name="btn_seleccionar_Medico" class="btn btn-sm btn-warning" 
+            data-id="${row.id_medico}" data-nombre="${row.nombre}" data-apellido="${row.apellido}">
+            <i class="fas fa-check mr-1"></i>Seleccionar
+          </button>`,
+        className: 'text-center',
+        orderable: false
+      }
     ]
   });
 
@@ -474,7 +701,7 @@ const initDatatablem = () => {
     $('#modalBuscarMedico').modal('hide');
   });
 };
-const buscarMedico = () => $('#txtmedico').on('click', () => $('#modalBuscarMedico').modal());
+const buscarMedico = () => $('#txtmedico').on('click', () => $('#modalBuscarMedico').modal('show'));
 
 // ------------------------ ESPECIALIDAD ------------------------
 const initDatatablee = () => {
@@ -483,9 +710,16 @@ const initDatatablee = () => {
     ajax: '/api/v1/especialidades',
     columns: [
       { data: 'descripcion' },
-      { data: null, render: (row) => `
-        <button type="button" name="btn_seleccionar_Especialidad" class="btn btn-primary"
-          data-id="${row.id_especialidad}" data-especialidad="${row.descripcion}">Seleccionar</button>` }
+      { 
+        data: null,
+        render: (row) => `
+          <button type="button" name="btn_seleccionar_Especialidad" class="btn btn-sm btn-warning"
+            data-id="${row.id_especialidad}" data-especialidad="${row.descripcion}">
+            <i class="fas fa-check mr-1"></i>Seleccionar
+          </button>`,
+        className: 'text-center',
+        orderable: false
+      }
     ]
   });
 
@@ -495,18 +729,25 @@ const initDatatablee = () => {
     $('#modalBuscarEspecialidad').modal('hide');
   });
 };
-const buscarEspecialidad = () => $('#txtespecialidad').on('click', () => $('#modalBuscarEspecialidad').modal());
+const buscarEspecialidad = () => $('#txtespecialidad').on('click', () => $('#modalBuscarEspecialidad').modal('show'));
 
 // ------------------------ ESTADO ------------------------
 const initDatatableestado = () => {
   $('#tblEstado').DataTable({
     language: { url: "{{ url_for('static', filename='vendor/datatables/es-ES.json') }}" },
-    ajax:'/api/v1/estadoscitas',
+    ajax: '/api/v1/estadoscitas',
     columns: [
       { data: 'descripcion' },
-      { data: null, render: (row) => `
-        <button type="button" name="btn_seleccionar_Estado" class="btn btn-primary"
-          data-id="${row.id_estado}" data-estado="${row.descripcion}">Seleccionar</button>` }
+      { 
+        data: null,
+        render: (row) => `
+          <button type="button" name="btn_seleccionar_Estado" class="btn btn-sm btn-warning"
+            data-id="${row.id_estado}" data-estado="${row.descripcion}">
+            <i class="fas fa-check mr-1"></i>Seleccionar
+          </button>`,
+        className: 'text-center',
+        orderable: false
+      }
     ]
   });
 
@@ -516,18 +757,25 @@ const initDatatableestado = () => {
     $('#modalBuscarEstado').modal('hide');
   });
 };
-const buscarEstado = () => $('#txtestado').on('click', () => $('#modalBuscarEstado').modal());
+const buscarEstado = () => $('#txtestado').on('click', () => $('#modalBuscarEstado').modal('show'));
 
 // ------------------------ TURNO ------------------------
 const initDatatableTurno = () => {
   $('#tblTurno').DataTable({
     language: { url: "{{ url_for('static', filename='vendor/datatables/es-ES.json') }}" },
-    ajax:'/api/v1/turnos',
+    ajax: '/api/v1/turnos',
     columns: [
       { data: 'descripcion' },
-      { data: null, render: (row) => `
-        <button type="button" name="btn_seleccionar_Turno" class="btn btn-primary"
-          data-id="${row.id_turno}" data-turno="${row.descripcion}">Seleccionar</button>` }
+      { 
+        data: null,
+        render: (row) => `
+          <button type="button" name="btn_seleccionar_Turno" class="btn btn-sm btn-warning"
+            data-id="${row.id_turno}" data-turno="${row.descripcion}">
+            <i class="fas fa-check mr-1"></i>Seleccionar
+          </button>`,
+        className: 'text-center',
+        orderable: false
+      }
     ]
   });
 
@@ -537,7 +785,7 @@ const initDatatableTurno = () => {
     $('#modalBuscarTurno').modal('hide');
   });
 };
-const buscarTurno = () => $('#txtturno').on('click', () => $('#modalBuscarTurno').modal());
+const buscarTurno = () => $('#txtturno').on('click', () => $('#modalBuscarTurno').modal('show'));
 
 // Función para limpiar el modal
 function limpiarModal() {
@@ -564,6 +812,59 @@ function limpiarModal() {
     // Resetear título del modal
     $('#modalTitle').text("Registrar Cita");
 }
+
+// En la inicialización $(function(){ ... })
+$(function(){
+  // ... tu código existente ...
+  
+  // 👉 Validación de horas (1-12)
+  $('#hora_horas').on('input', function() {
+    let val = parseInt($(this).val());
+    if (isNaN(val)) return;
+    
+    if (val > 12) {
+      $(this).val(12);
+      Swal.fire({
+        icon: 'info',
+        title: 'Valor ajustado',
+        text: 'Las horas deben estar entre 1 y 12.',
+        timer: 2000,
+        showConfirmButton: false
+      });
+    }
+    if (val < 1) {
+      $(this).val(1);
+    }
+  });
+  
+  // 👉 Validación de minutos (0-59)
+  $('#hora_minutos').on('input', function() {
+    let val = parseInt($(this).val());
+    if (isNaN(val)) return;
+    
+    if (val > 59) {
+      $(this).val(59);
+      Swal.fire({
+        icon: 'info',
+        title: 'Valor ajustado',
+        text: 'Los minutos deben estar entre 0 y 59.',
+        timer: 2000,
+        showConfirmButton: false
+      });
+    }
+    if (val < 0) {
+      $(this).val(0);
+    }
+  });
+  
+  // Formatear minutos con cero adelante
+  $('#hora_minutos').on('blur', function() {
+    let val = parseInt($(this).val());
+    if (!isNaN(val) && val >= 0 && val <= 9) {
+      $(this).val(String(val).padStart(2, '0'));
+    }
+  });
+});
 
 // ------------------------ AGREGAR / GUARDAR ------------------------
 const agregar = () => {
@@ -595,23 +896,53 @@ const guardar = () => {
     // siempre usamos la variable global AGENDA_ID
     const id_agenda_medica = AGENDA_ID || null;  
 
+    console.log("📋 ID Cita:", idCita);
+    console.log("📋 ID Agenda:", id_agenda_medica);
+    
+    // 👉 Construir hora en formato AM/PM desde los inputs
+    const horaAMPM = construirHoraAMPM();
+    
+    console.log("⏰ Hora AM/PM construida:", horaAMPM);
+    
+    // Validación de hora
+    if (!horaAMPM) {
+      console.log("❌ Hora vacía, mostrando alerta");
+      Swal.fire({
+        icon: 'warning',
+        title: 'Campo incompleto',
+        text: 'Debe ingresar la hora de la cita (horas y minutos).',
+        confirmButtonColor: '#f39c12'
+      });
+      return;
+    }
+    
+    // 👉 Convertir a formato 24h para la base de datos
+    const hora24h = convertirAFormato24h(horaAMPM);
+    
+    console.log("⏰ Hora 24h convertida:", hora24h);
+
     const payload = {
       id_paciente: $('#id_paciente').val(),
       id_medico: $('#id_medico').val(),
       id_especialidad: $('#id_especialidad').val(),
       id_turno: $('#id_turno').val(),
       fecha_cita: $('#fecha').val(),
-      hora: $('#hora').val(),
+      hora: hora24h,  // 👈 CAMBIO AQUÍ: era horaFormateada
       id_estado: $('#id_estado').val(),
       motivo_consulta: $('#txtmotivo').val(),
       id_agenda_medica: id_agenda_medica
     };
 
-    console.log("Payload enviado:", payload); // ✅ verificación
+    console.log("📦 Payload enviado:", payload);
 
     // validar agenda
     if (!id_agenda_medica) {
-      Swal.fire("Error", "No se ha vinculado la cita con una agenda médica.", "error");
+      Swal.fire({
+        icon: 'warning',
+        title: 'Agenda no seleccionada',
+        text: 'Debe seleccionar una agenda médica para la cita.',
+        confirmButtonColor: '#f39c12'
+      });
       return;
     }
 
@@ -631,111 +962,207 @@ const guardar = () => {
     .then(data => {
       if (data && !data.error && data.success) {
         tabla.ajax.reload();
-        Swal.fire(
-          idCita ? "Actualizado" : "Registrado", 
-          "La cita se guardó correctamente.", 
-          "success"
-        );
         $('#modalFormulario').modal('hide');
+        Swal.fire({
+          icon: 'success',
+          title: idCita ? 'Actualizado' : 'Registrado',
+          text: 'La cita se guardó correctamente.',
+          confirmButtonColor: '#28a745'
+        });
       } else {
-        Swal.fire("Error", data.error || "No se pudo guardar la cita.", "error");
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: data.error || 'No se pudo guardar la cita.',
+          confirmButtonColor: '#dc3545'
+        });
       }
     })
-    .catch(err => Swal.fire("Error", "Ocurrió un error al guardar la cita.", "error"));
+    .catch(err => {
+      console.error(err);
+      Swal.fire({
+        icon: 'error',
+        title: 'Error de conexión',
+        text: 'Ocurrió un error al guardar la cita.',
+        confirmButtonColor: '#dc3545'
+      });
+    });
   });
 };
 
 
-
-// ------------------------ EDITAR ------------------------
-// ------------------------ EDITAR ------------------------
+// ==========================================
+// EDITAR
+// ==========================================
 const editar = () => {
-  $('#tbl').on('click', 'button[name="btn_editar"]', function () {
+  $('#tbl').on('click', 'button[name="btn_editar"]', function() {
     const idCita = $(this).data('id_cita');
-    fetch(`/api/v1/registroc/${idCita}`)
-      .then(resp => resp.json())
-      .then(data => {
-        if (data && data.success && data.data) {
-          const cita = data.data;
 
-          // Rellenar campos básicos
-          $('#txtIdCita').val(idCita);
-          $('#fecha').val(formatDateForInput(cita.fecha_cita));
-          $('#hora').val(cita.hora ? cita.hora.slice(0,5) : "");
-          $('#txtmotivo').val(cita.motivo_consulta);
+    Swal.fire({
+      title: "¿Deseas editar este registro?",
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: "Sí, editar",
+      cancelButtonText: "Cancelar",
+      confirmButtonColor: '#17a2b8',
+      cancelButtonColor: '#6c757d'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        fetch(`/api/v1/registroc/${idCita}`)
+          .then(resp => resp.json())
+          .then(data => {
+            if (data && data.success && data.data) {
+              const cita = data.data;
 
-          // Paciente
-          $('#id_paciente').val(cita.id_paciente);
-          $('#txtpaciente').val(`${cita.paciente_nombre} ${cita.paciente_apellido}`);
+              $('#modalTitle').text("Editar Cita");
+              $('#txtIdCita').val(idCita);
+              $('#fecha').val(formatDateForInput(cita.fecha_cita));
+              // 👉 Separar hora en componentes (horas, minutos, periodo)
+              const horaPartes = separarHoraAMPM(cita.hora);
+              $('#hora_horas').val(horaPartes.horas);
+              $('#hora_minutos').val(horaPartes.minutos);
+              $('#hora_periodo').val(horaPartes.periodo);
+              $('#txtmotivo').val(cita.motivo_consulta);
 
-          // Médico
-          $('#id_medico').val(cita.id_medico);
-          $('#txtmedico').val(`${cita.medico_nombre} ${cita.medico_apellido}`);
+              // Paciente
+              $('#id_paciente').val(cita.id_paciente);
+              $('#txtpaciente').val(`${cita.paciente_nombre} ${cita.paciente_apellido}`);
 
-          // Especialidad
-          $('#id_especialidad').val(cita.id_especialidad);
-          $('#txtespecialidad').val(cita.especialidad);
+              // Médico
+              $('#id_medico').val(cita.id_medico);
+              $('#txtmedico').val(`${cita.medico_nombre} ${cita.medico_apellido}`);
 
-          // Turno
-          $('#id_turno').val(cita.id_turno);
-          $('#txtturno').val(cita.turno);
+              // Especialidad
+              $('#id_especialidad').val(cita.id_especialidad);
+              $('#txtespecialidad').val(cita.especialidad);
 
-          // Estado
-          $('#id_estado').val(cita.id_estado);
-          $('#txtestado').val(cita.estado);
+              // Turno
+              $('#id_turno').val(cita.id_turno);
+              $('#txtturno').val(cita.turno);
 
-          // Agenda
-          $('#id_agenda_medica').val(cita.id_agenda_medica);
+              // Estado
+              $('#id_estado').val(cita.id_estado);
+              $('#txtestado').val(cita.estado);
 
-          let agendaLabel = '';
-          if (cita.agenda_descripcion && cita.agenda_fecha) {
-            const d = new Date(cita.agenda_fecha);
-            const day = String(d.getUTCDate()).padStart(2,'0');
-            const month = String(d.getUTCMonth()+1).padStart(2,'0');
-            const year = d.getUTCFullYear();
-            agendaLabel = `${cita.agenda_descripcion} - ${day}/${month}/${year} (${cita.turno})`;
-          }
-          $('#txtagenda').val(agendaLabel);
+              // Agenda
+              $('#id_agenda_medica').val(cita.id_agenda_medica);
+              let agendaLabel = '';
+              if (cita.agenda_descripcion && cita.agenda_fecha) {
+                const d = new Date(cita.agenda_fecha);
+                const day = String(d.getUTCDate()).padStart(2,'0');
+                const month = String(d.getUTCMonth()+1).padStart(2,'0');
+                const year = d.getUTCFullYear();
+                agendaLabel = `${cita.agenda_descripcion} - ${day}/${month}/${year} (${cita.turno})`;
+              }
+              $('#txtagenda').val(agendaLabel);
 
-          // Actualizamos la variable global
-          AGENDA_ID = cita.id_agenda_medica;
+              AGENDA_ID = cita.id_agenda_medica;
 
-          // Modal
-          $('#modalTitle').text("Editar Cita");
-          $('#modalFormulario').modal('show');
-        } else {
-          Swal.fire("Error", data.error || "No se pudo cargar la cita", "error");
-        }
-      })
-      .catch(err => Swal.fire("Error", "Ocurrió un error al cargar la cita", "error"));
+              $('#modalFormulario').modal('show');
+            } else {
+              Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'No se pudo cargar la cita.',
+                confirmButtonColor: '#dc3545'
+              });
+            }
+          })
+          .catch(err => {
+            console.error(err);
+            Swal.fire({
+              icon: 'error',
+              title: 'Error de conexión',
+              text: 'Ocurrió un error al cargar la cita.',
+              confirmButtonColor: '#dc3545'
+            });
+          });
+      }
+    });
   });
 };
 
 
-// ------------------------ ELIMINAR ------------------------
+
+// ==========================================
+// ELIMINAR
+// ==========================================
 const eliminar = () => {
-  $('#tbl').on('click', 'button[name="btn_eliminar"]', function () {
+  $('#tbl').on('click', 'button[name="btn_eliminar"]', function() {
     const idCita = $(this).data('id_cita');
+    const botonEliminar = $(this);
+
     Swal.fire({
-      title: "¿Deseas eliminar esta cita?",
+      title: "¿Deseas eliminar este registro?",
+      icon: 'warning',
       showCancelButton: true,
-      confirmButtonText: "Sí",
-      cancelButtonText: "No"
+      confirmButtonText: "Sí, eliminar",
+      cancelButtonText: "Cancelar",
+      confirmButtonColor: '#dc3545',
+      cancelButtonColor: '#6c757d'
     }).then((result) => {
-      if(result.isConfirmed){
+      if (result.isConfirmed) {
         fetch(`/api/v1/registroc/${idCita}`, {
-          method:'DELETE',
-          headers:{ 'X-CSRFToken': CSRFToken }
-        }).then(resp=>resp.json()).then(data=>{
-          if(data && !data.error && data.success){
-            $('#tbl').DataTable().ajax.reload();
-            Swal.fire("Eliminado", "La cita ha sido eliminada correctamente.", "success");
-          } else Swal.fire("Error", data.error, "error");
+          method: 'DELETE',
+          headers: { 
+            'Content-Type': 'application/json', 
+            'X-CSRFToken': CSRFToken 
+          }
+        })
+        .then(resp => resp.json())
+        .then(result => {
+          if (result && !result.error && result.success) {
+            const fila = botonEliminar.closest('tr');
+            const tabla = $('#tbl').DataTable();
+            tabla.row(fila).remove().draw();
+            Swal.fire({
+              icon: 'success',
+              title: 'Eliminado',
+              text: 'El registro ha sido eliminado correctamente.',
+              confirmButtonColor: '#28a745'
+            });
+          } else {
+            Swal.fire({
+              icon: 'error',
+              title: 'Error al eliminar',
+              text: result.error || 'No se pudo eliminar el registro.',
+              confirmButtonColor: '#dc3545'
+            });
+          }
+        })
+        .catch(err => {
+          console.error(err);
+          Swal.fire({
+            icon: 'error',
+            title: 'Error de conexión',
+            text: 'Ocurrió un error al eliminar. Por favor, intente nuevamente.',
+            confirmButtonColor: '#dc3545'
+          });
         });
       }
     });
   });
 };
+// ==========================================
+// FIX MODAL SHIFT
+// ==========================================
+const fixModalShift = () => {
+  $.fn.modal.Constructor.prototype._setScrollbar = function() {};
+  $.fn.modal.Constructor.prototype._resetScrollbar = function() {};
+  
+  $(document).on('show.bs.modal', '.modal', function () {
+    setTimeout(() => {
+      $('body').css('padding-right', '0');
+      $('.modal').css('padding-right', '0');
+      $('.navbar-fixed-top, .navbar-fixed-bottom').css('padding-right', '0');
+    }, 0);
+  });
+
+  $(document).on('hidden.bs.modal', '.modal', function () {
+    $('body').css('padding-right', '0');
+  });
+};
+
 
 // ------------------------ INICIALIZACIÓN ------------------------
 $(function(){
@@ -758,6 +1185,7 @@ $(function(){
   buscarTurno();
   initDatatableAgenda();
 buscarAgenda();
+fixModalShift();
 });
 </script>
 {% endblock %}

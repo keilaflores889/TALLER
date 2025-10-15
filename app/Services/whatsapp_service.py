@@ -204,11 +204,13 @@ class AvisoRecordatorioService:
             return mensaje_personalizado
         
         # Si no hay mensaje o está vacío, generar automático
-        paciente = aviso.get('paciente', 'Estimado/a paciente')
-        personal = aviso.get('personal', 'Nuestro equipo')
+        # ✅ CORREGIDO: Usar ambos formatos de nombres (listado e individual)
+        paciente = aviso.get('paciente') or aviso.get('paciente_nombre', 'Estimado/a paciente')
+        personal = aviso.get('personal') or aviso.get('personal_nombre', 'Nuestro equipo')
+        medico = aviso.get('medico') or aviso.get('medico_nombre')  # ✅ Puede ser None
+        
         fecha = aviso.get('fecha_cita', 'N/A')
         hora = aviso.get('hora_cita', 'N/A')
-        medico = aviso.get('medico')  # ✅ Puede ser None
         consultorio = aviso.get('nombre_consultorio', 'nuestras instalaciones')
         
         # ✅ Construir la línea del médico solo si existe
@@ -219,23 +221,23 @@ class AvisoRecordatorioService:
         
         mensaje = f"""Buenos días/tardes, {paciente}
 
-        Le saluda {personal} del {consultorio}.
+    Le saluda {personal} del {consultorio}.
 
-        Le recordamos que tiene una cita médica programada con los siguientes detalles:
+    Le recordamos que tiene una cita médica programada con los siguientes detalles:
 
-        📅 *Fecha:* {fecha}
-        🕐 *Hora:* {hora}
-        {linea_medico}
-        🏥 *Consultorio:* {consultorio}
+    📅 *Fecha:* {fecha}
+    🕐 *Hora:* {hora}
+    {linea_medico}
+    🏥 *Consultorio:* {consultorio}
 
-        Por favor, le solicitamos confirmar su asistencia respondiendo a este mensaje.
+    Por favor, le solicitamos confirmar su asistencia respondiendo a este mensaje.
 
-        En caso de necesitar reprogramar su cita, le pedimos que nos avise con la mayor anticipación posible.
+    En caso de necesitar reprogramar su cita, le pedimos que nos confirme con 5 horas de anticipación.
 
-        Quedamos atentos a su confirmación.
+    Quedamos atentos a su confirmación.
 
-        Gracias.
-        """ 
+    Gracias.
+    """ 
         return mensaje
     
     def obtener_telefono_paciente(self, id_paciente):
