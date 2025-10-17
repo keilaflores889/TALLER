@@ -43,30 +43,60 @@ def addMedicamento():
     data = request.get_json()
     dao = MedicamentoDao()
 
-    # Validación de campos
-    required_fields = ['nombre_medicamento', 'dosis', 'indicaciones', 'forma_farmaceutica']
-    for field in required_fields:
-        if field not in data or not str(data[field]).strip():
-            return jsonify({'success': False, 'error': f'El campo {field} es obligatorio y no puede estar vacío.'}), 400
+    nombre_medicamento = data.get('nombre_medicamento', '').strip()
+    dosis = data.get('dosis', '').strip()
+    indicaciones = data.get('indicaciones', '').strip()
+    forma_farmaceutica = data.get('forma_farmaceutica', '').strip()
 
-    nombre = data['nombre_medicamento'].strip()
-    dosis = data['dosis'].strip()
-    indicaciones = data['indicaciones'].strip()
-    forma = data['forma_farmaceutica'].strip()
+    # Validaciones de campos obligatorios
+    if not nombre_medicamento:
+        return jsonify({'success': False, 'error': 'El campo nombre del medicamento es obligatorio.'}), 400
+    
+    if not dosis:
+        return jsonify({'success': False, 'error': 'El campo dosis es obligatorio.'}), 400
+    
+    if not indicaciones:
+        return jsonify({'success': False, 'error': 'El campo indicaciones es obligatorio.'}), 400
+    
+    if not forma_farmaceutica:
+        return jsonify({'success': False, 'error': 'El campo forma farmacéutica es obligatorio.'}), 400
 
+    # Validaciones de formato usando el DAO
+    if not dao.validarTexto(nombre_medicamento):
+        return jsonify({'success': False, 'error': 'El nombre del medicamento solo puede contener letras, espacios y "/"'}), 400
+
+    if not dao.validarPalabraConSentido(nombre_medicamento):
+        return jsonify({'success': False, 'error': 'El nombre del medicamento debe contener palabras entendibles.'}), 400
+
+    if not dao.validarDosis(dosis):
+        return jsonify({'success': False, 'error': 'La dosis tiene un formato inválido. Use formatos como: 500mg, 2.5ml, 10%, etc.'}), 400
+
+    # USAR validarIndicaciones EN LUGAR DE validarTexto
+    if not dao.validarIndicaciones(indicaciones):
+        return jsonify({'success': False, 'error': 'Las indicaciones contienen caracteres no permitidos.'}), 400
+
+    if not dao.validarPalabraConSentido(indicaciones):
+        return jsonify({'success': False, 'error': 'Las indicaciones deben contener palabras entendibles.'}), 400
+
+    if not dao.validarTexto(forma_farmaceutica):
+        return jsonify({'success': False, 'error': 'La forma farmacéutica solo puede contener letras, espacios y "/"'}), 400
+
+    if not dao.validarPalabraConSentido(forma_farmaceutica):
+        return jsonify({'success': False, 'error': 'La forma farmacéutica debe contener al menos una vocal.'}), 400
+
+    # Validación de duplicados
     try:
-        # Verificar duplicado
-        if dao.existeDuplicado(nombre, dosis, forma):
-            return jsonify({'success': False, 'error': 'Ya está registrado este medicamento con esa dosis y forma farmacéutica.'}), 400
+        if dao.existeDuplicado(nombre_medicamento, dosis, forma_farmaceutica):
+            return jsonify({'success': False, 'error': f'Ya está registrado el medicamento "{nombre_medicamento}" con la dosis "{dosis}" y forma "{forma_farmaceutica}".'}), 409
 
-        id_medicamento = dao.guardarMedicamento(nombre, dosis, indicaciones, forma)
+        id_medicamento = dao.guardarMedicamento(nombre_medicamento, dosis, indicaciones, forma_farmaceutica)
         if id_medicamento:
             return jsonify({'success': True, 'data': {
                 'id_medicamento': id_medicamento,
-                'nombre_medicamento': nombre,
+                'nombre_medicamento': nombre_medicamento,
                 'dosis': dosis,
                 'indicaciones': indicaciones,
-                'forma_farmaceutica': forma
+                'forma_farmaceutica': forma_farmaceutica
             }, 'error': None}), 201
         else:
             return jsonify({'success': False, 'error': 'No se pudo guardar el medicamento.'}), 500
@@ -81,39 +111,62 @@ def updateMedicamento(id_medicamento):
     data = request.get_json()
     dao = MedicamentoDao()
 
-    required_fields = ['nombre_medicamento', 'dosis', 'indicaciones', 'forma_farmaceutica']
-    for field in required_fields:
-        if field not in data or not str(data[field]).strip():
-            return jsonify({'success': False, 'error': f'El campo {field} es obligatorio y no puede estar vacío.'}), 400
+    nombre_medicamento = data.get('nombre_medicamento', '').strip()
+    dosis = data.get('dosis', '').strip()
+    indicaciones = data.get('indicaciones', '').strip()
+    forma_farmaceutica = data.get('forma_farmaceutica', '').strip()
 
-    nombre = data['nombre_medicamento'].strip()
-    dosis = data['dosis'].strip()
-    indicaciones = data['indicaciones'].strip()
-    forma = data['forma_farmaceutica'].strip()
+    # Validaciones de campos obligatorios
+    if not nombre_medicamento:
+        return jsonify({'success': False, 'error': 'El campo nombre del medicamento es obligatorio.'}), 400
+    
+    if not dosis:
+        return jsonify({'success': False, 'error': 'El campo dosis es obligatorio.'}), 400
+    
+    if not indicaciones:
+        return jsonify({'success': False, 'error': 'El campo indicaciones es obligatorio.'}), 400
+    
+    if not forma_farmaceutica:
+        return jsonify({'success': False, 'error': 'El campo forma farmacéutica es obligatorio.'}), 400
 
+    # Validaciones de formato usando el DAO
+    if not dao.validarTexto(nombre_medicamento):
+        return jsonify({'success': False, 'error': 'El nombre del medicamento solo puede contener letras, espacios y "/"'}), 400
+
+    if not dao.validarPalabraConSentido(nombre_medicamento):
+        return jsonify({'success': False, 'error': 'El nombre del medicamento debe contener palabras entendibles.'}), 400
+
+    if not dao.validarDosis(dosis):
+        return jsonify({'success': False, 'error': 'La dosis tiene un formato inválido. Use formatos como: 500mg, 2.5ml, 10%, etc.'}), 400
+
+    # USAR validarIndicaciones EN LUGAR DE validarTexto
+    if not dao.validarIndicaciones(indicaciones):
+        return jsonify({'success': False, 'error': 'Las indicaciones contienen caracteres no permitidos.'}), 400
+
+    if not dao.validarPalabraConSentido(indicaciones):
+        return jsonify({'success': False, 'error': 'Las indicaciones deben contener al menos una vocal.'}), 400
+
+    if not dao.validarTexto(forma_farmaceutica):
+        return jsonify({'success': False, 'error': 'La forma farmacéutica solo puede contener letras, espacios y "/"'}), 400
+
+    if not dao.validarPalabraConSentido(forma_farmaceutica):
+        return jsonify({'success': False, 'error': 'La forma farmacéutica debe contener al menos una vocal.'}), 400
+
+    # Validación de duplicados (excluyendo el registro actual)
     try:
-        medicamento_existente = dao.getMedicamentoById(id_medicamento)
-        if not medicamento_existente:
-            return jsonify({'success': False, 'error': 'No se encontró el medicamento con el ID proporcionado.'}), 404
+        if dao.existeDuplicadoExceptoId(nombre_medicamento, dosis, forma_farmaceutica, id_medicamento):
+            return jsonify({'success': False, 'error': f'Ya existe otro medicamento con el nombre "{nombre_medicamento}", dosis "{dosis}" y forma "{forma_farmaceutica}".'}), 409
 
-        # Validar duplicados (excepto para el mismo registro)
-        if dao.existeDuplicado(nombre, dosis, forma) and (
-            medicamento_existente['nombre_medicamento'].upper() != nombre.upper() or
-            medicamento_existente['dosis'].upper() != dosis.upper() or
-            medicamento_existente['forma_farmaceutica'].upper() != forma.upper()
-        ):
-            return jsonify({'success': False, 'error': 'Ya existe otro medicamento con ese nombre, dosis y forma.'}), 400
-
-        if dao.updateMedicamento(id_medicamento, nombre, dosis, indicaciones, forma):
+        if dao.updateMedicamento(id_medicamento, nombre_medicamento, dosis, indicaciones, forma_farmaceutica):
             return jsonify({'success': True, 'data': {
                 'id_medicamento': id_medicamento,
-                'nombre_medicamento': nombre,
+                'nombre_medicamento': nombre_medicamento,
                 'dosis': dosis,
                 'indicaciones': indicaciones,
-                'forma_farmaceutica': forma
+                'forma_farmaceutica': forma_farmaceutica
             }, 'error': None}), 200
         else:
-            return jsonify({'success': False, 'error': 'No se pudo actualizar el medicamento.'}), 500
+            return jsonify({'success': False, 'error': 'No se encontró el medicamento o no se pudo actualizar.'}), 404
     except Exception as e:
         app.logger.error(f"Error al actualizar medicamento: {str(e)}")
         return jsonify({'success': False, 'error': 'Ocurrió un error interno. Consulte con el administrador.'}), 500

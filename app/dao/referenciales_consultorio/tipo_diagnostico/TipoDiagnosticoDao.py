@@ -1,4 +1,5 @@
 # Data access object - DAO para tipo_diagnostico
+import re
 from flask import current_app as app
 from app.conexion.Conexion import Conexion
 
@@ -57,7 +58,22 @@ class TipoDiagnosticoDao:
             cur.close()
             con.close()
 
+    # ============================
+    # VALIDACIONES
+    # ============================
+
+    def validarTexto(self, texto):
+        """Permite letras (incluyendo ñ y acentuadas), espacios y barra diagonal."""
+        patron = r"^[A-Za-zÁÉÍÓÚáéíóúÑñ\s/]+$"
+        return bool(re.match(patron, texto))
+
+    def validarPalabraConSentido(self, texto):
+        """Valida que el texto contenga al menos una vocal."""
+        patron = r"[aeiouáéíóúAEIOUÁÉÍÓÚ]"
+        return bool(re.search(patron, texto))
+
     def diagnosticoExiste(self, descripcion_diagnostico):
+        """Verifica si ya existe un diagnóstico con esa descripción."""
         sql = """
         SELECT 1 FROM tipo_diagnostico
         WHERE UPPER(descripcion_diagnostico) = UPPER(%s)
@@ -74,6 +90,29 @@ class TipoDiagnosticoDao:
         finally:
             cur.close()
             con.close()
+
+    def diagnosticoExisteExceptoId(self, descripcion_diagnostico, id_tipo_diagnostico):
+        """Verifica si existe otro diagnóstico con esa descripción, excluyendo el id actual."""
+        sql = """
+        SELECT 1 FROM tipo_diagnostico 
+        WHERE UPPER(descripcion_diagnostico) = UPPER(%s) AND id_tipo_diagnostico != %s
+        """
+        conexion = Conexion()
+        con = conexion.getConexion()
+        cur = con.cursor()
+        try:
+            cur.execute(sql, (descripcion_diagnostico, id_tipo_diagnostico))
+            return cur.fetchone() is not None
+        except Exception as e:
+            app.logger.error(f"Error al verificar existencia de diagnóstico (excepto id): {str(e)}")
+            return False
+        finally:
+            cur.close()
+            con.close()
+
+    # ============================
+    # CRUD
+    # ============================
 
     def guardarTipoDiagnostico(self, descripcion_diagnostico, tipo_diagnostico):
         sql = """
