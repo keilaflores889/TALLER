@@ -1,16 +1,9 @@
 from flask import Blueprint, request, jsonify, current_app as app
 from app.dao.referenciales_consultorio.tipo_estudio.Tipo_EstudioDao import TipoEstudioDao
-import re
-
-# ✅ Validación: letras, números, espacios y "/"
-def descripcion_valida(texto):
-    return re.fullmatch(r'[A-Za-z0-9ÁÉÍÓÚÑáéíóúñ\s/]+', texto) is not None
 
 estudioapi = Blueprint('estudioapi', __name__)
 
-# ===============================
-# Obtener todos los estudios
-# ===============================
+# Trae todos los estudios
 @estudioapi.route('/estudios', methods=['GET'])
 def getEstudios():
     dao = TipoEstudioDao()
@@ -22,105 +15,172 @@ def getEstudios():
             'error': None
         }), 200
     except Exception as e:
-        app.logger.error(f"Error al obtener estudios: {str(e)}")
-        return jsonify({'success': False, 'error': str(e)}), 500
+        app.logger.error(f"Error al obtener todos los estudios: {str(e)}")
+        return jsonify({
+            'success': False,
+            'error': 'Ocurrió un error interno. Consulte con el administrador.'
+        }), 500
 
-# ===============================
-# Obtener estudio por ID
-# ===============================
-@estudioapi.route('/estudios/<int:estudio_id>', methods=['GET'])
-def getEstudio(estudio_id):
+# Trae un estudio por ID
+@estudioapi.route('/estudios/<int:id_estudio>', methods=['GET'])
+def getEstudioById(id_estudio):
     dao = TipoEstudioDao()
     try:
-        estudio = dao.getTipoEstudioById(estudio_id)
+        estudio = dao.getTipoEstudioById(id_estudio)
         if estudio:
-            return jsonify({'success': True, 'data': estudio, 'error': None}), 200
-        return jsonify({'success': False, 'error': 'Estudio no encontrado.'}), 404
+            return jsonify({
+                'success': True,
+                'data': estudio,
+                'error': None
+            }), 200
+        else:
+            return jsonify({
+                'success': False,
+                'error': 'No se encontró el estudio con el ID proporcionado.'
+            }), 404
     except Exception as e:
-        app.logger.error(f"Error al obtener estudio por ID: {str(e)}")
-        return jsonify({'success': False, 'error': str(e)}), 500
+        app.logger.error(f"Error al obtener estudio: {str(e)}")
+        return jsonify({
+            'success': False,
+            'error': 'Ocurrió un error interno. Consulte con el administrador.'
+        }), 500
 
-# ===============================
-# Agregar nuevo estudio
-# ===============================
+# Agrega un nuevo estudio
 @estudioapi.route('/estudios', methods=['POST'])
 def addEstudio():
     data = request.get_json()
     dao = TipoEstudioDao()
 
-    if 'descripcion' not in data or not data['descripcion'].strip():
-        return jsonify({'success': False, 'error': 'El campo descripción es obligatorio.'}), 400
+    descripcion_estudio = data.get('descripcion_estudio', '').strip()
 
-    descripcion = data['descripcion'].strip()
-    if not descripcion_valida(descripcion):
+    # ===== VALIDACIÓN DE CAMPO OBLIGATORIO =====
+    if not descripcion_estudio:
         return jsonify({
             'success': False,
-            'error': 'La descripción solo puede contener letras, números, espacios y "/".'
+            'error': 'El campo descripción del estudio es obligatorio.'
         }), 400
 
+    # ===== VALIDACIONES DE FORMATO =====
+    if not dao.validarTexto(descripcion_estudio):
+        return jsonify({
+            'success': False,
+            'error': 'La descripción solo puede contener letras, números, espacios, guiones, barras, comas y puntos.'
+        }), 400
+
+    if not dao.validarPalabraConSentido(descripcion_estudio):
+        return jsonify({
+            'success': False,
+            'error': 'La descripción debe contener al menos una vocal.'
+        }), 400
+
+    # ===== VALIDACIÓN DE DUPLICADOS =====
     try:
-        if dao.estudioExiste(descripcion):
+        if dao.estudioExiste(descripcion_estudio):
             return jsonify({
                 'success': False,
-                'error': f'El estudio "{descripcion}" ya existe.'
+                'error': f'El tipo de estudio "{descripcion_estudio}" ya existe.'
             }), 409
 
-        id_estudio = dao.guardarTipoEstudio(descripcion)
+        id_estudio = dao.guardarTipoEstudio(descripcion_estudio)
         if id_estudio:
             return jsonify({
                 'success': True,
-                'data': {'id_tipo_estudio': id_estudio, 'descripcion_estudio': descripcion},
+                'data': {
+                    'id_tipo_estudio': id_estudio,
+                    'descripcion_estudio': descripcion_estudio
+                },
                 'error': None
             }), 201
-        return jsonify({'success': False, 'error': 'No se pudo guardar el estudio.'}), 500
+        else:
+            return jsonify({
+                'success': False,
+                'error': 'No se pudo guardar el tipo de estudio.'
+            }), 500
+
     except Exception as e:
         app.logger.error(f"Error al agregar estudio: {str(e)}")
-        return jsonify({'success': False, 'error': str(e)}), 500
+        return jsonify({
+            'success': False,
+            'error': 'Ocurrió un error interno. Consulte con el administrador.'
+        }), 500
 
-# ===============================
-# Actualizar estudio
-# ===============================
-@estudioapi.route('/estudios/<int:estudio_id>', methods=['PUT'])
-def updateEstudio(estudio_id):
+# Actualiza un estudio
+@estudioapi.route('/estudios/<int:id_estudio>', methods=['PUT'])
+def updateEstudio(id_estudio):
     data = request.get_json()
     dao = TipoEstudioDao()
 
-    if 'descripcion' not in data or not data['descripcion'].strip():
-        return jsonify({'success': False, 'error': 'El campo descripción es obligatorio.'}), 400
+    descripcion_estudio = data.get('descripcion_estudio', '').strip()
 
-    descripcion = data['descripcion'].strip()
-    if not descripcion_valida(descripcion):
+    # ===== VALIDACIÓN DE CAMPO OBLIGATORIO =====
+    if not descripcion_estudio:
         return jsonify({
             'success': False,
-            'error': 'La descripción solo puede contener letras, números, espacios y "/".'
+            'error': 'El campo descripción del estudio es obligatorio.'
         }), 400
 
+    # ===== VALIDACIONES DE FORMATO =====
+    if not dao.validarTexto(descripcion_estudio):
+        return jsonify({
+            'success': False,
+            'error': 'La descripción solo puede contener letras, números, espacios, guiones, barras, comas y puntos.'
+        }), 400
+
+    if not dao.validarPalabraConSentido(descripcion_estudio):
+        return jsonify({
+            'success': False,
+            'error': 'La descripción debe contener al menos una vocal.'
+        }), 400
+
+    # ===== VALIDACIÓN DE DUPLICADOS (excluyendo el registro actual) =====
     try:
-        if dao.updateTipoEstudio(estudio_id, descripcion):
+        if dao.estudioExisteExceptoId(descripcion_estudio, id_estudio):
+            return jsonify({
+                'success': False,
+                'error': f'Ya existe otro tipo de estudio con la descripción "{descripcion_estudio}".'
+            }), 409
+
+        if dao.updateTipoEstudio(id_estudio, descripcion_estudio):
             return jsonify({
                 'success': True,
-                'data': {'id_tipo_estudio': estudio_id, 'descripcion_estudio': descripcion},
+                'data': {
+                    'id_tipo_estudio': id_estudio,
+                    'descripcion_estudio': descripcion_estudio
+                },
                 'error': None
             }), 200
-        return jsonify({'success': False, 'error': 'No se pudo actualizar el estudio.'}), 404
+        else:
+            return jsonify({
+                'success': False,
+                'error': 'No se encontró el tipo de estudio o no se pudo actualizar.'
+            }), 404
+
     except Exception as e:
         app.logger.error(f"Error al actualizar estudio: {str(e)}")
-        return jsonify({'success': False, 'error': str(e)}), 500
+        return jsonify({
+            'success': False,
+            'error': 'Ocurrió un error interno. Consulte con el administrador.'
+        }), 500
 
-# ===============================
-# Eliminar estudio
-# ===============================
-@estudioapi.route('/estudios/<int:estudio_id>', methods=['DELETE'])
-def deleteEstudio(estudio_id):
+# Elimina un estudio
+@estudioapi.route('/estudios/<int:id_estudio>', methods=['DELETE'])
+def deleteEstudio(id_estudio):
     dao = TipoEstudioDao()
     try:
-        if dao.deleteTipoEstudio(estudio_id):
+        if dao.deleteTipoEstudio(id_estudio):
             return jsonify({
                 'success': True,
-                'mensaje': f'Estudio con ID {estudio_id} eliminado correctamente.',
+                'mensaje': f'Tipo de estudio con ID {id_estudio} eliminado correctamente.',
                 'error': None
             }), 200
-        return jsonify({'success': False, 'error': 'Estudio no encontrado o no se pudo eliminar.'}), 404
+        else:
+            return jsonify({
+                'success': False,
+                'error': 'No se encontró el tipo de estudio con el ID proporcionado o no se pudo eliminar.'
+            }), 404
     except Exception as e:
         app.logger.error(f"Error al eliminar estudio: {str(e)}")
-        return jsonify({'success': False, 'error': str(e)}), 500
+        return jsonify({
+            'success': False,
+            'error': 'Ocurrió un error interno. Consulte con el administrador.'
+        }), 500

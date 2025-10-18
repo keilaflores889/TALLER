@@ -1,3 +1,5 @@
+# Data Access Object - DAO
+import re
 from flask import current_app as app
 from app.conexion.Conexion import Conexion
 
@@ -48,7 +50,24 @@ class TipoAnalisisDao:
             cur.close()
             con.close()
 
+    # ============================
+    # VALIDACIONES
+    # ============================
+
+    def validarTexto(self, texto):
+        """Permite letras (incluyendo ñ y acentuadas), números, espacios, barra, guion, comas y puntos."""
+        patron = r"^[A-Za-z0-9ÁÉÍÓÚáéíóúÑñ\s\/\-\,\.]+$"
+        return bool(re.match(patron, texto))
+
+    def validarPalabraConSentido(self, texto):
+        """Valida que el texto contenga al menos una vocal."""
+        patron = r"[aeiouáéíóúAEIOUÁÉÍÓÚ]"
+        return bool(re.search(patron, texto))
+
     def analisisExiste(self, descripcion):
+        """
+        Verifica si ya existe un tipo de análisis con la misma descripción (ignora mayúsculas/minúsculas).
+        """
         sql = """
         SELECT 1 FROM tipo_analisis WHERE UPPER(descripcion_analisis) = UPPER(%s)
         """
@@ -65,15 +84,36 @@ class TipoAnalisisDao:
             cur.close()
             con.close()
 
+    def analisisExisteExceptoId(self, descripcion, id_tipo_analisis):
+        """
+        Verifica si existe otro tipo de análisis con la misma descripción, excluyendo el id actual.
+        """
+        sql = """
+        SELECT 1 FROM tipo_analisis 
+        WHERE UPPER(descripcion_analisis) = UPPER(%s)
+          AND id_tipo_analisis != %s
+        """
+        conexion = Conexion()
+        con = conexion.getConexion()
+        cur = con.cursor()
+        try:
+            cur.execute(sql, (descripcion, id_tipo_analisis))
+            return cur.fetchone() is not None
+        except Exception as e:
+            app.logger.error(f"Error al verificar duplicado de análisis (excepto id): {str(e)}")
+            return False
+        finally:
+            cur.close()
+            con.close()
+
+    # ============================
+    # CRUD
+    # ============================
+
     def guardarTipoAnalisis(self, descripcion):
-        if not descripcion or not descripcion.strip():
-            app.logger.error("Descripción vacía al intentar guardar tipo de análisis")
-            return False
-
-        if self.analisisExiste(descripcion):
-            app.logger.error(f"Ya existe un análisis con la descripción: {descripcion}")
-            return False
-
+        """
+        Inserta un tipo de análisis.
+        """
         sql = """
         INSERT INTO tipo_analisis(descripcion_analisis)
         VALUES(%s) RETURNING id_tipo_analisis
@@ -95,14 +135,9 @@ class TipoAnalisisDao:
             con.close()
 
     def updateTipoAnalisis(self, id_tipo_analisis, descripcion):
-        if not descripcion or not descripcion.strip():
-            app.logger.error("Descripción vacía al intentar actualizar tipo de análisis")
-            return False
-
-        if self.analisisExiste(descripcion):
-            app.logger.error(f"Ya existe un análisis con la descripción: {descripcion}")
-            return False
-
+        """
+        Actualiza la descripción de un tipo de análisis.
+        """
         sql = """
         UPDATE tipo_analisis
         SET descripcion_analisis=%s

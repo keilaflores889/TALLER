@@ -1,23 +1,31 @@
 {% extends 'base.html' %}
-
+    
 {% block titulo %}
-Procedimientos
+Tipo de Estudio
 {% endblock %}
 
 {% block contenido %}
 <div class="container mt-4">
-    <h3>Listar Procedimientos</h3>
 
-    <!-- tarjeta -->
-    <div class="card">
-      <div class="card-header">
-        <button type="button" class="btn btn-outline-info" id="btnAgregar">Agregar</button>
-      </div>
-      <div class="card-body">
-        <table class="table table-striped" id="tbl">
-          <thead class="table-info">
+  <!-- Card principal -->
+  <div class="card shadow-sm border-0 rounded-lg">
+    <!-- Header: Botón Agregar y Título -->
+    <div class="card-header bg-info text-white d-flex justify-content-between align-items-center">
+      <button type="button" class="btn btn-light btn-sm" id="btnAgregar">
+        <i class="fas fa-plus-circle mr-1"></i> Agregar
+      </button>
+      <h5 class="mb-0 font-weight-bold">
+        <i class="fas fa-microscope mr-2"></i> Tipos de Estudios
+      </h5>
+    </div>
+
+    <!-- Body: Tabla de tipos de estudio -->
+    <div class="card-body p-2">
+      <div class="table-responsive shadow-sm rounded">
+        <table class="table table-hover table-bordered align-middle text-center" id="tbl">
+          <thead class="bg-info text-white">
             <tr>
-              <th>Procedimiento</th>
+              <th>Tipos de Estudios</th>
               <th>Acciones</th>
             </tr>
           </thead>
@@ -25,99 +33,171 @@ Procedimientos
         </table>
       </div>
     </div>
-    <!-- /tarjeta -->
+  </div>
 
-    <!-- Modal formulario -->
-    <div class="modal" id="modalFormulario">
-      <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
+  <!-- =========================== -->
+  <!-- Modal Formulario Tipo de Estudio -->
+  <!-- =========================== -->
+  <div class="modal fade" id="modalFormulario" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content shadow-lg border-0 rounded-lg">
 
-          <div class="modal-header">
-            <h4 class="modal-title" id="modalTitle"></h4>
-            <button type="button" class="close" data-dismiss="modal">&times;</button>
-          </div>
-
-          <div class="modal-body">
-            <div class="form-group">
-              <input type="hidden" id="txtIdProcedimiento">
-              <label for="txtDescripcion">Procedimiento:</label>
-              <textarea type="text" class="form-control" placeholder="Ingrese un tipo de procedimiento" id="txtDescripcion"></textarea>
-            </div>
-          </div>
-
-          <div class="modal-footer">
-            <button type="button" class="btn btn-primary" id="btnGuardar">Guardar</button>
-            <button type="button" class="btn btn-danger" data-dismiss="modal">Cerrar</button>
-          </div>
-
+        <!-- Header -->
+        <div class="modal-header bg-info text-white rounded-top">
+          <h5 class="modal-title font-weight-bold">
+            <i class="fas fa-microscope mr-2"></i> <span id="modalTitle">Nuevo Tipo de Estudio</span>
+          </h5>
+          <button type="button" class="close text-white" data-dismiss="modal">&times;</button>
         </div>
+
+        <!-- Body -->
+        <div class="modal-body">
+          <input type="hidden" id="txtIdEstudio">
+
+          <div class="form-group">
+            <label for="txtDescripcion" class="font-weight-bold">
+              <i class="fas fa-file-medical mr-1"></i> Descripción del Estudio:
+            </label>
+            <textarea class="form-control" 
+                      id="txtDescripcion" 
+                      placeholder="Ingrese descripción del estudio" 
+                      rows="3"></textarea>
+            <small class="form-text text-muted">
+              <i class="fas fa-info-circle"></i> Se permiten letras, números, espacios, guiones, barras, comas y puntos - Debe contener al menos una vocal.
+            </small>
+          </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="modal-footer bg-light">
+          <button type="button" class="btn btn-info" id="btnGuardar">
+            <i class="fas fa-save mr-1"></i> Guardar
+          </button>
+          <button type="button" class="btn btn-danger" data-dismiss="modal">
+            <i class="fas fa-times mr-1"></i> Cerrar
+          </button>
+        </div>
+
       </div>
     </div>
+  </div>
 
 </div>
 {% endblock %}
 
 {% block js %}
 <script>
-  const CSRFToken = "{{ csrf_token() }}" || null;
+const CSRFToken = "{{ csrf_token() }}" || null;
 
-  // Validación: letras, números, espacios, acentos y "/"
-  function descripcionValida(descripcion) {
-    const regex = /^[A-Za-z0-9ÁÉÍÓÚÑáéíóúñ\s/]+$/;
-    return regex.test(descripcion.trim());
-  }
+// =====================================================
+// FUNCIONES DE VALIDACIÓN
+// =====================================================
 
-  const initDatatable = () => {
-    $('#tbl').DataTable({
-      language: {
-        url: "{{ url_for('static', filename='vendor/datatables/es-ES.json') }}",
-      },
-      ajax:'/api/v1/procedimientos',
-      columns: [
-        { data: 'descripcion_procedimiento' },
-        {
-          data: function(row) {
-            return `<button type="button" name="btn_editar" class="btn btn-info" data-id_procedimiento="${row.id_tipo_procedimiento}" title="Editar"><i class="fas fa-edit"></i></button>
-                    <button type="button" name="btn_eliminar" class="btn btn-danger" data-id_procedimiento="${row.id_tipo_procedimiento}" title="Eliminar"><i class="fas fa-trash-alt"></i></button>`;
-          }
+// Función para validar texto (permite letras, números, espacios, guiones, barras, comas y puntos)
+const validarTexto = (texto) => {
+  const patron = /^[A-Za-z0-9ÁÉÍÓÚÑáéíóúñ\s\/\-\,\.]+$/;
+  return patron.test(texto);
+}
+
+// Función para validar que contenga vocales
+const validarPalabraConSentido = (texto) => {
+  const patron = /[aeiouáéíóúAEIOUÁÉÍÓÚ]/;
+  return patron.test(texto);
+}
+
+// =====================================================
+// INICIALIZACIÓN DE DATATABLE
+// =====================================================
+const initDatatable = () => {
+  $('#tbl').DataTable({
+    language: {
+      url: "{{ url_for('static', filename='vendor/datatables/es-ES.json') }}",
+    },
+    ajax: {
+      url: '/api/v1/estudios',
+      dataSrc: function(json) {
+        if (json.success && json.data) {
+          return json.data;
         }
-      ],
-      createdRow: function(row, data, dataIndex) {
-        $('td:eq(0)', row).css({
-          "white-space": "normal",
-          "word-wrap": "break-word",
-          "max-width": "250px"
-        });
+        return [];
       }
-    });
-  }
-
-  const agregar = () => {
-    $('#btnAgregar').on('click', function(){
-      $('#modalTitle').text("Agregar un Procedimiento");
-      $('#txtIdProcedimiento').val("");
-      $('#txtDescripcion').val("");
-      $('#modalFormulario').modal();
-    });
-  }
-
-  const guardar = () => {
-    $('#btnGuardar').on('click', function() {
-      const id_procedimiento = $('#txtIdProcedimiento').val();
-      const descripcion = $('#txtDescripcion').val().trim();
-      const tabla = $('#tbl').DataTable();
-
-      if (!descripcionValida(descripcion)) {
-        Swal.fire("Error", "La descripción solo puede contener letras, números, espacios, acentos y '/'.", "error");
-        return;
+    },
+    columns: [
+      { data: 'descripcion_estudio' },
+      {
+        data: function (row) {
+          return `<button type="button" name="btn_editar" class="btn btn-sm btn-info" 
+                      data-id="${row.id_tipo_estudio}" title="Editar">
+                    <i class="fas fa-edit"></i>
+                  </button>
+                  <button type="button" name="btn_eliminar" class="btn btn-sm btn-danger" 
+                      data-id="${row.id_tipo_estudio}" title="Eliminar">
+                    <i class="fas fa-trash-alt"></i>
+                  </button>`;
+        }
       }
+    ],
+    order: [[0, 'asc']]
+  });
+};
 
-      const payload = { descripcion };
-      const url = id_procedimiento ? `/api/v1/procedimientos/${id_procedimiento}` : `/api/v1/procedimientos`;
-      const method = id_procedimiento ? 'PUT' : 'POST';
+// =====================================================
+// AGREGAR NUEVO TIPO DE ESTUDIO
+// =====================================================
+const agregar = () => {
+  $('#btnAgregar').on('click', function () {
+    $('#modalTitle').text("Nuevo Tipo de Estudio");
+    $('#txtIdEstudio').val("");
+    $('#txtDescripcion').val("");
+    $('#modalFormulario').modal();
+  });
+};
 
-      fetch(url, {
-        method: method,
+// =====================================================
+// GUARDAR TIPO DE ESTUDIO (INSERT O UPDATE)
+// =====================================================
+const guardar = () => {
+  $('#btnGuardar').on('click', function () {
+    const id = $('#txtIdEstudio').val();
+    const descripcion_estudio = $('#txtDescripcion').val().trim();
+    const tabla = $('#tbl').DataTable();
+
+    // ===== VALIDACIÓN: DESCRIPCIÓN =====
+    if (!descripcion_estudio) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Campo requerido',
+        text: 'El campo Descripción del Estudio es obligatorio.'
+      });
+      return;
+    }
+
+    if (!validarTexto(descripcion_estudio)) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Formato inválido',
+        text: 'La descripción solo puede contener letras, números, espacios, guiones, barras, comas y puntos.'
+      });
+      return;
+    }
+
+    if (!validarPalabraConSentido(descripcion_estudio)) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Formato inválido',
+        text: 'La descripción debe contener palabras válidas.'
+      });
+      return;
+    }
+
+    const payload = {
+      descripcion_estudio: descripcion_estudio
+    };
+
+    if (id) {
+      // Update
+      fetch(`/api/v1/estudios/${id}`, {
+        method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
           'X-CSRFToken': CSRFToken
@@ -126,97 +206,184 @@ Procedimientos
       })
       .then(resp => resp.json())
       .then(data => {
-        if (data && data.success) {
+        if (data && !data.error && data.success) {
           tabla.ajax.reload();
-          Swal.fire(
-            "Éxito",
-            id_procedimiento ? "El procedimiento fue actualizado correctamente." : "El procedimiento fue agregado correctamente.",
-            "success"
-          );
-        } else if (data.error && data.error.includes("ya existe")) {
-          Swal.fire("Atención", "Este procedimiento ya está registrado, no es necesario volver a cargarlo.", "warning");
+          $('#modalFormulario').modal("hide");
+          Swal.fire({
+            icon: 'success',
+            title: 'Actualizado',
+            text: 'El tipo de estudio ha sido actualizado correctamente.'
+          });
         } else {
-          Swal.fire("Error", data.error || "No se pudo guardar.", "error");
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: data.error || 'No se pudo actualizar el tipo de estudio.'
+          });
         }
-      })
-      .catch(err => {
+      }).catch(err => {
         console.error(err);
-        Swal.fire("Error", "Ocurrió un problema al guardar.", "error");
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'Ocurrió un error al actualizar el tipo de estudio.'
+        });
       });
-
-      $('#txtDescripcion').val("");
-      $('#modalFormulario').modal("hide");
-    });
-  }
-
-  const editar = () => {
-    $('#tbl').on('click', 'button[name="btn_editar"]', function() {
-      Swal.fire({
-        title: "¿Deseas editar este registro?",
-        showCancelButton: true,
-        confirmButtonText: "Si",
-        cancelButtonText: "No"
-      }).then((result) => {
-        if (result.isConfirmed) {
-          $('#modalTitle').text("Editar un Procedimiento");
-          const id_procedimiento = $(this).data('id_procedimiento');
-          $('#txtIdProcedimiento').val(id_procedimiento);
-
-          fetch(`/api/v1/procedimientos/${id_procedimiento}`)
-          .then(resp => resp.json())
-          .then(data => {
-            $('#txtDescripcion').val(data.data.descripcion_procedimiento);
-            $('#modalFormulario').modal();
+    } else {
+      // Insert
+      fetch(`/api/v1/estudios`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': CSRFToken
+        },
+        body: JSON.stringify(payload)
+      })
+      .then(resp => resp.json())
+      .then(data => {
+        if (data && !data.error && data.success) {
+          tabla.ajax.reload();
+          $('#modalFormulario').modal("hide");
+          Swal.fire({
+            icon: 'success',
+            title: 'Agregado',
+            text: 'El tipo de estudio ha sido agregado correctamente.'
+          });
+        } else {
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: data.error || 'No se pudo guardar el tipo de estudio.'
           });
         }
+      }).catch(err => {
+        console.error(err);
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'Ocurrió un error al guardar el tipo de estudio.'
+        });
       });
-    });
-  }
-
-  const eliminar = () => {
-    $('#tbl').on('click', 'button[name="btn_eliminar"]', function() {
-      const id_procedimiento = $(this).data('id_procedimiento');
-
-      Swal.fire({
-        title: "¿Deseas eliminar este registro?",
-        showCancelButton: true,
-        confirmButtonText: "Si",
-        cancelButtonText: "No"
-      }).then((result) => {
-        if (result.isConfirmed) {
-          fetch(`/api/v1/procedimientos/${id_procedimiento}`, {
-            method: 'DELETE',
-            headers: {
-              'Content-Type': 'application/json',
-              'X-CSRFToken': CSRFToken
-            }
-          })
-          .then(resp => resp.json())
-          .then(data => {
-            if(data && data.success) {
-              const fila = $(this).closest('tr');
-              const tabla = $('#tbl').DataTable();
-              tabla.row(fila).remove().draw();
-              Swal.fire("Eliminado", "", "success");
-            } else {
-              Swal.fire("Error", data.error || "No se pudo eliminar.");
-            }
-          });
-        }
-      });
-    });
-  }
-
-  const addEvents = () => {
-    agregar();
-    guardar();
-    editar();
-    eliminar();
-  }
-
-  $(function() {
-    initDatatable();
-    addEvents();
+    }
   });
+};
+
+// =====================================================
+// EDITAR TIPO DE ESTUDIO
+// =====================================================
+const editar = () => {
+  $('#tbl').on('click', 'button[name="btn_editar"]', function () {
+    const id = $(this).data('id');
+    
+    Swal.fire({
+      title: "¿Deseas editar este registro?",
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: "Sí",
+      cancelButtonText: "No",
+      confirmButtonColor: '#17a2b8',
+      cancelButtonColor: '#6c757d'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        $('#modalTitle').text("Editar Tipo de Estudio");
+        $('#txtIdEstudio').val(id);
+
+        fetch(`/api/v1/estudios/${id}`, {
+          method: 'GET',
+          headers: { 'Content-Type': 'application/json' }
+        })
+        .then(resp => resp.json())
+        .then(data => {
+          if (data && data.success && data.data) {
+            $('#txtDescripcion').val(data.data.descripcion_estudio);
+            $('#modalFormulario').modal();
+          } else {
+            Swal.fire({
+              icon: 'error',
+              title: 'Error',
+              text: 'No se pudo cargar el tipo de estudio.'
+            });
+          }
+        })
+        .catch(err => {
+          console.error(err);
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'Ocurrió un error al cargar el tipo de estudio.'
+          });
+        });
+      }
+    });
+  });
+};
+
+// =====================================================
+// ELIMINAR TIPO DE ESTUDIO
+// =====================================================
+const eliminar = () => {
+  $('#tbl').on('click', 'button[name="btn_eliminar"]', function () {
+    const id = $(this).data('id');
+    const botonEliminar = $(this);
+    
+    Swal.fire({
+      title: "¿Deseas eliminar este registro?",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: "Sí, eliminar",
+      cancelButtonText: "No, cancelar",
+      confirmButtonColor: '#dc3545',
+      cancelButtonColor: '#6c757d'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        fetch(`/api/v1/estudios/${id}`, {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': CSRFToken
+          }
+        })
+        .then(resp => resp.json())
+        .then(data => {
+          if (data && !data.error && data.success) {
+            const fila = botonEliminar.closest('tr');
+            const tabla = $('#tbl').DataTable();
+            tabla.row(fila).remove().draw();
+            Swal.fire({
+              icon: 'success',
+              title: 'Eliminado',
+              text: 'El tipo de estudio ha sido eliminado correctamente.'
+            });
+          } else {
+            Swal.fire({
+              icon: 'error',
+              title: 'Error',
+              text: data.error || 'No se pudo eliminar el tipo de estudio.'
+            });
+          }
+        }).catch(err => {
+          console.error(err);
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'Ocurrió un error al eliminar el tipo de estudio.'
+          });
+        });
+      }
+    });
+  });
+};
+
+// =====================================================
+// INICIALIZACIÓN
+// =====================================================
+$(function () {
+  initDatatable();
+  agregar();
+  guardar();
+  editar();
+  eliminar();
+});
+
 </script>
 {% endblock %}

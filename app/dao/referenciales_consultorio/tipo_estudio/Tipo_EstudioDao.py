@@ -1,4 +1,5 @@
-# Data access object - DAO para tipo_estudio
+# Data Access Object - DAO
+import re
 from flask import current_app as app
 from app.conexion.Conexion import Conexion
 
@@ -8,7 +9,7 @@ class TipoEstudioDao:
         sql = """
         SELECT id_tipo_estudio, descripcion_estudio
         FROM tipo_estudio
-        ORDER BY descripcion_estudio ASC
+        ORDER BY id_tipo_estudio
         """
         conexion = Conexion()
         con = conexion.getConexion()
@@ -16,9 +17,12 @@ class TipoEstudioDao:
         try:
             cur.execute(sql)
             estudios = cur.fetchall()
-            return [{'id_tipo_estudio': est[0], 'descripcion_estudio': est[1]} for est in estudios]
+            return [
+                {"id_tipo_estudio": e[0], "descripcion_estudio": e[1]}
+                for e in estudios
+            ]
         except Exception as e:
-            app.logger.error(f"Error al obtener todos los tipos de estudio: {str(e)}")
+            app.logger.error(f"Error al obtener tipos de estudio: {str(e)}")
             return []
         finally:
             cur.close()
@@ -28,16 +32,16 @@ class TipoEstudioDao:
         sql = """
         SELECT id_tipo_estudio, descripcion_estudio
         FROM tipo_estudio
-        WHERE id_tipo_estudio = %s
+        WHERE id_tipo_estudio=%s
         """
         conexion = Conexion()
         con = conexion.getConexion()
         cur = con.cursor()
         try:
             cur.execute(sql, (id_tipo_estudio,))
-            estudio = cur.fetchone()
-            if estudio:
-                return {"id_tipo_estudio": estudio[0], "descripcion_estudio": estudio[1]}
+            row = cur.fetchone()
+            if row:
+                return {"id_tipo_estudio": row[0], "descripcion_estudio": row[1]}
             return None
         except Exception as e:
             app.logger.error(f"Error al obtener tipo de estudio: {str(e)}")
@@ -46,7 +50,24 @@ class TipoEstudioDao:
             cur.close()
             con.close()
 
-    def estudioExiste(self, descripcion_estudio):
+    # ============================
+    # VALIDACIONES
+    # ============================
+
+    def validarTexto(self, texto):
+        """Permite letras (incluyendo ñ y acentuadas), números, espacios, barra, guion, comas y puntos."""
+        patron = r"^[A-Za-z0-9ÁÉÍÓÚáéíóúÑñ\s\/\-\,\.]+$"
+        return bool(re.match(patron, texto))
+
+    def validarPalabraConSentido(self, texto):
+        """Valida que el texto contenga al menos una vocal."""
+        patron = r"[aeiouáéíóúAEIOUÁÉÍÓÚ]"
+        return bool(re.search(patron, texto))
+
+    def estudioExiste(self, descripcion):
+        """
+        Verifica si ya existe un tipo de estudio con la misma descripción (ignora mayúsculas/minúsculas).
+        """
         sql = """
         SELECT 1 FROM tipo_estudio WHERE UPPER(descripcion_estudio) = UPPER(%s)
         """
@@ -54,7 +75,7 @@ class TipoEstudioDao:
         con = conexion.getConexion()
         cur = con.cursor()
         try:
-            cur.execute(sql, (descripcion_estudio,))
+            cur.execute(sql, (descripcion,))
             return cur.fetchone() is not None
         except Exception as e:
             app.logger.error(f"Error al verificar existencia de estudio: {str(e)}")
@@ -63,28 +84,48 @@ class TipoEstudioDao:
             cur.close()
             con.close()
 
-    def guardarTipoEstudio(self, descripcion_estudio):
+    def estudioExisteExceptoId(self, descripcion, id_tipo_estudio):
+        """
+        Verifica si existe otro tipo de estudio con la misma descripción, excluyendo el id actual.
+        """
         sql = """
-        INSERT INTO tipo_estudio(descripcion_estudio)
-        VALUES (%s)
-        RETURNING id_tipo_estudio
+        SELECT 1 FROM tipo_estudio 
+        WHERE UPPER(descripcion_estudio) = UPPER(%s)
+          AND id_tipo_estudio != %s
         """
         conexion = Conexion()
         con = conexion.getConexion()
         cur = con.cursor()
         try:
-            if not descripcion_estudio or not descripcion_estudio.strip():
-                app.logger.error("Descripción vacía o nula al intentar guardar tipo de estudio")
-                return False
+            cur.execute(sql, (descripcion, id_tipo_estudio))
+            return cur.fetchone() is not None
+        except Exception as e:
+            app.logger.error(f"Error al verificar duplicado de estudio (excepto id): {str(e)}")
+            return False
+        finally:
+            cur.close()
+            con.close()
 
-            if self.estudioExiste(descripcion_estudio):
-                app.logger.error(f"Ya existe un estudio con la descripción: {descripcion_estudio}")
-                return False
+    # ============================
+    # CRUD
+    # ============================
 
-            cur.execute(sql, (descripcion_estudio,))
-            id_estudio = cur.fetchone()[0]
+    def guardarTipoEstudio(self, descripcion):
+        """
+        Inserta un tipo de estudio.
+        """
+        sql = """
+        INSERT INTO tipo_estudio(descripcion_estudio)
+        VALUES(%s) RETURNING id_tipo_estudio
+        """
+        conexion = Conexion()
+        con = conexion.getConexion()
+        cur = con.cursor()
+        try:
+            cur.execute(sql, (descripcion,))
+            id_tipo_estudio = cur.fetchone()[0]
             con.commit()
-            return id_estudio
+            return id_tipo_estudio
         except Exception as e:
             app.logger.error(f"Error al insertar tipo de estudio: {str(e)}")
             con.rollback()
@@ -93,20 +134,23 @@ class TipoEstudioDao:
             cur.close()
             con.close()
 
-    def updateTipoEstudio(self, id_tipo_estudio, descripcion_estudio):
+    def updateTipoEstudio(self, id_tipo_estudio, descripcion):
+        """
+        Actualiza la descripción de un tipo de estudio.
+        """
         sql = """
         UPDATE tipo_estudio
-        SET descripcion_estudio = %s
-        WHERE id_tipo_estudio = %s
+        SET descripcion_estudio=%s
+        WHERE id_tipo_estudio=%s
         """
         conexion = Conexion()
         con = conexion.getConexion()
         cur = con.cursor()
         try:
-            cur.execute(sql, (descripcion_estudio, id_tipo_estudio))
-            filas = cur.rowcount
+            cur.execute(sql, (descripcion, id_tipo_estudio))
+            filas_afectadas = cur.rowcount
             con.commit()
-            return filas > 0
+            return filas_afectadas > 0
         except Exception as e:
             app.logger.error(f"Error al actualizar tipo de estudio: {str(e)}")
             con.rollback()
@@ -117,17 +161,16 @@ class TipoEstudioDao:
 
     def deleteTipoEstudio(self, id_tipo_estudio):
         sql = """
-        DELETE FROM tipo_estudio
-        WHERE id_tipo_estudio = %s
+        DELETE FROM tipo_estudio WHERE id_tipo_estudio=%s
         """
         conexion = Conexion()
         con = conexion.getConexion()
         cur = con.cursor()
         try:
             cur.execute(sql, (id_tipo_estudio,))
-            filas = cur.rowcount
+            filas_afectadas = cur.rowcount
             con.commit()
-            return filas > 0
+            return filas_afectadas > 0
         except Exception as e:
             app.logger.error(f"Error al eliminar tipo de estudio: {str(e)}")
             con.rollback()

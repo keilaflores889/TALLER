@@ -1,4 +1,5 @@
 # Data Access Object - DAO
+import re
 from flask import current_app as app
 from app.conexion.Conexion import Conexion
 
@@ -20,26 +21,6 @@ class SintomaDao:
         except Exception as e:
             app.logger.error(f"Error al obtener todos los síntomas: {str(e)}")
             return []
-        finally:
-            cur.close()
-            con.close()
-
-    def sintomaExiste(self, descripcion):
-        """
-        Verifica si ya existe un síntoma con la misma descripción (ignora mayúsculas/minúsculas).
-        """
-        sql = """
-        SELECT 1 FROM sintoma WHERE UPPER(descripcion_sintoma) = UPPER(%s)
-        """
-        conexion = Conexion()
-        con = conexion.getConexion()
-        cur = con.cursor()
-        try:
-            cur.execute(sql, (descripcion,))
-            return cur.fetchone() is not None
-        except Exception as e:
-            app.logger.error(f"Error al verificar existencia del síntoma: {str(e)}")
-            return False
         finally:
             cur.close()
             con.close()
@@ -68,14 +49,70 @@ class SintomaDao:
             cur.close()
             con.close()
 
+    # ============================
+    # VALIDACIONES
+    # ============================
+
+    def validarTexto(self, texto):
+        """Permite letras (incluyendo ñ y acentuadas), espacios, comas y puntos."""
+        patron = r"^[A-Za-zÁÉÍÓÚáéíóúÑñ\s\,\.]+$"
+        return bool(re.match(patron, texto))
+
+    def validarPalabraConSentido(self, texto):
+        """Valida que el texto contenga al menos una vocal."""
+        patron = r"[aeiouáéíóúAEIOUÁÉÍÓÚ]"
+        return bool(re.search(patron, texto))
+
+    def sintomaExiste(self, descripcion):
+        """
+        Verifica si ya existe un síntoma con la misma descripción (ignora mayúsculas/minúsculas).
+        """
+        sql = """
+        SELECT 1 FROM sintoma WHERE UPPER(descripcion_sintoma) = UPPER(%s)
+        """
+        conexion = Conexion()
+        con = conexion.getConexion()
+        cur = con.cursor()
+        try:
+            cur.execute(sql, (descripcion,))
+            return cur.fetchone() is not None
+        except Exception as e:
+            app.logger.error(f"Error al verificar existencia del síntoma: {str(e)}")
+            return False
+        finally:
+            cur.close()
+            con.close()
+
+    def sintomaExisteExceptoId(self, descripcion, id_sintoma):
+        """
+        Verifica si existe otro síntoma con la misma descripción, excluyendo el id actual.
+        """
+        sql = """
+        SELECT 1 FROM sintoma 
+        WHERE UPPER(descripcion_sintoma) = UPPER(%s)
+          AND id_sintoma != %s
+        """
+        conexion = Conexion()
+        con = conexion.getConexion()
+        cur = con.cursor()
+        try:
+            cur.execute(sql, (descripcion, id_sintoma))
+            return cur.fetchone() is not None
+        except Exception as e:
+            app.logger.error(f"Error al verificar duplicado de síntoma (excepto id): {str(e)}")
+            return False
+        finally:
+            cur.close()
+            con.close()
+
+    # ============================
+    # CRUD
+    # ============================
+
     def guardarSintoma(self, descripcion):
         """
-        Inserta un síntoma si no existe duplicado.
+        Inserta un síntoma.
         """
-        if self.sintomaExiste(descripcion):
-            app.logger.warning(f"Duplicado detectado: {descripcion}")
-            return False
-
         sql = """
         INSERT INTO sintoma(descripcion_sintoma)
         VALUES(%s) RETURNING id_sintoma
@@ -98,12 +135,8 @@ class SintomaDao:
 
     def updateSintoma(self, id_sintoma, descripcion):
         """
-        Actualiza la descripción de un síntoma validando duplicados.
+        Actualiza la descripción de un síntoma.
         """
-        if self.sintomaExiste(descripcion):
-            app.logger.warning(f"Duplicado detectado al actualizar: {descripcion}")
-            return False
-
         sql = """
         UPDATE sintoma
         SET descripcion_sintoma = %s

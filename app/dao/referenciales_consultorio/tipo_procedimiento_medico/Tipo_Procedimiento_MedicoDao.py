@@ -1,4 +1,5 @@
-# Data access object - DAO para tipo_procedimiento_medico
+# Data Access Object - DAO
+import re
 from flask import current_app as app
 from app.conexion.Conexion import Conexion
 
@@ -8,7 +9,7 @@ class TipoProcedimientoDao:
         sql = """
         SELECT id_tipo_procedimiento, procedimiento, descripcion, duracion
         FROM tipo_procedimiento_medico
-        ORDER BY procedimiento ASC
+        ORDER BY id_tipo_procedimiento
         """
         conexion = Conexion()
         con = conexion.getConexion()
@@ -18,15 +19,15 @@ class TipoProcedimientoDao:
             procedimientos = cur.fetchall()
             return [
                 {
-                    'id_tipo_procedimiento': proc[0],
-                    'procedimiento': proc[1],
-                    'descripcion': proc[2],
-                    'duracion': proc[3]
+                    "id_tipo_procedimiento": p[0],
+                    "procedimiento": p[1],
+                    "descripcion": p[2],
+                    "duracion": p[3]
                 }
-                for proc in procedimientos
+                for p in procedimientos
             ]
         except Exception as e:
-            app.logger.error(f"Error al obtener todos los procedimientos: {str(e)}")
+            app.logger.error(f"Error al obtener tipos de procedimiento: {str(e)}")
             return []
         finally:
             cur.close()
@@ -36,33 +37,49 @@ class TipoProcedimientoDao:
         sql = """
         SELECT id_tipo_procedimiento, procedimiento, descripcion, duracion
         FROM tipo_procedimiento_medico
-        WHERE id_tipo_procedimiento = %s
+        WHERE id_tipo_procedimiento=%s
         """
         conexion = Conexion()
         con = conexion.getConexion()
         cur = con.cursor()
         try:
             cur.execute(sql, (id_tipo_procedimiento,))
-            procedimiento = cur.fetchone()
-            if procedimiento:
+            row = cur.fetchone()
+            if row:
                 return {
-                    "id_tipo_procedimiento": procedimiento[0],
-                    "procedimiento": procedimiento[1],
-                    "descripcion": procedimiento[2],
-                    "duracion": procedimiento[3]
+                    "id_tipo_procedimiento": row[0],
+                    "procedimiento": row[1],
+                    "descripcion": row[2],
+                    "duracion": row[3]
                 }
             return None
         except Exception as e:
-            app.logger.error(f"Error al obtener procedimiento: {str(e)}")
+            app.logger.error(f"Error al obtener tipo de procedimiento: {str(e)}")
             return None
         finally:
             cur.close()
             con.close()
 
+    # ============================
+    # VALIDACIONES
+    # ============================
+
+    def validarTexto(self, texto):
+        """Permite letras (incluyendo ñ y acentuadas), números, espacios, barra, guion, comas y puntos."""
+        patron = r"^[A-Za-z0-9ÁÉÍÓÚáéíóúÑñ\s\/\-\,\.]+$"
+        return bool(re.match(patron, texto))
+
+    def validarPalabraConSentido(self, texto):
+        """Valida que el texto contenga al menos una vocal."""
+        patron = r"[aeiouáéíóúAEIOUÁÉÍÓÚ]"
+        return bool(re.search(patron, texto))
+
     def procedimientoExiste(self, procedimiento):
+        """
+        Verifica si ya existe un tipo de procedimiento con el mismo nombre (ignora mayúsculas/minúsculas).
+        """
         sql = """
-        SELECT 1 FROM tipo_procedimiento_medico
-        WHERE UPPER(procedimiento) = UPPER(%s)
+        SELECT 1 FROM tipo_procedimiento_medico WHERE UPPER(procedimiento) = UPPER(%s)
         """
         conexion = Conexion()
         con = conexion.getConexion()
@@ -77,30 +94,50 @@ class TipoProcedimientoDao:
             cur.close()
             con.close()
 
-    def guardarTipoProcedimiento(self, procedimiento, descripcion, duracion):
+    def procedimientoExisteExceptoId(self, procedimiento, id_tipo_procedimiento):
+        """
+        Verifica si existe otro tipo de procedimiento con el mismo nombre, excluyendo el id actual.
+        """
         sql = """
-        INSERT INTO tipo_procedimiento_medico(procedimiento, descripcion, duracion)
-        VALUES (%s, %s, %s)
-        RETURNING id_tipo_procedimiento
+        SELECT 1 FROM tipo_procedimiento_medico 
+        WHERE UPPER(procedimiento) = UPPER(%s)
+          AND id_tipo_procedimiento != %s
         """
         conexion = Conexion()
         con = conexion.getConexion()
         cur = con.cursor()
         try:
-            if not procedimiento or not procedimiento.strip():
-                app.logger.error("Procedimiento vacío o nulo al intentar guardar")
-                return False
-
-            if self.procedimientoExiste(procedimiento):
-                app.logger.error(f"Ya existe un procedimiento con el nombre: {procedimiento}")
-                return False
-
-            cur.execute(sql, (procedimiento, descripcion, duracion))
-            id_procedimiento = cur.fetchone()[0]
-            con.commit()
-            return id_procedimiento
+            cur.execute(sql, (procedimiento, id_tipo_procedimiento))
+            return cur.fetchone() is not None
         except Exception as e:
-            app.logger.error(f"Error al insertar procedimiento: {str(e)}")
+            app.logger.error(f"Error al verificar duplicado de procedimiento (excepto id): {str(e)}")
+            return False
+        finally:
+            cur.close()
+            con.close()
+
+    # ============================
+    # CRUD
+    # ============================
+
+    def guardarTipoProcedimiento(self, procedimiento, descripcion, duracion):
+        """
+        Inserta un tipo de procedimiento.
+        """
+        sql = """
+        INSERT INTO tipo_procedimiento_medico(procedimiento, descripcion, duracion)
+        VALUES(%s, %s, %s) RETURNING id_tipo_procedimiento
+        """
+        conexion = Conexion()
+        con = conexion.getConexion()
+        cur = con.cursor()
+        try:
+            cur.execute(sql, (procedimiento, descripcion, duracion))
+            id_tipo_procedimiento = cur.fetchone()[0]
+            con.commit()
+            return id_tipo_procedimiento
+        except Exception as e:
+            app.logger.error(f"Error al insertar tipo de procedimiento: {str(e)}")
             con.rollback()
             return False
         finally:
@@ -108,23 +145,26 @@ class TipoProcedimientoDao:
             con.close()
 
     def updateTipoProcedimiento(self, id_tipo_procedimiento, procedimiento, descripcion, duracion):
+        """
+        Actualiza un tipo de procedimiento.
+        """
         sql = """
         UPDATE tipo_procedimiento_medico
-        SET procedimiento = %s,
-            descripcion = %s,
-            duracion = %s
-        WHERE id_tipo_procedimiento = %s
+        SET procedimiento=%s,
+            descripcion=%s,
+            duracion=%s
+        WHERE id_tipo_procedimiento=%s
         """
         conexion = Conexion()
         con = conexion.getConexion()
         cur = con.cursor()
         try:
             cur.execute(sql, (procedimiento, descripcion, duracion, id_tipo_procedimiento))
-            filas = cur.rowcount
+            filas_afectadas = cur.rowcount
             con.commit()
-            return filas > 0
+            return filas_afectadas > 0
         except Exception as e:
-            app.logger.error(f"Error al actualizar procedimiento: {str(e)}")
+            app.logger.error(f"Error al actualizar tipo de procedimiento: {str(e)}")
             con.rollback()
             return False
         finally:
@@ -133,19 +173,18 @@ class TipoProcedimientoDao:
 
     def deleteTipoProcedimiento(self, id_tipo_procedimiento):
         sql = """
-        DELETE FROM tipo_procedimiento_medico
-        WHERE id_tipo_procedimiento = %s
+        DELETE FROM tipo_procedimiento_medico WHERE id_tipo_procedimiento=%s
         """
         conexion = Conexion()
         con = conexion.getConexion()
         cur = con.cursor()
         try:
             cur.execute(sql, (id_tipo_procedimiento,))
-            filas = cur.rowcount
+            filas_afectadas = cur.rowcount
             con.commit()
-            return filas > 0
+            return filas_afectadas > 0
         except Exception as e:
-            app.logger.error(f"Error al eliminar procedimiento: {str(e)}")
+            app.logger.error(f"Error al eliminar tipo de procedimiento: {str(e)}")
             con.rollback()
             return False
         finally:
