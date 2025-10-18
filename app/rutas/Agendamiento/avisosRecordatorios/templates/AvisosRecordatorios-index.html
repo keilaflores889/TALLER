@@ -683,16 +683,16 @@ const initDatatableAvisos = () => {
       { data: 'nombre_consultorio' },
       { data: 'paciente' },
       { 
-  data: 'telefono_paciente', 
-  render: data => formatearTelefonoParaMostrar(data),
-  width: "120px",           
-  className: "text-nowrap"
-},
+        data: 'telefono_paciente', 
+        render: data => formatearTelefonoParaMostrar(data),
+        width: "120px",           
+        className: "text-nowrap"
+      },
       { data: 'medico', render: data => data || 'Sin médico' },
       { data: 'fecha_cita', render: data => formatDateForDisplay(data) },
       { 
         data: 'hora_cita',
-        render: data => formatTimeToAMPM(data)  // ✅ Mostrar en formato AM/PM
+        render: data => formatTimeToAMPM(data)
       },
       { 
         data: 'forma_envio',
@@ -709,7 +709,6 @@ const initDatatableAvisos = () => {
         data: 'mensaje',
         render: function(data, type, row) {
           if (!data || data.trim() === '') {
-            // Si está vacío, mostrar que es automático
             return `<span class="badge badge-info">Automático</span>
                     <button type="button" class="btn btn-sm btn-link p-0 ml-1" 
                             onclick="verMensajeAutomatico(${row.id_aviso})" 
@@ -717,7 +716,6 @@ const initDatatableAvisos = () => {
                       <i class="fas fa-eye"></i>
                     </button>`;
           } else {
-            // Si tiene mensaje personalizado
             const mensajeCorto = data.length > 30 ? data.substring(0, 30) + '...' : data;
             return `<span title="Click en el ojo para ver completo">${mensajeCorto}</span>
                     <button type="button" class="btn btn-sm btn-link p-0 ml-1 btn-ver-mensaje" 
@@ -753,24 +751,28 @@ const initDatatableAvisos = () => {
       {
         data: function(row) {
           let buttons = `
-            <button type="button" name="btn_editar" class="btn btn-info btn-sm" data-id_aviso="${row.id_aviso}" title="Editar">
-              <i class="fas fa-edit"></i>
-            </button>
-            <button type="button" name="btn_eliminar" class="btn btn-danger btn-sm" data-id_aviso="${row.id_aviso}" title="Eliminar">
-              <i class="fas fa-trash-alt"></i>
-            </button>`;
+            <div class="d-flex justify-content-center gap-1">
+              <button type="button" name="btn_editar" class="btn btn-info btn-sm" data-id_aviso="${row.id_aviso}" title="Editar">
+                <i class="fas fa-edit"></i>
+              </button>
+              <button type="button" name="btn_eliminar" class="btn btn-danger btn-sm" data-id_aviso="${row.id_aviso}" title="Eliminar">
+                <i class="fas fa-trash-alt"></i>
+              </button>`;
           
           if (row.forma_envio === 'WhatsApp' && 
               row.estado_envio === 'Pendiente' && 
               row.estado_confirmacion === 'Pendiente') {
             buttons += `
-            <button type="button" name="btn_enviar_individual" class="btn btn-success btn-sm" data-id_aviso="${row.id_aviso}" title="Enviar ahora">
-              <i class="fab fa-whatsapp"></i>
-            </button>`;
+              <button type="button" name="btn_enviar_individual" class="btn btn-success btn-sm" data-id_aviso="${row.id_aviso}" title="Enviar ahora">
+                <i class="fab fa-whatsapp"></i>
+              </button>`;
           }
           
+          buttons += `</div>`;
           return buttons;
-        }
+        },
+        width: "180px",
+        className: "text-center"
       }
     ]
   });

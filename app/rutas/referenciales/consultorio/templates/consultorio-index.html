@@ -153,38 +153,51 @@ const initDatatable = () => {
 // FORMATO DE TELÉFONO
 // ==========================================
 const formatearTelefonoParaMostrar = (telefono) => {
-  // Si viene de BD con 595, quitarlo para mostrar
+  // Limpiar todo excepto dígitos
   let limpio = telefono.replace(/\D/g, '');
   
+  // Si viene con +595 o 595, quitarlo
   if (limpio.startsWith('595')) {
-    limpio = limpio.substring(3); // Quitar el 595
+    limpio = limpio.substring(3);
   }
   
-  // Formatear con espacio: "098 123456"
-  if (limpio.length > 3) {
-    return limpio.substring(0, 3) + ' ' + limpio.substring(3);
+  // Asegurar que tenga el 0 al inicio
+  if (!limpio.startsWith('0')) {
+    limpio = '0' + limpio;
+  }
+  
+  // Formatear con espacio: "0982 341322"
+  if (limpio.length > 4) {
+    return limpio.substring(0, 4) + ' ' + limpio.substring(4);
   }
   return limpio;
 };
 
 const formatearTelefonoParaGuardar = (telefono) => {
-  // Limpiar espacios y caracteres no numéricos
-  let limpio = telefono.replace(/\D/g, '');
+  // Limpiar espacios y caracteres no numéricos (excepto el +)
+  let limpio = telefono.replace(/[^\d+]/g, '');
   
-  // Si ya tiene 595, devolverlo tal cual
-  if (limpio.startsWith('595')) {
+  // Si ya tiene +595, devolverlo tal cual
+  if (limpio.startsWith('+595')) {
     return limpio;
   }
   
+  // Quitar cualquier + o 595 existente para limpiar
+  limpio = limpio.replace(/^\+?595?/, '');
+  
   // Si empieza con 0, quitarlo
   if (limpio.startsWith('0')) {
-    limpio = limpio.substring(1); // Quitar el 0
+    limpio = limpio.substring(1);
   }
   
-  // Agregar 595 al inicio
-  return '595' + limpio;
+  // Limitar a 9 dígitos máximo (ej: 982341322)
+  if (limpio.length > 9) {
+    limpio = limpio.substring(0, 9);
+  }
+  
+  // Agregar +595 al inicio
+  return '+595' + limpio;
 };
-
 // ==========================================
 // CRUD
 // ==========================================
