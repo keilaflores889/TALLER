@@ -6,7 +6,7 @@ Diagnósticos
 
 {% block contenido %}
 <div class="container-fluid mt-4">
-  <h3>Registros de Diagnósticos</h3>
+  <h3></h3>
 
   <!-- Card principal -->
   <div class="card shadow-sm border-0 rounded-lg">
@@ -15,9 +15,9 @@ Diagnósticos
        <!--<button type="button" class="btn btn-light btn-sm" id="btnAgregar">
         <i class="fas fa-plus-circle mr-1"></i> Agregar
       </button>-->
-      <h5 class="mb-0 font-weight-bold">
+      <h4 class="mb-0 font-weight-bold">
         <i class="fas fa-notes-medical mr-2"></i> Diagnósticos
-      </h5>
+      </h4>
     </div>
 
     <!-- Body: Tabla de diagnósticos -->
@@ -267,11 +267,11 @@ const initDatatable = () => {
       {
         data: function(row) {
           return `
-          <button type="button" name="btn_editar" class="btn btn-info btn-sm" data-id="${row.id_diagnostico}" title="Editar">
+            <!-- <button type="button" name="btn_editar" class="btn btn-info btn-sm" data-id="${row.id_diagnostico}" title="Editar">
             <i class="fas fa-edit"></i>
-          </button>
+          </button>-->
           <button type="button" name="btn_eliminar" class="btn btn-danger btn-sm" data-id="${row.id_diagnostico}" title="Eliminar">
-            <i class="fas fa-trash-alt"></i>
+            <i class="fas fa-trash-alt"> Eliminar Registro </i>
           </button>`;
         }
       }
@@ -465,6 +465,9 @@ const eliminar = () => {
     });
   });
 };
+
+
+
 
 // --- Inicialización ---
 const addEvents = () => {

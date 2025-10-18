@@ -1,7 +1,20 @@
-from flask import Blueprint, jsonify, request, current_app as app
+from flask import Blueprint, jsonify, request, current_app as app, render_template
 from app.dao.ModuloConsultorio.RegisConsulta.ConsultasDao import ConsultasDao
+import os
+from datetime import datetime
 
 consultasapi = Blueprint('consultasapi', __name__)
+
+# Definir la carpeta de templates para este blueprint
+current_dir = os.path.dirname(os.path.abspath(__file__))
+template_folder = os.path.join(current_dir, 'templates')
+
+# Crear el blueprint con la carpeta de templates
+consultasapi = Blueprint(
+    'consultasapi',
+    __name__,
+    template_folder=template_folder
+)
 
 # ============================
 # CONSULTAS CABECERA - Obtener todas
@@ -322,7 +335,14 @@ def addDiagnostico():
             ), 201
         return jsonify(success=False, error="No se pudo guardar el diagnóstico."), 500
     except ValueError as ve:
-        return jsonify(success=False, error=str(ve)), 400
+        es_duplicado = "Ya existe" in str(ve)
+        codigo_http = 409 if es_duplicado else 400
+        app.logger.warning(f"⚠️ Validación fallida al agregar diagnóstico: {str(ve)}")
+        return jsonify(
+            success=False, 
+            error=str(ve),
+            type="duplicate" if es_duplicado else "validation"
+        ), codigo_http
     except Exception as e:
         app.logger.error(f"Error al agregar diagnóstico: {str(e)}")
         return jsonify(success=False, error="Error interno al guardar diagnóstico."), 500
@@ -346,7 +366,14 @@ def updateDiagnostico(id_diagnostico):
             ), 200
         return jsonify(success=False, error=f"No se encontró diagnóstico con ID {id_diagnostico}."), 404
     except ValueError as ve:
-        return jsonify(success=False, error=str(ve)), 400
+        es_duplicado = "Ya existe" in str(ve)
+        codigo_http = 409 if es_duplicado else 400
+        app.logger.warning(f"⚠️ Validación fallida al actualizar diagnóstico: {str(ve)}")
+        return jsonify(
+            success=False, 
+            error=str(ve),
+            type="duplicate" if es_duplicado else "validation"
+        ), codigo_http
     except Exception as e:
         app.logger.error(f"Error al actualizar diagnóstico {id_diagnostico}: {str(e)}")
         return jsonify(success=False, error="Error interno al actualizar diagnóstico."), 500
@@ -453,7 +480,14 @@ def addTratamiento():
             ), 201
         return jsonify(success=False, error="No se pudo guardar el tratamiento."), 500
     except ValueError as ve:
-        return jsonify(success=False, error=str(ve)), 400
+        es_duplicado = "Ya existe" in str(ve)
+        codigo_http = 409 if es_duplicado else 400
+        app.logger.warning(f"⚠️ Validación fallida al agregar tratamiento: {str(ve)}")
+        return jsonify(
+            success=False, 
+            error=str(ve),
+            type="duplicate" if es_duplicado else "validation"
+        ), codigo_http
     except Exception as e:
         app.logger.error(f"Error al agregar tratamiento: {str(e)}")
         return jsonify(success=False, error="Error interno al guardar tratamiento."), 500
@@ -495,3 +529,155 @@ def deleteTratamiento(id_tratamiento):
     except Exception as e:
         app.logger.error(f"Error al eliminar tratamiento {id_tratamiento}: {str(e)}")
         return jsonify(success=False, error="Error interno al eliminar tratamiento."), 500
+    
+# ============================
+# FICHA MÉDICA - Generar ficha médica completa del paciente
+# ============================
+@consultasapi.route('/ficha-medica/<int:id_paciente>', methods=['GET'])
+def generarFichaMedica(id_paciente):
+    dao = ConsultasDao()
+    try:
+        app.logger.info(f"📋 Generando ficha médica para paciente ID: {id_paciente}")
+        datos = dao.getFichaMedicaPaciente(id_paciente)
+        
+        if datos:
+            # ✅ Pasamos la fecha actual al template
+            return render_template(
+                'ficha_medica.html',
+                datos=datos,
+                now=datetime.now()
+            )
+        else:
+            app.logger.warning("⚠️ No se encontraron datos para el paciente.")
+            return jsonify({"success": False, "error": "No se encontraron datos para el paciente."}), 404
+    except Exception as e:
+        app.logger.error(f"❌ Error al generar ficha médica: {e}")
+        return jsonify({"success": False, "error": str(e)}), 500
+    
+
+# ============================
+# DIAGNÓSTICOS - Obtener diagnósticos por consulta_detalle
+# ============================
+@consultasapi.route('/Diagnostico/consulta-detalle/<int:id_consulta_detalle>', methods=['GET'])
+def obtener_diagnosticos_por_detalle(id_consulta_detalle):
+    dao = ConsultasDao()
+    try:
+        app.logger.info(f"🔍 Buscando diagnósticos para consulta_detalle ID: {id_consulta_detalle}")
+        diagnosticos = dao.getDiagnosticosByConsultaDetalle(id_consulta_detalle)
+        
+        if diagnosticos:
+            app.logger.info(f"✅ Se encontraron {len(diagnosticos)} diagnósticos")
+            return jsonify(success=True, data=diagnosticos, error=None), 200
+        else:
+            app.logger.warning(f"⚠️ No se encontraron diagnósticos para consulta_detalle {id_consulta_detalle}")
+            return jsonify(success=False, error='No se encontraron diagnósticos', data=[]), 404
+            
+    except Exception as e:
+        app.logger.error(f"❌ Error al obtener diagnósticos: {str(e)}")
+        return jsonify(success=False, error=str(e)), 500
+
+
+# ============================
+# TRATAMIENTOS - Obtener tratamientos por consulta_detalle
+# ============================
+@consultasapi.route('/Tratamiento/consulta-detalle/<int:id_consulta_detalle>', methods=['GET'])
+def obtener_tratamientos_por_detalle(id_consulta_detalle):
+    dao = ConsultasDao()
+    try:
+        app.logger.info(f"🔍 Buscando tratamientos para consulta_detalle ID: {id_consulta_detalle}")
+        tratamientos = dao.getTratamientosByConsultaDetalle(id_consulta_detalle)
+        
+        if tratamientos:
+            app.logger.info(f"✅ Se encontraron {len(tratamientos)} tratamientos")
+            return jsonify(success=True, data=tratamientos, error=None), 200
+        else:
+            app.logger.warning(f"⚠️ No se encontraron tratamientos para consulta_detalle {id_consulta_detalle}")
+            return jsonify(success=False, error='No se encontraron tratamientos', data=[]), 404
+            
+    except Exception as e:
+        app.logger.error(f"❌ Error al obtener tratamientos: {str(e)}")
+        return jsonify(success=False, error=str(e)), 500
+
+
+# ============================
+# DIAGNÓSTICOS - Actualizar diagnóstico (ACTUALIZADO)
+# ============================
+@consultasapi.route('/Diagnostico/<int:id_diagnostico>', methods=['PUT'])
+def actualizar_diagnostico(id_diagnostico):
+    data = request.get_json() or {}
+    dao = ConsultasDao()
+
+    try:
+        app.logger.info(f"📝 Actualizando diagnóstico ID: {id_diagnostico}")
+        app.logger.debug(f"Datos recibidos: {data}")
+        
+        actualizado = dao.updateDiagnostico(id_diagnostico, data)
+        
+        if actualizado:
+            app.logger.info(f"✅ Diagnóstico {id_diagnostico} actualizado correctamente")
+            return jsonify(
+                success=True, 
+                data={**data, "id_diagnostico": id_diagnostico},
+                message='Diagnóstico actualizado correctamente',
+                error=None
+            ), 200
+        else:
+            app.logger.warning(f"⚠️ No se encontró diagnóstico con ID {id_diagnostico}")
+            return jsonify(
+                success=False, 
+                error=f'No se encontró diagnóstico con ID {id_diagnostico}'
+            ), 404
+    except ValueError as ve:
+        es_duplicado = "Ya existe" in str(ve)
+        codigo_http = 409 if es_duplicado else 400
+        app.logger.warning(f"⚠️ Validación fallida al actualizar diagnóstico: {str(ve)}")
+        return jsonify(
+            success=False, 
+            error=str(ve),
+            type="duplicate" if es_duplicado else "validation"
+        ), codigo_http
+    except Exception as e:
+        app.logger.error(f"❌ Error al actualizar diagnóstico: {str(e)}")
+        return jsonify(success=False, error=str(e)), 500
+
+
+# ============================
+# TRATAMIENTOS - Actualizar tratamiento (ACTUALIZADO)
+# ============================
+@consultasapi.route('/Tratamiento/<int:id_tratamiento>', methods=['PUT'])
+def actualizar_tratamiento(id_tratamiento):
+    data = request.get_json() or {}
+    dao = ConsultasDao()
+
+    try:
+        app.logger.info(f"📝 Actualizando tratamiento ID: {id_tratamiento}")
+        app.logger.debug(f"Datos recibidos: {data}")
+        
+        actualizado = dao.updateTratamiento(id_tratamiento, data)
+        
+        if actualizado:
+            app.logger.info(f"✅ Tratamiento {id_tratamiento} actualizado correctamente")
+            return jsonify(
+                success=True, 
+                data={**data, "id_tratamiento": id_tratamiento},
+                message='Tratamiento actualizado correctamente',
+                error=None
+            ), 200
+        else:
+            app.logger.warning(f"⚠️ No se encontró tratamiento con ID {id_tratamiento}")
+            return jsonify(
+                success=False, 
+                error=f'No se encontró tratamiento con ID {id_tratamiento}'
+            ), 404
+    except ValueError as ve:
+        es_duplicado = "Ya existe" in str(ve)
+        codigo_http = 409 if es_duplicado else 400
+        app.logger.warning(f"⚠️ Validación fallida al actualizar tratamiento: {str(ve)}")
+        return jsonify(
+            success=False, 
+            error=str(ve),
+            type="duplicate" if es_duplicado else "validation"
+        ), codigo_http
+    except Exception as e:
+        app.logger.error(f"❌ Error al actualizar tratamiento: {str(e)}")
+        return jsonify(success=False, error=str(e)), 500

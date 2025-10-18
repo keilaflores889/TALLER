@@ -28,6 +28,71 @@ class ConsultasDao:
                 data["duracion_minutos"] = duracion
             except ValueError:
                 raise ValueError("La duración debe ser un número entero válido")
+            
+    def _validar_consulta_duplicada(self, data, id_consulta_cab=None):
+        """Valida que no exista una consulta duplicada en la misma fecha, hora y consultorio"""
+        try:
+            cursor = self.conn.cursor()
+            
+            if id_consulta_cab:
+                # Para UPDATE: excluir el registro actual
+                cursor.execute("""
+                    SELECT COUNT(*) 
+                    FROM consultas_cabecera 
+                    WHERE id_consultorio = %s 
+                    AND fecha_cita = %s 
+                    AND hora_cita = %s
+                    AND id_consulta_cab != %s
+                """, (
+                    data.get("id_consultorio"),
+                    data.get("fecha_cita"),
+                    data.get("hora_cita"),
+                    id_consulta_cab
+                ))
+            else:
+                # Para INSERT
+                cursor.execute("""
+                    SELECT COUNT(*) 
+                    FROM consultas_cabecera 
+                    WHERE id_consultorio = %s 
+                    AND fecha_cita = %s 
+                    AND hora_cita = %s
+                """, (
+                    data.get("id_consultorio"),
+                    data.get("fecha_cita"),
+                    data.get("hora_cita")
+                ))
+            
+            count = cursor.fetchone()[0]
+            cursor.close()
+            
+            if count > 0:
+                raise ValueError(
+                    f"Ya existe una consulta programada en el consultorio "
+                    f"'{data.get('id_consultorio')}' para la fecha {data.get('fecha_cita')} "
+                    f"a las {data.get('hora_cita')}"
+                )
+        except ValueError:
+            raise
+        except Exception as e:
+            app.logger.error(f"Error al validar consulta duplicada: {str(e)}")
+            raise ValueError("Error al validar disponibilidad de la consulta")
+
+    def getFichaMedicaPaciente(self, id_paciente):
+        try:
+            sql = """
+                SELECT *
+                FROM ficha_medica
+                WHERE id_paciente = %s
+            """
+            cursor = self.conn.cursor()
+            cursor.execute(sql, (id_paciente,))
+        except Exception as e:
+            print(f"Error al obtener ficha médica del paciente: {e}")
+            return None
+    
+    
+    
 
     # ============================
     # Validación de datos DETALLE
@@ -46,6 +111,7 @@ class ConsultasDao:
     # Validación de datos DIAGNÓSTICO
     # ============================
     def _validar_datos_diagnostico(self, data):
+    # ✅ SOLO VALIDAR CAMPOS REALMENTE OBLIGATORIOS
         campos_obligatorios = ["id_consulta_detalle", "descripcion_diagnostico"]
         
         for campo in campos_obligatorios:
@@ -124,6 +190,7 @@ class ConsultasDao:
     def addConsultaCabecera(self, data):
         try:
             self._validar_datos_cabecera(data)
+            self._validar_consulta_duplicada(data)
             cursor = self.conn.cursor()
             cursor.execute("""
                 INSERT INTO consultas_cabecera(
@@ -154,6 +221,7 @@ class ConsultasDao:
     def updateConsultaCabecera(self, id_consulta_cab, data):
         try:
             self._validar_datos_cabecera(data)
+            self._validar_consulta_duplicada(data, id_consulta_cab)
             cursor = self.conn.cursor()
             cursor.execute("""
                 UPDATE consultas_cabecera SET
@@ -368,9 +436,59 @@ class ConsultasDao:
             app.logger.error(f"Error al obtener detalles por consulta: {str(e)}")
             return []
 
+
+    def _validar_detalle_duplicado(self, data, id_consulta_detalle=None):
+        """Valida que no exista un detalle duplicado con el mismo síntoma en la misma consulta"""
+        try:
+            cursor = self.conn.cursor()
+            
+            if id_consulta_detalle:
+                # Para UPDATE
+                cursor.execute("""
+                    SELECT COUNT(*) 
+                    FROM consultas_detalle 
+                    WHERE id_consulta_cab = %s 
+                    AND id_sintoma = %s
+                    AND COALESCE(pieza_dental, '') = COALESCE(%s, '')
+                    AND id_consulta_detalle != %s
+                """, (
+                    data.get("id_consulta_cab"),
+                    data.get("id_sintoma"),
+                    data.get("pieza_dental"),
+                    id_consulta_detalle
+                ))
+            else:
+                # Para INSERT
+                cursor.execute("""
+                    SELECT COUNT(*) 
+                    FROM consultas_detalle 
+                    WHERE id_consulta_cab = %s 
+                    AND id_sintoma = %s
+                    AND COALESCE(pieza_dental, '') = COALESCE(%s, '')
+                """, (
+                    data.get("id_consulta_cab"),
+                    data.get("id_sintoma"),
+                    data.get("pieza_dental")
+                ))
+            
+            count = cursor.fetchone()[0]
+            cursor.close()
+            
+            if count > 0:
+                pieza_info = f" en la pieza dental '{data.get('pieza_dental')}'" if data.get("pieza_dental") else ""
+                raise ValueError(
+                    f"Ya existe un detalle con el mismo síntoma{pieza_info} en esta consulta"
+                )
+        except ValueError:
+            raise
+        except Exception as e:
+            app.logger.error(f"Error al validar detalle duplicado: {str(e)}")
+            raise ValueError("Error al validar duplicidad del detalle")
+
     def addConsultaDetalle(self, data):
         try:
             self._validar_datos_detalle(data)
+            self._validar_detalle_duplicado(data) 
             cursor = self.conn.cursor()
             cursor.execute("""
                 INSERT INTO consultas_detalle(
@@ -399,9 +517,11 @@ class ConsultasDao:
             app.logger.error(f"Error al insertar consulta detalle: {str(e)}")
             return None
 
+
     def updateConsultaDetalle(self, id_consulta_detalle, data):
         try:
             self._validar_datos_detalle(data)
+            self._validar_detalle_duplicado(data, id_consulta_detalle)
             cursor = self.conn.cursor()
             cursor.execute("""
                 UPDATE consultas_detalle SET
@@ -517,10 +637,79 @@ class ConsultasDao:
             app.logger.error(f"Error al obtener diagnósticos: {str(e)}")
             return []
 
+
+    def _validar_diagnostico_duplicado(self, data, id_diagnostico=None):
+        """Valida que no exista un diagnóstico duplicado exactamente igual"""
+        try:
+            cursor = self.conn.cursor()
+            
+            descripcion_nueva = data.get("descripcion_diagnostico", "").strip().lower()
+            
+            app.logger.info(f"🔍 Validando duplicado: descripcion='{descripcion_nueva}', id_consulta_detalle={data.get('id_consulta_detalle')}")
+            
+            if id_diagnostico:
+                # Para UPDATE
+                cursor.execute("""
+                    SELECT LOWER(TRIM(descripcion_diagnostico))
+                    FROM diagnosticos 
+                    WHERE id_diagnostico = %s
+                """, (id_diagnostico,))
+                
+                result = cursor.fetchone()
+                descripcion_actual = result[0] if result else None
+                
+                if descripcion_actual and descripcion_actual == descripcion_nueva:
+                    app.logger.info("✅ Descripción no cambió, permitir actualización")
+                    cursor.close()
+                    return
+                
+                cursor.execute("""
+                    SELECT COUNT(*) 
+                    FROM diagnosticos 
+                    WHERE id_consulta_detalle = %s 
+                    AND LOWER(TRIM(descripcion_diagnostico)) = %s
+                    AND id_diagnostico != %s
+                """, (
+                    data.get("id_consulta_detalle"),
+                    descripcion_nueva,
+                    id_diagnostico
+                ))
+            else:
+                # Para INSERT
+                cursor.execute("""
+                    SELECT COUNT(*) 
+                    FROM diagnosticos 
+                    WHERE id_consulta_detalle = %s 
+                    AND LOWER(TRIM(descripcion_diagnostico)) = %s
+                """, (
+                    data.get("id_consulta_detalle"),
+                    descripcion_nueva
+                ))
+            
+            count = cursor.fetchone()[0]
+            cursor.close()
+            
+            app.logger.info(f"🔍 Duplicados encontrados: {count}")
+            
+            if count > 0:
+                app.logger.warning("⚠️ DUPLICADO DETECTADO - Rechazando operación")
+                raise ValueError("Ya existe un diagnóstico con la misma descripción en este detalle de consulta")
+                
+        except ValueError:
+            raise
+        except Exception as e:
+            app.logger.error(f"Error al validar diagnóstico duplicado: {str(e)}")
+            raise ValueError("Error al validar duplicidad del diagnóstico")
+
+
+
     def addDiagnostico(self, data):
         """Agrega un nuevo diagnóstico detallado con pieza_dental de consulta_detalle si no se proporciona"""
         try:
+            # ✅ ESTAS DOS LÍNEAS DEBEN ESTAR AQUÍ
             self._validar_datos_diagnostico(data)
+            self._validar_diagnostico_duplicado(data)  # 🔥 CRÍTICO
+            
             cursor = self.conn.cursor()
             
             # Si no se proporciona pieza_dental, obtenerla de consultas_detalle
@@ -559,16 +748,44 @@ class ConsultasDao:
             self.conn.commit()
             cursor.close()
             return id_diagnostico
+        except ValueError as ve:  # 🔥 CRÍTICO - Captura ValueError
+            self.conn.rollback()
+            app.logger.warning(f"⚠️ Validación fallida: {str(ve)}")
+            raise  # Re-lanza la excepción para que el API la capture
         except Exception as e:
             self.conn.rollback()
             app.logger.error(f"Error al insertar diagnóstico: {str(e)}")
             return None
 
+
     def updateDiagnostico(self, id_diagnostico, data):
-        """Actualiza un diagnóstico específico"""
+        """Actualiza un diagnóstico específico con validación de duplicados"""
         try:
             cursor = self.conn.cursor()
             
+            # ✅ Obtener id_consulta_detalle actual
+            cursor.execute("""
+                SELECT id_consulta_detalle 
+                FROM diagnosticos 
+                WHERE id_diagnostico = %s
+            """, (id_diagnostico,))
+            
+            result = cursor.fetchone()
+            if not result:
+                cursor.close()
+                return False
+            
+            id_consulta_detalle_actual = result[0]
+            
+            # ✅ Si se intenta actualizar la descripción, validar duplicados
+            if "descripcion_diagnostico" in data:
+                if "id_consulta_detalle" not in data:
+                    data["id_consulta_detalle"] = id_consulta_detalle_actual
+                
+                # Validar duplicado (solo si la descripción cambió)
+                self._validar_diagnostico_duplicado(data, id_diagnostico)
+            
+            # ✅ Construir query de actualización
             campos_actualizar = []
             valores = []
             
@@ -589,6 +806,7 @@ class ConsultasDao:
                 valores.append(data.get("fecha_diagnostico"))
             
             if not campos_actualizar:
+                cursor.close()
                 return False
             
             valores.append(id_diagnostico)
@@ -598,11 +816,14 @@ class ConsultasDao:
             self.conn.commit()
             cursor.close()
             return True
+            
+        except ValueError:
+            raise
         except Exception as e:
             self.conn.rollback()
             app.logger.error(f"Error al actualizar diagnóstico: {str(e)}")
             return False
-
+    
     def deleteDiagnostico(self, id_diagnostico):
         """Elimina un diagnóstico específico"""
         try:
@@ -682,10 +903,73 @@ class ConsultasDao:
             app.logger.error(f"Error al obtener tratamientos: {str(e)}")
             return []
 
+
+    def _validar_tratamiento_duplicado(self, data, id_tratamiento=None):
+        """Valida que no exista un tratamiento duplicado exactamente igual"""
+        try:
+            cursor = self.conn.cursor()
+            
+            # ✅ Obtener la descripción actual si estamos actualizando
+            descripcion_nueva = data.get("descripcion_tratamiento", "").strip().lower()
+            
+            if id_tratamiento:
+                # Para UPDATE: Obtener la descripción actual del registro
+                cursor.execute("""
+                    SELECT LOWER(TRIM(descripcion_tratamiento))
+                    FROM tratamientos 
+                    WHERE id_tratamiento = %s
+                """, (id_tratamiento,))
+                
+                result = cursor.fetchone()
+                descripcion_actual = result[0] if result else None
+                
+                # Si la descripción NO cambió, no validar duplicado
+                if descripcion_actual and descripcion_actual == descripcion_nueva:
+                    cursor.close()
+                    return  # ✅ No es duplicado, es el mismo registro
+                
+                # Validar contra otros registros
+                cursor.execute("""
+                    SELECT COUNT(*) 
+                    FROM tratamientos 
+                    WHERE id_consulta_detalle = %s 
+                    AND LOWER(TRIM(descripcion_tratamiento)) = %s
+                    AND id_tratamiento != %s
+                """, (
+                    data.get("id_consulta_detalle"),
+                    descripcion_nueva,
+                    id_tratamiento
+                ))
+            else:
+                # Para INSERT
+                cursor.execute("""
+                    SELECT COUNT(*) 
+                    FROM tratamientos 
+                    WHERE id_consulta_detalle = %s 
+                    AND LOWER(TRIM(descripcion_tratamiento)) = %s
+                """, (
+                    data.get("id_consulta_detalle"),
+                    descripcion_nueva
+                ))
+            
+            count = cursor.fetchone()[0]
+            cursor.close()
+            
+            if count > 0:
+                raise ValueError("Ya existe un tratamiento con la misma descripción en este detalle de consulta")
+        except ValueError:
+            raise
+        except Exception as e:
+            app.logger.error(f"Error al validar tratamiento duplicado: {str(e)}")
+            raise ValueError("Error al validar duplicidad del tratamiento")
+
+
+
     def addTratamiento(self, data):
         """Agrega un nuevo tratamiento con la fecha de la consulta"""
         try:
             self._validar_datos_tratamiento(data)
+            self._validar_tratamiento_duplicado(data)
             cursor = self.conn.cursor()
             
             # Obtener la fecha_cita de la consulta
@@ -732,10 +1016,33 @@ class ConsultasDao:
             return None
 
     def updateTratamiento(self, id_tratamiento, data):
-        """Actualiza un tratamiento específico"""
+        """Actualiza un tratamiento específico con validación de duplicados"""
         try:
             cursor = self.conn.cursor()
             
+            # ✅ Obtener id_consulta_detalle actual
+            cursor.execute("""
+                SELECT id_consulta_detalle 
+                FROM tratamientos 
+                WHERE id_tratamiento = %s
+            """, (id_tratamiento,))
+            
+            result = cursor.fetchone()
+            if not result:
+                cursor.close()
+                return False
+            
+            id_consulta_detalle_actual = result[0]
+            
+            # ✅ Si se intenta actualizar la descripción, validar duplicados
+            if "descripcion_tratamiento" in data:
+                if "id_consulta_detalle" not in data:
+                    data["id_consulta_detalle"] = id_consulta_detalle_actual
+                
+                # Validar duplicado (solo si la descripción cambió)
+                self._validar_tratamiento_duplicado(data, id_tratamiento)
+            
+            # ✅ Construir query de actualización
             campos_actualizar = []
             valores = []
             
@@ -756,6 +1063,7 @@ class ConsultasDao:
                 valores.append(data.get("estado"))
             
             if not campos_actualizar:
+                cursor.close()
                 return False
             
             valores.append(id_tratamiento)
@@ -765,11 +1073,14 @@ class ConsultasDao:
             self.conn.commit()
             cursor.close()
             return True
+            
+        except ValueError:
+            raise
         except Exception as e:
             self.conn.rollback()
             app.logger.error(f"Error al actualizar tratamiento: {str(e)}")
             return False
-
+    
     def deleteTratamiento(self, id_tratamiento):
         """Elimina un tratamiento específico"""
         try:
@@ -782,3 +1093,172 @@ class ConsultasDao:
             self.conn.rollback()
             app.logger.error(f"Error al eliminar tratamiento: {str(e)}")
             return False
+
+    def getFichaMedicaPaciente(self, id_paciente):
+        """Obtiene toda la información para generar la ficha médica del paciente"""
+        try:
+            cursor = self.conn.cursor()
+            
+            # Log inicial
+            app.logger.info(f"Consultando ficha médica para paciente ID: {id_paciente}")
+            
+            # Obtener datos del paciente con sus consultas, diagnósticos y tratamientos
+            cursor.execute("""
+                SELECT 
+                    -- Datos del paciente
+                    p.id_paciente,
+                    p.nombre || ' ' || p.apellido AS nombre_completo,
+                    p.cedula_entidad,
+                    TO_CHAR(p.fecha_nacimiento, 'DD/MM/YYYY') AS fecha_nacimiento,
+                    EXTRACT(YEAR FROM AGE(CURRENT_DATE, p.fecha_nacimiento)) AS edad,
+                    p.telefono,
+                    p.direccion,
+                    p.correo,
+                    c.descripcion AS ciudad,
+                    
+                    -- Datos de la consulta
+                    cc.id_consulta_cab,
+                    TO_CHAR(cc.fecha_cita, 'DD/MM/YYYY') AS fecha_consulta,
+                    cc.hora_cita,
+                    cc.estado AS estado_consulta,
+                    m.nombre || ' ' || m.apellido AS nombre_medico,
+                    con.nombre_consultorio,
+                    
+                    -- Datos del detalle
+                    cd.id_consulta_detalle,
+                    s.descripcion_sintoma,
+                    cd.pieza_dental,
+                    cd.diagnostico,
+                    cd.tratamiento,
+                    cd.procedimiento,
+                    td.tipo_diagnostico,
+                    tp.procedimiento AS tipo_procedimiento,
+                    
+                    -- Diagnósticos adicionales
+                    d.id_diagnostico,
+                    d.descripcion_diagnostico,
+                    TO_CHAR(d.fecha_diagnostico, 'DD/MM/YYYY') AS fecha_diagnostico,
+                    
+                    -- Tratamientos adicionales
+                    t.id_tratamiento,
+                    t.descripcion_tratamiento,
+                    TO_CHAR(t.fecha_tratamiento, 'DD/MM/YYYY') AS fecha_tratamiento,
+                    t.estado AS estado_tratamiento
+                    
+                FROM paciente p
+                LEFT JOIN ciudad c ON p.id_ciudad = c.id_ciudad
+                LEFT JOIN consultas_cabecera cc ON p.id_paciente = cc.id_paciente
+                LEFT JOIN medico m ON cc.id_medico = m.id_medico
+                LEFT JOIN consultorio con ON cc.id_consultorio = con.codigo
+                LEFT JOIN consultas_detalle cd ON cc.id_consulta_cab = cd.id_consulta_cab
+                LEFT JOIN sintoma s ON cd.id_sintoma = s.id_sintoma
+                LEFT JOIN tipo_diagnostico td ON cd.id_tipo_diagnostico = td.id_tipo_diagnostico
+                LEFT JOIN tipo_procedimiento_medico tp ON cd.id_tipo_procedimiento = tp.id_tipo_procedimiento
+                LEFT JOIN diagnosticos d ON cd.id_consulta_detalle = d.id_consulta_detalle
+                LEFT JOIN tratamientos t ON cd.id_consulta_detalle = t.id_consulta_detalle
+                
+                WHERE p.id_paciente = %s
+                ORDER BY cc.fecha_cita DESC, cc.hora_cita DESC
+            """, (id_paciente,))
+            
+            rows = cursor.fetchall()
+            
+            app.logger.info(f"Filas recuperadas: {len(rows)}")
+            
+            if not rows or rows[0][0] is None:
+                cursor.close()
+                app.logger.warning(f"No se encontró paciente con ID {id_paciente}")
+                return None
+            
+            # Estructurar los datos
+            datos_paciente = {
+                'id_paciente': rows[0][0],
+                'nombre_completo': rows[0][1],
+                'cedula': rows[0][2],
+                'fecha_nacimiento': rows[0][3],
+                'edad': rows[0][4],
+                'telefono': rows[0][5],
+                'direccion': rows[0][6],
+                'correo': rows[0][7],
+                'ciudad': rows[0][8],
+                'consultas': []
+            }
+            
+            app.logger.info(f"Paciente encontrado: {datos_paciente['nombre_completo']}")
+            
+            # Agrupar consultas
+            consultas_dict = {}
+            for row in rows:
+                id_consulta = row[9]
+                if id_consulta and id_consulta not in consultas_dict:
+                    consultas_dict[id_consulta] = {
+                        'id_consulta_cab': id_consulta,
+                        'fecha_consulta': row[10],
+                        'hora_cita': row[11],
+                        'estado': row[12],
+                        'medico': row[13],
+                        'consultorio': row[14],
+                        'detalles': []
+                    }
+                
+                # Agregar detalles
+                id_detalle = row[15]
+                if id_detalle and id_consulta:
+                    detalle_existente = next(
+                        (d for d in consultas_dict[id_consulta]['detalles'] 
+                        if d.get('id_consulta_detalle') == id_detalle),
+                        None
+                    )
+                    
+                    if not detalle_existente:
+                        detalle = {
+                            'id_consulta_detalle': id_detalle,
+                            'sintoma': row[16],
+                            'pieza_dental': row[17],
+                            'diagnostico': row[18],
+                            'tratamiento': row[19],
+                            'procedimiento': row[20],
+                            'tipo_diagnostico': row[21],
+                            'tipo_procedimiento': row[22],
+                            'diagnosticos_adicionales': [],
+                            'tratamientos_adicionales': []
+                        }
+                        consultas_dict[id_consulta]['detalles'].append(detalle)
+                    else:
+                        detalle = detalle_existente
+                    
+                    # Agregar diagnósticos adicionales
+                    id_diagnostico = row[23]
+                    if id_diagnostico:
+                        diag_adicional = {
+                            'id_diagnostico': id_diagnostico,
+                            'descripcion': row[24],
+                            'fecha': row[25]
+                        }
+                        if diag_adicional not in detalle['diagnosticos_adicionales']:
+                            detalle['diagnosticos_adicionales'].append(diag_adicional)
+                    
+                    # Agregar tratamientos adicionales
+                    id_tratamiento = row[26]
+                    if id_tratamiento:
+                        trat_adicional = {
+                            'id_tratamiento': id_tratamiento,
+                            'descripcion': row[27],
+                            'fecha': row[28],
+                            'estado': row[29]
+                        }
+                        if trat_adicional not in detalle['tratamientos_adicionales']:
+                            detalle['tratamientos_adicionales'].append(trat_adicional)
+            
+            datos_paciente['consultas'] = list(consultas_dict.values())
+            
+            app.logger.info(f"Total de consultas encontradas: {len(datos_paciente['consultas'])}")
+            
+            cursor.close()
+            return datos_paciente
+            
+        except Exception as e:
+            app.logger.error(f"Error al obtener ficha médica del paciente: {str(e)}")
+            import traceback
+            app.logger.error(f"Traceback completo: {traceback.format_exc()}")
+            return None

@@ -101,6 +101,7 @@ app.register_blueprint(consultamod, url_prefix=f'{modulo0}/consultorios')
 app.register_blueprint(regisdiagnosticomod, url_prefix=f'{modulo0}/Diagnosticos')
 app.register_blueprint(registratamientomod, url_prefix=f'{modulo0}/tratamiento')
 
+
 # registrar agendamientos
 modulo0 = '/agendamientos'
 app.register_blueprint(registrocmod, url_prefix=f'{modulo0}/registcita')  # cita

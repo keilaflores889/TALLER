@@ -6,17 +6,17 @@ Tratamientos
 
 {% block contenido %}
 <div class="container-fluid mt-4">
-<h3>Registros de Tratamientos</h3>
+<h3></h3>
   <!-- Card principal -->
   <div class="card shadow-sm border-0 rounded-lg">
     <!-- Header: Botón Agregar y Título -->
     <div class="card-header bg-info text-white d-flex justify-content-between align-items-center">
-      <button type="button" class="btn btn-light btn-sm" id="btnAgregar">
+      <!--<button type="button" class="btn btn-light btn-sm" id="btnAgregar">
         <i class="fas fa-plus-circle mr-1"></i> Agregar
-      </button>
-      <h5 class="mb-0 font-weight-bold">
+      </button>-->
+      <h4 class="mb-0 font-weight-bold">
         <i class="fas fa-tooth mr-2"></i> Tratamientos
-      </h5>
+      </h4>
     </div>
 
     <!-- Body: Tabla de tratamientos -->
@@ -25,7 +25,7 @@ Tratamientos
         <table class="table table-hover table-bordered align-middle text-center" id="tbl">
           <thead class="bg-info text-white">
             <tr>
-              <th>ID Consulta</th>
+              
               <th>Médico</th>
               <th>Paciente</th>
               <th>Descripción</th>
@@ -229,7 +229,7 @@ const initDatatable = () => {
     language: { url: "{{ url_for('static', filename='vendor/datatables/es-ES.json') }}" },
     ajax: '/api/v1/Tratamiento',
     columns: [
-      { data: 'id_consulta_detalle' },
+      
       { data: 'medico_nombre' },
       { data: 'paciente_nombre' },
       { 
