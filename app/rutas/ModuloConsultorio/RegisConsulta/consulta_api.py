@@ -319,10 +319,19 @@ def addDiagnostico():
     data = request.get_json() or {}
     dao = ConsultasDao()
 
+    app.logger.info(f"📝 Datos recibidos en API: {data}")
+
     campos_requeridos = ['id_consulta_detalle', 'descripcion_diagnostico']
     faltantes = [c for c in campos_requeridos if not data.get(c)]
     if faltantes:
         return jsonify(success=False, error=f"Faltan campos: {', '.join(faltantes)}"), 400
+
+    # ✅ VALIDAR id_tipo_diagnostico
+    if 'id_tipo_diagnostico' not in data or not data.get('id_tipo_diagnostico'):
+        return jsonify(
+            success=False, 
+            error="El campo tipo diagnóstico es obligatorio."
+        ), 400
 
     try:
         diagnostico_id = dao.addDiagnostico(data)
@@ -337,7 +346,7 @@ def addDiagnostico():
     except ValueError as ve:
         es_duplicado = "Ya existe" in str(ve)
         codigo_http = 409 if es_duplicado else 400
-        app.logger.warning(f"⚠️ Validación fallida al agregar diagnóstico: {str(ve)}")
+        app.logger.warning(f"⚠️ Validación fallida: {str(ve)}")
         return jsonify(
             success=False, 
             error=str(ve),
@@ -681,3 +690,5 @@ def actualizar_tratamiento(id_tratamiento):
     except Exception as e:
         app.logger.error(f"❌ Error al actualizar tratamiento: {str(e)}")
         return jsonify(success=False, error=str(e)), 500
+    
+    

@@ -178,6 +178,42 @@ def updateTratamiento(tratamiento_id):
         app.logger.error(f"Error al actualizar tratamiento con ID {tratamiento_id}: {str(e)}")
         return jsonify(success=False,
                        error="Ocurrió un error interno al actualizar el tratamiento. Consulte con el administrador."), 500
+        
+        
+@tratamientoapi.route('/Tratamiento/<int:tratamiento_id>/parcial', methods=['PUT'])
+def updateTratamientoParcial(tratamiento_id):
+    """Actualiza solo duración, costo y estado del tratamiento"""
+    data = request.get_json() or {}
+    tratamientodao = TratamientoDao()
+
+    campos_editables = ['duracion_estimada', 'costo_estimado', 'estado']
+    tiene_campos = any(campo in data for campo in campos_editables)
+    
+    if not tiene_campos:
+        return jsonify(success=False,
+                       error="Debe proporcionar al menos uno de los campos: duracion_estimada, costo_estimado o estado"), 400
+
+    if 'estado' in data and data['estado'] not in ['pendiente', 'en_proceso', 'completado', 'cancelado']:
+        return jsonify(success=False,
+                       error="Estado inválido. Valores permitidos: pendiente, en_proceso, completado, cancelado"), 400
+
+    try:
+        actualizado = tratamientodao.updateTratamientoParcial(tratamiento_id, data)
+        if actualizado:
+            app.logger.info(f"Tratamiento con ID {tratamiento_id} actualizado parcialmente.")
+            return jsonify(success=True,
+                           data={**data, 'id_tratamiento': tratamiento_id},
+                           message="Tratamiento actualizado correctamente",
+                           error=None), 200
+        else:
+            return jsonify(success=False,
+                           error=f"No se encontró el tratamiento con el ID {tratamiento_id} o no se pudo actualizar."), 404
+
+    except Exception as e:
+        app.logger.error(f"Error al actualizar tratamiento parcial con ID {tratamiento_id}: {str(e)}")
+        return jsonify(success=False,
+                       error="Ocurrió un error interno al actualizar el tratamiento. Consulte con el administrador."), 500
+
 
 # ============================
 # TRATAMIENTOS - Eliminar

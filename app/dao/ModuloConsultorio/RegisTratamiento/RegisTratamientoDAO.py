@@ -252,6 +252,36 @@ class TratamientoDao:
             cur.close()
             con.close()
 
+    def updateTratamientoParcial(self, id_tratamiento, tratamiento):
+        """Actualiza solo costo, duración y estado del tratamiento"""
+        sql = """
+        UPDATE tratamientos SET
+            duracion_estimada = %s,
+            costo_estimado = %s,
+            estado = %s
+        WHERE id_tratamiento = %s;
+        """
+        conexion = Conexion()
+        con = conexion.getConexion()
+        cur = con.cursor()
+        try:
+            cur.execute(sql, (
+                tratamiento.get('duracion_estimada'),
+                tratamiento.get('costo_estimado'),
+                tratamiento.get('estado', 'pendiente'),
+                id_tratamiento
+            ))
+            con.commit()
+            return True
+        except Exception as e:
+            con.rollback()
+            app.logger.error(f"Error al actualizar tratamiento parcial {id_tratamiento}: {e}")
+            return False
+        finally:
+            cur.close()
+            con.close()
+
+
     # Eliminar tratamiento
     def deleteTratamiento(self, id_tratamiento):
         sql = "DELETE FROM tratamientos WHERE id_tratamiento = %s;"

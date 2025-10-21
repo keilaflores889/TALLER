@@ -441,12 +441,16 @@ const eliminar = () => {
     const fila = $(this).closest('tr');
 
     Swal.fire({
-      title: "¿Deseas eliminar este diagnóstico?",
+      title: '¿Eliminar diagnóstico?',
+      icon: 'warning',
       showCancelButton: true,
-      confirmButtonText: "Si",
-      cancelButtonText: "No"
-    }).then(result => {
-      if (result.isConfirmed) {
+      confirmButtonText: 'Sí, eliminar',
+      cancelButtonText: 'Cancelar',
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#6c757d',
+      reverseButtons: true
+    }).then(res => {
+      if (res.isConfirmed) {
         fetch(`/api/v1/Diagnostico/${idDiagnostico}`, {
           method: 'DELETE',
           headers: { 'Content-Type': 'application/json', 'X-CSRFToken': CSRFToken }
@@ -455,18 +459,16 @@ const eliminar = () => {
         .then(data => {
           if (data.success) {
             $('#tbl').DataTable().row(fila).remove().draw();
-            Swal.fire("Eliminado", "", "success");
+            Swal.fire('Eliminado', 'Diagnóstico eliminado correctamente', 'success');
           } else {
-            Swal.fire("Error", data.error, "error");
+            Swal.fire('Error', data.error, 'error');
           }
         })
-        .catch(err => Swal.fire("Error", "No se pudo eliminar", "error"));
+        .catch(err => Swal.fire('Error', 'No se pudo eliminar el diagnóstico', 'error'));
       }
     });
   });
 };
-
-
 
 
 // --- Inicialización ---

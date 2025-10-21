@@ -107,17 +107,7 @@ class ConsultasDao:
             if valor is None or (isinstance(valor, str) and valor.strip() == ""):
                 raise ValueError(f"El campo '{campo}' es obligatorio y no puede estar vacío")
 
-    # ============================
-    # Validación de datos DIAGNÓSTICO
-    # ============================
-    def _validar_datos_diagnostico(self, data):
-    # ✅ SOLO VALIDAR CAMPOS REALMENTE OBLIGATORIOS
-        campos_obligatorios = ["id_consulta_detalle", "descripcion_diagnostico"]
-        
-        for campo in campos_obligatorios:
-            valor = data.get(campo)
-            if valor is None or (isinstance(valor, str) and valor.strip() == ""):
-                raise ValueError(f"El campo '{campo}' es obligatorio y no puede estar vacío")
+    
 
     # ============================
     # CONSULTAS CABECERA
@@ -607,6 +597,30 @@ class ConsultasDao:
             app.logger.error(f"Error al eliminar consulta detalle: {str(e)}")
             return False
 
+
+
+    # ============================
+    # Validación de datos DIAGNÓSTICO
+    # ============================
+    def _validar_datos_diagnostico(self, data):
+        """Validar solo campos realmente obligatorios"""
+        campos_obligatorios = ["id_consulta_detalle", "descripcion_diagnostico"]
+        
+        for campo in campos_obligatorios:
+            valor = data.get(campo)
+            if valor is None or (isinstance(valor, str) and valor.strip() == ""):
+                raise ValueError(f"El campo '{campo}' es obligatorio y no puede estar vacío")
+        
+        # ✅ VALIDAR id_tipo_diagnostico solo si viene en data
+        if "id_tipo_diagnostico" in data:
+            tipo_diag = data.get("id_tipo_diagnostico")
+            if tipo_diag is not None and tipo_diag != "":
+                try:
+                    data["id_tipo_diagnostico"] = int(tipo_diag)
+                except (ValueError, TypeError):
+                    raise ValueError("El id_tipo_diagnostico debe ser un número entero válido")
+
+
     # ============================
     # DIAGNÓSTICOS
     # ============================
@@ -702,13 +716,12 @@ class ConsultasDao:
             raise ValueError("Error al validar duplicidad del diagnóstico")
 
 
-
     def addDiagnostico(self, data):
         """Agrega un nuevo diagnóstico detallado con pieza_dental de consulta_detalle si no se proporciona"""
         try:
-            # ✅ ESTAS DOS LÍNEAS DEBEN ESTAR AQUÍ
+            # ✅ VALIDAR DATOS
             self._validar_datos_diagnostico(data)
-            self._validar_diagnostico_duplicado(data)  # 🔥 CRÍTICO
+            self._validar_diagnostico_duplicado(data)
             
             cursor = self.conn.cursor()
             
@@ -722,6 +735,9 @@ class ConsultasDao:
                 """, (data.get("id_consulta_detalle"),))
                 result = cursor.fetchone()
                 pieza_dental = result[0] if result else None
+            
+            # ✅ LOG PARA DEBUG
+            app.logger.info(f"🔍 Insertando diagnóstico con id_tipo_diagnostico: {data.get('id_tipo_diagnostico')}")
             
             cursor.execute("""
                 INSERT INTO diagnosticos(
@@ -739,7 +755,7 @@ class ConsultasDao:
                 data.get("id_consulta_detalle"),
                 data.get("id_medico"),
                 data.get("id_paciente"),
-                data.get("id_tipo_diagnostico"),
+                data.get("id_tipo_diagnostico"),  # ✅ Asegurar que se envíe
                 data.get("descripcion_diagnostico"),
                 data.get("fecha_diagnostico"),
                 pieza_dental
@@ -748,10 +764,10 @@ class ConsultasDao:
             self.conn.commit()
             cursor.close()
             return id_diagnostico
-        except ValueError as ve:  # 🔥 CRÍTICO - Captura ValueError
+        except ValueError as ve:
             self.conn.rollback()
             app.logger.warning(f"⚠️ Validación fallida: {str(ve)}")
-            raise  # Re-lanza la excepción para que el API la capture
+            raise
         except Exception as e:
             self.conn.rollback()
             app.logger.error(f"Error al insertar diagnóstico: {str(e)}")
@@ -1262,3 +1278,7 @@ class ConsultasDao:
             import traceback
             app.logger.error(f"Traceback completo: {traceback.format_exc()}")
             return None
+        
+    
+    
+    

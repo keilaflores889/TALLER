@@ -296,7 +296,7 @@ Consultas Médicas
         <div class="col-md-6">
           <div class="form-group">
             <label>
-              <i class="fas fa-tooth label-icon"></i>Pieza Dental:
+              <i class="fas fa-tooth label-icon"></i>Pieza Dental: <span style="color:red">*</span>
             </label>
             <input type="text" id="pieza_dental" class="form-control" placeholder="Ej: 18, 21, 4.6">
           </div>
@@ -317,7 +317,7 @@ Consultas Médicas
         <div class="col-md-12">
           <div class="form-group">
             <label>
-              <i class="fas fa-clipboard-list label-icon"></i>Tipo de Diagnóstico:
+              <i class="fas fa-clipboard-list label-icon"></i>Tipo de Diagnóstico: <span style="color:red">*</span>
             </label>
             <input type="hidden" id="id_tipo_diagnostico">
             <input type="text" id="txtTipoDiagnostico" class="form-control" placeholder="Click para seleccionar Tipo de Diagnóstico" readonly style="cursor: pointer;">
@@ -340,7 +340,7 @@ Consultas Médicas
         <div class="col-md-12">
           <div class="form-group">
             <label>
-              <i class="fas fa-procedures label-icon"></i>Procedimiento:
+              <i class="fas fa-procedures label-icon"></i>Procedimiento: <span style="color:red">*</span>
             </label>
             <textarea id="procedimiento" class="form-control" rows="2" placeholder="Procedimiento realizado..."></textarea>
           </div>
@@ -350,7 +350,7 @@ Consultas Médicas
         <div class="col-md-12">
           <div class="form-group">
             <label>
-              <i class="fas fa-tasks label-icon"></i>Tipo de Procedimiento:
+              <i class="fas fa-tasks label-icon"></i>Tipo de Procedimiento: <span style="color:red">*</span>
             </label>
             <input type="hidden" id="id_tipo_procedimiento">
             <input type="text" id="txtTipoProcedimiento" class="form-control" placeholder="Click para seleccionar Tipo de Procedimiento" readonly style="cursor: pointer;">
@@ -1305,14 +1305,13 @@ function cargarDetallesConsulta(idConsulta) {
   fetch(`/api/v1/consultas/${idConsulta}/detalles`)
     .then(r => r.json())
     .then(d => {
-      console.log('Datos recibidos del API:', d); // 🔍 DEBUG
+      console.log('Datos recibidos del API:', d);
       
       const tbody = $('#tblDetalles tbody');
       tbody.empty();
 
       if (d.success && d.data.length > 0) {
         d.data.forEach(det => {
-          // 🔍 Verificar qué campos vienen
           console.log('Detalle individual:', det);
           
           tbody.append(`
@@ -1324,27 +1323,29 @@ function cargarDetallesConsulta(idConsulta) {
               <td>${det.tratamiento || '-'}</td>
               <td>${det.procedimiento || '-'}</td>
               <td>${det.procedimiento_medico || det.tipo_procedimiento || det.descripcion_tipo_procedimiento || '-'}</td>
-              <td>
-                <button class="btn btn-info btn-sm" name="btn_editar_detalle" 
-                  data-id="${det.id_consulta_detalle}"
-                  data-id_sintoma="${det.id_sintoma || ''}"
-                  data-descripcion_sintoma="${det.descripcion_sintoma || det.sintoma || ''}"
-                  data-pieza_dental="${det.pieza_dental || ''}"
-                  data-diagnostico="${det.diagnostico || ''}"
-                  data-tratamiento="${det.tratamiento || ''}"
-                  data-procedimiento="${det.procedimiento || ''}"
-                  data-id_tipo_diagnostico="${det.id_tipo_diagnostico || ''}"
-                  data-descripcion_tipo_diagnostico="${det.tipo_diagnostico || det.descripcion_tipo_diagnostico || ''}"
-                  data-id_tipo_procedimiento="${det.id_tipo_procedimiento || ''}"
-                  data-descripcion_tipo_procedimiento="${det.procedimiento_medico || det.tipo_procedimiento || det.descripcion_tipo_procedimiento || ''}"
-                  title="Editar">
-                  <i class="fas fa-edit"></i>
-                </button>
-                <button class="btn btn-danger btn-sm" name="btn_eliminar_detalle" 
-                  data-id="${det.id_consulta_detalle}"
-                  title="Eliminar">
-                  <i class="fas fa-trash-alt"></i>
-                </button>
+              <td class="text-center align-middle">
+                <div class="btn-group" role="group">
+                  <button class="btn btn-info btn-sm" name="btn_editar_detalle" 
+                    data-id="${det.id_consulta_detalle}"
+                    data-id_sintoma="${det.id_sintoma || ''}"
+                    data-descripcion_sintoma="${det.descripcion_sintoma || det.sintoma || ''}"
+                    data-pieza_dental="${det.pieza_dental || ''}"
+                    data-diagnostico="${det.diagnostico || ''}"
+                    data-tratamiento="${det.tratamiento || ''}"
+                    data-procedimiento="${det.procedimiento || ''}"
+                    data-id_tipo_diagnostico="${det.id_tipo_diagnostico || ''}"
+                    data-descripcion_tipo_diagnostico="${det.tipo_diagnostico || det.descripcion_tipo_diagnostico || ''}"
+                    data-id_tipo_procedimiento="${det.id_tipo_procedimiento || ''}"
+                    data-descripcion_tipo_procedimiento="${det.procedimiento_medico || det.tipo_procedimiento || det.descripcion_tipo_procedimiento || ''}"
+                    title="Editar"> 
+                    <i class="fas fa-edit"></i>
+                  </button>
+                  <button class="btn btn-danger btn-sm" name="btn_eliminar_detalle" 
+                    data-id="${det.id_consulta_detalle}"
+                    title="Eliminar">
+                    <i class="fas fa-trash-alt"></i>
+                  </button>
+                </div>
               </td>
             </tr>
           `);
@@ -1366,7 +1367,6 @@ function cargarDetallesConsulta(idConsulta) {
       `);
     });
 }
-
 // --- Editar Detalle ---
 $('#tblDetalles').on('click', 'button[name="btn_editar_detalle"]', function() {
   const btn = $(this);
@@ -1585,9 +1585,7 @@ $('#tblDetalles').on('click', 'button[name="btn_eliminar_detalle"]', function() 
   });
 });
 
-// ========================================
-// GESTIONAR DIAGNÓSTICOS (CORREGIDO)
-// ========================================
+
 // ========================================
 // GESTIONAR DIAGNÓSTICOS (CORREGIDO)
 // ========================================
@@ -1609,9 +1607,8 @@ $('#btnGestionarDiagnosticos').on('click', function() {
           $('#diag_medico_nombre').text(detalle.nombre_medico);
           $('#diag_medico_info').text(`Consultorio: ${detalle.nombre_consultorio || 'N/A'}`);
           
-          $('#diag_consulta_fecha').text(`${formatDateForDisplay(detalle.fecha_cita)} - ${detalle.hora_cita}`);
+          $('#diag_consulta_fecha').text(`${formatDateForDisplay(detalle.fecha_cita)} - ${formatTimeToAMPM(detalle.hora_cita)}`);
           
-          // Mostrar más información incluyendo pieza dental
           let infoExtra = `Síntoma: ${detalle.descripcion_sintoma}`;
           if (detalle.pieza_dental) {
             infoExtra += ` | Pieza Dental: ${detalle.pieza_dental}`;
@@ -1620,13 +1617,25 @@ $('#btnGestionarDiagnosticos').on('click', function() {
           
           $('#diagnostico_principal').val(detalle.diagnostico || '');
           
-          // Guardar el id_tipo_diagnostico si existe
+          // ✅ ASEGURAR QUE SE CARGUE CORRECTAMENTE
           if (detalle.id_tipo_diagnostico) {
             $('#id_tipo_diagnostico_principal').val(detalle.id_tipo_diagnostico);
-            $('#txtTipoDiagnosticoPrincipal').val(detalle.tipo_diagnostico || detalle.descripcion_tipo_diagnostico || '');
+            
+            // Obtener el nombre del tipo de diagnóstico
+            const descripcionTipo = detalle.tipo_diagnostico || 
+                                   detalle.descripcion_tipo_diagnostico || 
+                                   '';
+            $('#txtTipoDiagnosticoPrincipal').val(descripcionTipo);
+            
+            // ✅ LOG PARA VERIFICAR
+            console.log('✅ Tipo diagnóstico cargado:', {
+              id: detalle.id_tipo_diagnostico,
+              descripcion: descripcionTipo
+            });
           } else {
             $('#id_tipo_diagnostico_principal').val('');
             $('#txtTipoDiagnosticoPrincipal').val('');
+            console.warn('⚠️ No hay tipo de diagnóstico en el detalle');
           }
           
           $('#modalGestionarDiagnosticos').modal('show');
@@ -1750,16 +1759,45 @@ $('#tblDiagnosticos').on('click', 'button[name="btn_eliminar_diagnostico"]', fun
   });
 });
 
-// --- Guardar diagnóstico principal ---
+
 // --- Guardar diagnóstico principal ---
 $('#btnGuardarDiagnosticoPrincipal').on('click', function() {
+  if (isSubmittingDiagnostico) {
+    console.warn('⚠️ Ya hay una operación en proceso...');
+    return;
+  }
+
   const diagnostico = $('#diagnostico_principal').val();
   const idTipoDiagnostico = $('#id_tipo_diagnostico_principal').val();
+  
+  // ✅ LOG PARA VER QUÉ VALOR TIENE
+  console.log('🔍 id_tipo_diagnostico_principal:', idTipoDiagnostico);
+  console.log('🔍 Tipo de dato:', typeof idTipoDiagnostico);
   
   if (!diagnostico.trim()) {
     Swal.fire('Advertencia', 'Debe ingresar un diagnóstico', 'warning');
     return;
   }
+  
+  if (!idTipoDiagnostico || idTipoDiagnostico === '' || idTipoDiagnostico === 'null') {
+    Swal.fire({
+      icon: 'warning',
+      title: 'Campo requerido',
+      text: 'Debe seleccionar un tipo de diagnóstico',
+      confirmButtonText: 'Entendido'
+    });
+    return;
+  }
+  
+  if (!consultaDetalleActualId || !idMedicoActual || !idPacienteActual) {
+    Swal.fire('Error', 'Faltan datos necesarios para guardar el diagnóstico', 'error');
+    return;
+  }
+
+  isSubmittingDiagnostico = true;
+  const $btn = $('#btnGuardarDiagnosticoPrincipal');
+  const btnOriginalText = $btn.html();
+  $btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Guardando...');
   
   const fechaConsulta = $('#diag_consulta_fecha').text().split(' - ')[0];
   const partes = fechaConsulta.split('/');
@@ -1768,63 +1806,105 @@ $('#btnGuardarDiagnosticoPrincipal').on('click', function() {
   fetch(`/api/v1/consultas-detalle/${consultaDetalleActualId}`)
     .then(r => r.json())
     .then(d => {
-      if (d.success) {
-        const detalle = d.data;
-        
-        // 1. Actualizar consultas_detalle con el diagnóstico
-        return fetch(`/api/v1/consultas-detalle/${consultaDetalleActualId}`, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json', 'X-CSRFToken': CSRFToken },
-          body: JSON.stringify({
-            id_consulta_cab: consultaActualId,
-            id_sintoma: detalle.id_sintoma,
-            pieza_dental: detalle.pieza_dental,
-            diagnostico: diagnostico,
-            tratamiento: detalle.tratamiento,
-            procedimiento: detalle.procedimiento,
-            id_tipo_diagnostico: idTipoDiagnostico || detalle.id_tipo_diagnostico,
-            id_tipo_procedimiento: detalle.id_tipo_procedimiento
-          })
+      if (!d.success) {
+        throw new Error(d.error || 'Error al obtener detalle');
+      }
+      
+      const detalle = d.data;
+      
+      // ✅ CONVERTIR A ENTERO
+      const idTipoDiagInt = parseInt(idTipoDiagnostico);
+      
+      // ✅ LOG PARA DEBUG
+      console.log('📦 Payload para actualizar detalle:', {
+        id_tipo_diagnostico: idTipoDiagInt,
+        diagnostico: diagnostico
+      });
+      
+      return fetch(`/api/v1/consultas-detalle/${consultaDetalleActualId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', 'X-CSRFToken': CSRFToken },
+        body: JSON.stringify({
+          id_consulta_cab: consultaActualId,
+          id_sintoma: detalle.id_sintoma,
+          pieza_dental: detalle.pieza_dental,
+          diagnostico: diagnostico,
+          tratamiento: detalle.tratamiento,
+          procedimiento: detalle.procedimiento,
+          id_tipo_diagnostico: idTipoDiagInt,
+          id_tipo_procedimiento: detalle.id_tipo_procedimiento
         })
-        .then(r => r.json())
-        .then(updateResult => {
-          if (updateResult.success) {
-            // 2. Insertar en la tabla diagnósticos
+      })
+      .then(r => r.json())
+      .then(updateResult => {
+        if (!updateResult.success) {
+          throw new Error(updateResult.error || 'Error al actualizar detalle');
+        }
+        
+        return fetch(`/api/v1/consultas-detalle/${consultaDetalleActualId}/diagnosticos`)
+          .then(r => r.json())
+          .then(diagData => {
+            const yaExiste = diagData.success && diagData.data.some(
+              diag => diag.descripcion_diagnostico.trim().toLowerCase() === diagnostico.trim().toLowerCase()
+            );
+            
+            if (yaExiste) {
+              Swal.fire({
+                icon: 'info',
+                title: 'Información',
+                text: 'Este diagnóstico ya fue registrado',
+                confirmButtonText: 'Entendido'
+              });
+              return { success: true, message: 'Este diagnóstico ya fue registrado', duplicado: true };
+            }
+            
+            // ✅ PAYLOAD PARA INSERTAR EN DIAGNOSTICOS
+            const payloadDiagnostico = {
+              id_consulta_detalle: consultaDetalleActualId,
+              id_medico: idMedicoActual,
+              id_paciente: idPacienteActual,
+              id_tipo_diagnostico: idTipoDiagInt,
+              descripcion_diagnostico: diagnostico.trim(),
+              fecha_diagnostico: fechaFormateada,
+              pieza_dental: detalle.pieza_dental
+            };
+            
+            console.log('📦 Payload para insertar diagnóstico:', payloadDiagnostico);
+            
             return fetch('/api/v1/Diagnostico', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json', 'X-CSRFToken': CSRFToken },
-              body: JSON.stringify({
-                id_consulta_detalle: consultaDetalleActualId,
-                id_medico: idMedicoActual,
-                id_paciente: idPacienteActual,
-                id_tipo_diagnostico: idTipoDiagnostico ? parseInt(idTipoDiagnostico) : null,
-                descripcion_diagnostico: diagnostico,
-                fecha_diagnostico: fechaFormateada,
-                pieza_dental: detalle.pieza_dental
-              })
-            });
-          } else {
-            throw new Error(updateResult.error || 'Error al actualizar detalle');
-          }
-        });
-      } else {
-        throw new Error(d.error || 'Error al obtener detalle');
-      }
+              body: JSON.stringify(payloadDiagnostico)
+            }).then(r => r.json());
+          });
+      });
     })
-    .then(r => r.json())
     .then(d => {
-      if (d.success) {
+      if (d.success && !d.duplicado) {
         Swal.fire('Éxito', 'Diagnóstico guardado correctamente', 'success');
         cargarDetallesConsulta(consultaActualId);
+      } else if (d.success && d.duplicado) {
+        cargarDetallesConsulta(consultaActualId);
       } else {
-        Swal.fire('Error', d.error, 'error');
+        const esDuplicado = d.error && d.error.includes('Ya existe');
+        Swal.fire({
+          icon: esDuplicado ? 'info' : 'error',
+          title: esDuplicado ? 'Información' : 'Error',
+          text: d.error || 'Error al guardar',
+          confirmButtonText: 'Entendido'
+        });
       }
     })
     .catch(err => {
-      console.error('Error:', err);
+      console.error('❌ Error:', err);
       Swal.fire('Error', `Error al guardar: ${err.message}`, 'error');
+    })
+    .finally(() => {
+      isSubmittingDiagnostico = false;
+      $btn.prop('disabled', false).html(btnOriginalText);
     });
 });
+
 // ========================================
 // REGISTRAR TRATAMIENTOS
 // ========================================
@@ -1987,6 +2067,7 @@ $('#btnGuardarTratamientoPrincipal').on('click', function() {
       $btn.prop('disabled', false).html(btnOriginalText);
     });
 });
+
 
 $('#btnAbrirOdontograma').on('click', function() {
   if (!idPacienteActual) {
