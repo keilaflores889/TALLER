@@ -349,18 +349,21 @@ const initDatatable = () => {
       {
         data: function(row) {
           return `
-            <button type="button" name="btn_editar" class="btn btn-sm btn-info" 
-                    data-id_personal="${row.id_personal}" title="Editar">
-              <i class="fas fa-edit"></i>
-            </button>
-            <button type="button" name="btn_eliminar" class="btn btn-sm btn-danger" 
-                    data-id_personal="${row.id_personal}" title="Eliminar">
-              <i class="fas fa-trash-alt"></i>
-            </button>
+            <div class="d-flex justify-content-center align-items-center gap-2">
+              <button type="button" name="btn_editar" class="btn btn-sm btn-info" 
+                      data-id_personal="${row.id_personal}" title="Editar">
+                <i class="fas fa-edit"></i>
+              </button>
+              <button type="button" name="btn_eliminar" class="btn btn-sm btn-danger" 
+                      data-id_personal="${row.id_personal}" title="Eliminar">
+                <i class="fas fa-trash-alt"></i>
+              </button>
+            </div>
           `;
         },
         className: 'text-center',
-        orderable: false
+        orderable: false,
+        width: "100px"
       }
     ]
   });
