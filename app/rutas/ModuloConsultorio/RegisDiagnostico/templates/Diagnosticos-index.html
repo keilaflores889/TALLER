@@ -267,11 +267,11 @@ const initDatatable = () => {
       {
         data: function(row) {
           return `
-            <!-- <button type="button" name="btn_editar" class="btn btn-info btn-sm" data-id="${row.id_diagnostico}" title="Editar">
-            <i class="fas fa-edit"></i>
-          </button>-->
+          <button type="button" name="btn_ver_odontograma" class="btn btn-success btn-sm" data-id-paciente="${row.id_paciente}" title="Ver Odontograma">
+            <i class="fas fa-tooth"></i> Odontograma
+          </button>
           <button type="button" name="btn_eliminar" class="btn btn-danger btn-sm" data-id="${row.id_diagnostico}" title="Eliminar">
-            <i class="fas fa-trash-alt"> Eliminar Registro </i>
+            <i class="fas fa-trash-alt"> Eliminar</i>
           </button>`;
         }
       }
@@ -346,6 +346,42 @@ const initDatatableTipoDiagnostico = () => {
     $('#id_tipo_diagnostico').val(id);
     $('#txtTipoDiagnostico').val(tipo_diagnostico);
     $('#modalBuscarTipoDiagnostico').modal('hide');
+  });
+};
+
+// --- Ver Odontograma ---
+// --- Ver Odontograma ---
+const verOdontograma = () => {
+  $('#tbl').on('click', 'button[name="btn_ver_odontograma"]', function() {
+    const idPaciente = $(this).data('id-paciente');
+    
+    // Verificar si hay un odontograma existente para el paciente
+    fetch(`/api/v1/odontograma/paciente/${idPaciente}`)
+      .then(r => r.json())
+      .then(d => {
+        if (d.success) {
+          // Si existe, redirigir a ver el odontograma
+          window.location.href = `/api/v1/odontograma-index?action=ver&id=${d.data.id_odontograma}&paciente=${idPaciente}`;
+        } else {
+          // Si no existe, preguntar si desea crear uno
+          Swal.fire({
+            title: 'Sin Odontograma',
+            text: 'El paciente no tiene un odontograma registrado. ¿Desea crear uno?',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'Sí, crear',
+            cancelButtonText: 'Cancelar'
+          }).then(result => {
+            if (result.isConfirmed) {
+              // Necesitarás el ID del médico, puedes obtenerlo de la fila o del contexto
+              window.location.href = `/api/v1/odontograma-index?action=nuevo&paciente=${idPaciente}`;
+            }
+          });
+        }
+      })
+      .catch(err => {
+        Swal.fire('Error', 'No se pudo verificar el odontograma', 'error');
+      });
   });
 };
 
@@ -477,6 +513,7 @@ const addEvents = () => {
   guardar();
   editar();
   eliminar();
+  verOdontograma();
   buscarMedico();
   buscarPaciente();
   buscarTipoDiagnostico();
