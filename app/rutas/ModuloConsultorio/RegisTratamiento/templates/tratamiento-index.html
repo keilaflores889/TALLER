@@ -6,17 +6,17 @@ Tratamientos
 
 {% block contenido %}
 <div class="container-fluid mt-4">
-<h3>Registros de Tratamientos</h3>
+<h3></h3>
   <!-- Card principal -->
   <div class="card shadow-sm border-0 rounded-lg">
     <!-- Header: Botón Agregar y Título -->
     <div class="card-header bg-info text-white d-flex justify-content-between align-items-center">
-      <button type="button" class="btn btn-light btn-sm" id="btnAgregar">
+      <!--<button type="button" class="btn btn-light btn-sm" id="btnAgregar">
         <i class="fas fa-plus-circle mr-1"></i> Agregar
-      </button>
-      <h5 class="mb-0 font-weight-bold">
+      </button>-->
+      <h4 class="mb-0 font-weight-bold">
         <i class="fas fa-tooth mr-2"></i> Tratamientos
-      </h5>
+      </h4>
     </div>
 
     <!-- Body: Tabla de tratamientos -->
@@ -25,10 +25,10 @@ Tratamientos
         <table class="table table-hover table-bordered align-middle text-center" id="tbl">
           <thead class="bg-info text-white">
             <tr>
-              <th>ID Consulta</th>
+              
               <th>Médico</th>
               <th>Paciente</th>
-              <th>Descripción</th>
+              <th>Tratamiento</th>
               <th>Fecha</th>
               <th>Duración</th>
               <th>Costo</th>
@@ -98,19 +98,19 @@ Tratamientos
 
             <!-- Duración -->
             <div class="col-md-6 mb-3">
-              <label class="font-weight-bold">Duración Estimada</label>
+              <label class="font-weight-bold">Duración Estimada <span class="text-danger">*</span></label>
               <input type="text" id="duracion_estimada" class="form-control" placeholder="Ej: 3 sesiones, 1 mes">
             </div>
 
             <!-- Costo -->
             <div class="col-md-6 mb-3">
-              <label class="font-weight-bold">Costo Estimado</label>
-              <input type="number" step="0.01" id="costo_estimado" class="form-control" placeholder="0.00">
+              <label class="font-weight-bold">Costo Estimado <span class="text-danger">*</span></label>
+              <input type="number" step="0.01" id="costo_estimado" class="form-control" placeholder="00.000gs">
             </div>
 
             <!-- Estado -->
             <div class="col-md-6 mb-3">
-              <label class="font-weight-bold">Estado</label>
+              <label class="font-weight-bold">Estado <span class="text-danger">*</span></label>
               <select id="estado" class="form-control">
                 <option value="pendiente">Pendiente</option>
                 <option value="en_proceso">En Proceso</option>
@@ -127,7 +127,7 @@ Tratamientos
           <button type="button" class="btn btn-info" id="btnGuardar">
             <i class="fas fa-save mr-1"></i> Guardar
           </button>
-          <button type="button" class="btn btn-secondary" data-dismiss="modal">
+          <button type="button" class="btn btn-danger" data-dismiss="modal">
             <i class="fas fa-times mr-1"></i> Cerrar
           </button>
         </div>
@@ -229,7 +229,7 @@ const initDatatable = () => {
     language: { url: "{{ url_for('static', filename='vendor/datatables/es-ES.json') }}" },
     ajax: '/api/v1/Tratamiento',
     columns: [
-      { data: 'id_consulta_detalle' },
+      
       { data: 'medico_nombre' },
       { data: 'paciente_nombre' },
       { 
@@ -270,7 +270,7 @@ const initDatatable = () => {
       {
         data: function(row) {
           return `
-          <button type="button" name="btn_editar" class="btn btn-info btn-sm" data-id="${row.id_tratamiento}" title="Editar">
+          <button type="button" name="btn_editar" class="btn btn-info btn-sm" data-id="${row.id_tratamiento}" title="Agregar/Editar">
             <i class="fas fa-edit"></i>
           </button>
           <button type="button" name="btn_eliminar" class="btn btn-danger btn-sm" data-id="${row.id_tratamiento}" title="Eliminar">
@@ -345,108 +345,212 @@ const agregar = () => {
   });
 };
 
-// --- Guardar ---
+
+
+// --- Guardar (solo actualiza campos editables) ---
 const guardar = () => $('#btnGuardar').on('click', function() {
   const idTratamiento = $('#txtIdTratamiento').val();
 
+  if (!idTratamiento) {
+    Swal.fire("Error", "No hay tratamiento seleccionado para actualizar", "error");
+    return;
+  }
+
   const payload = {
-    id_consulta_detalle: parseInt($('#id_consulta_detalle').val()),
-    id_medico: parseInt($('#id_medico').val()),
-    id_paciente: parseInt($('#id_paciente').val()),
-    descripcion_tratamiento: $('#descripcion_tratamiento').val(),
-    fecha_tratamiento: $('#fecha_tratamiento').val() || null,
     duracion_estimada: $('#duracion_estimada').val() || null,
     costo_estimado: $('#costo_estimado').val() ? parseFloat($('#costo_estimado').val()) : null,
     estado: $('#estado').val()
   };
 
-  if (!payload.id_consulta_detalle || !payload.id_medico || !payload.id_paciente || !payload.descripcion_tratamiento) {
-    Swal.fire("Error", "Complete los campos obligatorios (Consulta, Médico, Paciente y Descripción)", "error");
-    return;
-  }
-
-  const tabla = $('#tbl').DataTable();
-  const method = idTratamiento ? 'PUT' : 'POST';
-  const url = idTratamiento ? `/api/v1/Tratamiento/${idTratamiento}` : '/api/v1/Tratamiento';
-
-  fetch(url, {
-    method: method,
+  // ✅ SIEMPRE USA EL ENDPOINT PARCIAL
+  fetch(`/api/v1/Tratamiento/${idTratamiento}/parcial`, {
+    method: 'PUT',
     headers: { 'Content-Type': 'application/json', 'X-CSRFToken': CSRFToken },
     body: JSON.stringify(payload)
   })
   .then(resp => resp.json())
   .then(data => {
     if (data.success) {
-      tabla.ajax.reload();
-      Swal.fire(idTratamiento ? "Actualizado" : "Registrado", "Tratamiento guardado correctamente.", "success");
+      $('#tbl').DataTable().ajax.reload();
+      Swal.fire("Actualizado", "Información del tratamiento completada correctamente.", "success");
       $('#modalFormulario').modal("hide");
+      limpiarFormulario();
     } else {
       Swal.fire("Error", data.error, "error");
     }
   })
-  .catch(err => Swal.fire("Error", "Ocurrió un error al guardar el tratamiento.", "error"));
+  .catch(err => Swal.fire("Error", "Ocurrió un error al actualizar el tratamiento.", "error"));
 });
 
-// --- Editar ---
+// --- Limpiar formulario ---
+const limpiarFormulario = () => {
+  $('#txtIdTratamiento, #id_consulta_detalle, #txtMedico, #txtPaciente, #descripcion_tratamiento, #fecha_tratamiento, #duracion_estimada, #costo_estimado').val("");
+  $('#id_medico, #id_paciente').val("");
+  $('#estado').val('pendiente');
+  
+  // Restaurar estilos
+  $('#id_consulta_detalle, #txtMedico, #txtPaciente, #descripcion_tratamiento, #fecha_tratamiento, #duracion_estimada, #costo_estimado')
+    .prop('readonly', false)
+    .css({'background-color': '#ffffff', 'cursor': 'text'});
+  
+  $('#estado').prop('disabled', false);
+  
+  // Rehabilitar clicks
+  $('#txtMedico').on('click', () => $('#modalBuscarMedico').modal());
+  $('#txtPaciente').on('click', () => $('#modalBuscarPaciente').modal());
+};
+
+
+// --- Editar (Completar datos) ---
+// --- Editar (Completar datos) - DISEÑO MEJORADO ---
 const editar = () => {
   $('#tbl').on('click', 'button[name="btn_editar"]', function() {
     const idTratamiento = $(this).data('id');
 
+    // Mostrar loading
+    Swal.fire({
+      title: 'Cargando...',
+      text: 'Obteniendo información del tratamiento',
+      allowOutsideClick: false,
+      didOpen: () => {
+        Swal.showLoading();
+      }
+    });
+
     fetch(`/api/v1/Tratamiento/${idTratamiento}`)
       .then(resp => resp.json())
       .then(data => {
+        Swal.close(); // Cerrar loading
+        
         const d = data.data;
 
         $('#txtIdTratamiento').val(d.id_tratamiento);
-        $('#id_consulta_detalle').val(d.id_consulta_detalle);
+        
+        // ✅ CAMPOS NO EDITABLES con mejor estilo
+        $('#id_consulta_detalle').val(d.id_consulta_detalle)
+          .prop('readonly', true)
+          .css({
+            'background-color': '#f8f9fa',
+            'cursor': 'not-allowed',
+            'border': '1px solid #dee2e6',
+            'color': '#6c757d'
+          });
+        
         $('#id_medico').val(d.id_medico);
-        $('#txtMedico').val(d.medico_nombre);
+        $('#txtMedico').val(d.medico_nombre)
+          .prop('readonly', true)
+          .css({
+            'background-color': '#f8f9fa',
+            'cursor': 'not-allowed',
+            'border': '1px solid #dee2e6',
+            'color': '#6c757d'
+          })
+          .off('click');
+        
         $('#id_paciente').val(d.id_paciente);
-        $('#txtPaciente').val(d.paciente_nombre);
-        $('#descripcion_tratamiento').val(d.descripcion_tratamiento);
-        $('#fecha_tratamiento').val(formatDateForInput(d.fecha_tratamiento));
-        $('#duracion_estimada').val(d.duracion_estimada || "");
-        $('#costo_estimado').val(d.costo_estimado || "");
-        $('#estado').val(d.estado);
+        $('#txtPaciente').val(d.paciente_nombre)
+          .prop('readonly', true)
+          .css({
+            'background-color': '#f8f9fa',
+            'cursor': 'not-allowed',
+            'border': '1px solid #dee2e6',
+            'color': '#6c757d'
+          })
+          .off('click');
+        
+        $('#descripcion_tratamiento').val(d.descripcion_tratamiento)
+          .prop('readonly', true)
+          .css({
+            'background-color': '#f8f9fa',
+            'cursor': 'not-allowed',
+            'border': '1px solid #dee2e6',
+            'color': '#6c757d'
+          });
+        
+        $('#fecha_tratamiento').val(formatDateForInput(d.fecha_tratamiento))
+          .prop('readonly', true)
+          .css({
+            'background-color': '#f8f9fa',
+            'cursor': 'not-allowed',
+            'border': '1px solid #dee2e6',
+            'color': '#6c757d'
+          });
+        
+        // ✅ CAMPOS EDITABLES con estilo destacado
+        $('#duracion_estimada').val(d.duracion_estimada || "")
+          .prop('readonly', false)
+          .css({
+            'background-color': '#fff3cd',
+            'cursor': 'text',
+            'border': '2px solid #ffc107',
+            'color': '#000'
+          });
+        
+        $('#costo_estimado').val(d.costo_estimado || "")
+          .prop('readonly', false)
+          .css({
+            'background-color': '#fff3cd',
+            'cursor': 'text',
+            'border': '2px solid #ffc107',
+            'color': '#000'
+          });
+        
+        $('#estado').val(d.estado)
+          .prop('disabled', false)
+          .css({
+            'background-color': '#fff3cd',
+            'cursor': 'pointer',
+            'border': '2px solid #ffc107',
+            'color': '#000'
+          });
 
-        $('#modalTitle').text("Editar Tratamiento");
+        $('#modalTitle').html('<i class="fas fa-check-circle"></i> Completar Información del Tratamiento');
         $('#modalFormulario').modal();
       })
-      .catch(err => Swal.fire("Error", "No se pudo cargar el tratamiento", "error"));
+      .catch(err => {
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'No se pudo cargar el tratamiento',
+          confirmButtonColor: '#d33'
+        });
+      });
   });
 };
 
-// --- Eliminar ---
+// --- Eliminar - DISEÑO MEJORADO ---
 const eliminar = () => {
   $('#tbl').on('click', 'button[name="btn_eliminar"]', function() {
     const idTratamiento = $(this).data('id');
     const fila = $(this).closest('tr');
 
     Swal.fire({
-      title: "¿Deseas eliminar este tratamiento?",
+      title: '¿Eliminar tratamiento?',
+      icon: 'warning',
       showCancelButton: true,
-      confirmButtonText: "Si",
-      cancelButtonText: "No"
-    }).then(result => {
-      if (result.isConfirmed) {
+      confirmButtonText: 'Sí, eliminar',
+      cancelButtonText: 'Cancelar'
+    }).then(res => {
+      if (res.isConfirmed) {
         fetch(`/api/v1/Tratamiento/${idTratamiento}`, {
           method: 'DELETE',
-          headers: { 'Content-Type': 'application/json', 'X-CSRFToken': CSRFToken }
+          headers: { 'X-CSRFToken': CSRFToken }
         })
         .then(resp => resp.json())
         .then(data => {
           if (data.success) {
             $('#tbl').DataTable().row(fila).remove().draw();
-            Swal.fire("Eliminado", "", "success");
+            Swal.fire('Eliminado', 'Tratamiento eliminado correctamente', 'success');
           } else {
-            Swal.fire("Error", data.error, "error");
+            Swal.fire('Error', data.error, 'error');
           }
         })
-        .catch(err => Swal.fire("Error", "No se pudo eliminar", "error"));
+        .catch(err => Swal.fire('Error', 'No se pudo eliminar', 'error'));
       }
     });
   });
 };
+
 
 // --- Inicialización ---
 const addEvents = () => {

@@ -6,18 +6,26 @@ Síntomas
 
 {% block contenido %}
 <div class="container mt-4">
-    <h3>Listar Síntomas</h3>
 
-    <!-- tarjeta -->
-    <div class="card">
-      <div class="card-header">
-        <button type="button" class="btn btn-outline-info" id="btnAgregar">Agregar</button>
-      </div>
-      <div class="card-body">
-        <table class="table table-striped" id="tbl">
-          <thead class="table-info">
+  <!-- Card principal -->
+  <div class="card shadow-sm border-0 rounded-lg">
+    <!-- Header: Botón Agregar y Título -->
+    <div class="card-header bg-info text-white d-flex justify-content-between align-items-center">
+      <button type="button" class="btn btn-light btn-sm" id="btnAgregar">
+        <i class="fas fa-plus-circle mr-1"></i> Agregar
+      </button>
+      <h5 class="mb-0 font-weight-bold">
+        <i class="fas fa-notes-medical mr-2"></i> Síntomas
+      </h5>
+    </div>
+
+    <!-- Body: Tabla de síntomas -->
+    <div class="card-body p-2">
+      <div class="table-responsive shadow-sm rounded">
+        <table class="table table-hover table-bordered align-middle text-center" id="tbl">
+          <thead class="bg-info text-white">
             <tr>
-              <th>Síntomas</th>
+              <th>Descripción del Síntoma</th>
               <th>Acciones</th>
             </tr>
           </thead>
@@ -25,206 +33,357 @@ Síntomas
         </table>
       </div>
     </div>
-    <!-- /tarjeta -->
+  </div>
 
-    <!-- El formulario -->
-    <div class="modal" id="modalFormulario">
-      <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
+  <!-- =========================== -->
+  <!-- Modal Formulario Síntoma -->
+  <!-- =========================== -->
+  <div class="modal fade" id="modalFormulario" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content shadow-lg border-0 rounded-lg">
 
-          <!-- Modal Header -->
-          <div class="modal-header">
-            <h4 class="modal-title" id="modalTitle"></h4>
-            <button type="button" class="close" data-dismiss="modal">&times;</button>
-          </div>
-
-          <!-- Modal body -->
-          <div class="modal-body">
-            <div class="form-group">
-              <input type="hidden" id="txtIdSintoma">
-              <label for="txtDescripcion">Síntoma:</label>
-              <textarea type="text" class="form-control" placeholder="Ingrese un síntoma" id="txtDescripcion"></textarea>
-            </div>
-          </div>
-
-          <!-- Modal footer -->
-          <div class="modal-footer">
-          <button type="button" class="btn btn-primary" id="btnGuardar">Guardar</button>
-          <button type="button" class="btn btn-danger" data-dismiss="modal">Cerrar</button>
+        <!-- Header -->
+        <div class="modal-header bg-info text-white rounded-top">
+          <h5 class="modal-title font-weight-bold">
+            <i class="fas fa-notes-medical mr-2"></i> <span id="modalTitle">Nuevo Síntoma</span>
+          </h5>
+          <button type="button" class="close text-white" data-dismiss="modal">&times;</button>
         </div>
 
+        <!-- Body -->
+        <div class="modal-body">
+          <input type="hidden" id="txtIdSintoma">
+
+          <div class="form-group">
+            <label for="txtDescripcion" class="font-weight-bold">
+              <i class="fas fa-stethoscope mr-1"></i> Descripción del Síntoma:
+            </label>
+            <textarea class="form-control" 
+                      id="txtDescripcion" 
+                      placeholder="Ingrese descripción del síntoma" 
+                      rows="3"></textarea>
+            <small class="form-text text-muted">
+              <i class="fas fa-info-circle"></i> Solo se permiten letras, espacios, comas y puntos - Debe contener al menos una vocal.
+            </small>
+          </div>
         </div>
+
+        <!-- Footer -->
+        <div class="modal-footer bg-light">
+          <button type="button" class="btn btn-info" id="btnGuardar">
+            <i class="fas fa-save mr-1"></i> Guardar
+          </button>
+          <button type="button" class="btn btn-danger" data-dismiss="modal">
+            <i class="fas fa-times mr-1"></i> Cerrar
+          </button>
+        </div>
+
       </div>
     </div>
+  </div>
+
 </div>
 {% endblock %}
 
 {% block js %}
 <script>
-  const CSRFToken = "{{ csrf_token() }}" || null;
-function validarDescripcion(descripcion) {
-  // Acepta solo letras, espacios y acentos, pero NO números
-  const regex = /^[A-Za-zÁÉÍÓÚÑáéíóúñ\s]+$/;
-  return regex.test(descripcion.trim());
+const CSRFToken = "{{ csrf_token() }}" || null;
+
+// =====================================================
+// FUNCIONES DE VALIDACIÓN
+// =====================================================
+
+// Función para validar texto (permite letras, espacios, comas y puntos)
+const validarTexto = (texto) => {
+  const patron = /^[A-Za-zÁÉÍÓÚÑáéíóúñ\s\,\.]+$/;
+  return patron.test(texto);
 }
 
-  const initDatatable = () => {
-    $('#tbl').DataTable({
-      language: {
-        url: "{{ url_for('static', filename='vendor/datatables/es-ES.json') }}",
-      },
-      ajax:'/api/v1/sintomas',
-      columns: [
-        { data: 'descripcion_sintoma' },  // CORREGIDO
-        { data: function(row) {
-            return `<button type="button" name="btn_editar" class="btn btn-info" data-id_sintoma="${row.id_sintoma}" title="Editar"><i class="fas fa-edit"></i></button>
-                    <button type="button" name="btn_eliminar" class="btn btn-danger" data-id_sintoma="${row.id_sintoma}" title="Eliminar"><i class="fas fa-trash-alt"></i></button>`;
-          }
+// Función para validar que contenga vocales
+const validarPalabraConSentido = (texto) => {
+  const patron = /[aeiouáéíóúAEIOUÁÉÍÓÚ]/;
+  return patron.test(texto);
+}
+
+// =====================================================
+// INICIALIZACIÓN DE DATATABLE
+// =====================================================
+const initDatatable = () => {
+  $('#tbl').DataTable({
+    language: {
+      url: "{{ url_for('static', filename='vendor/datatables/es-ES.json') }}",
+    },
+    ajax: {
+      url: '/api/v1/sintomas',
+      dataSrc: function(json) {
+        if (json.success && json.data) {
+          return json.data;
         }
-      ]
-    });
-  }
+        return [];
+      }
+    },
+    columns: [
+      { data: 'descripcion_sintoma' },
+      {
+        data: function (row) {
+          return `<button type="button" name="btn_editar" class="btn btn-sm btn-info" 
+                      data-id="${row.id_sintoma}" title="Editar">
+                    <i class="fas fa-edit"></i>
+                  </button>
+                  <button type="button" name="btn_eliminar" class="btn btn-sm btn-danger" 
+                      data-id="${row.id_sintoma}" title="Eliminar">
+                    <i class="fas fa-trash-alt"></i>
+                  </button>`;
+        }
+      }
+    ],
+    order: [[0, 'asc']]
+  });
+};
 
-  const agregar = () => {
-    $('#btnAgregar').on('click', function(){
-      $('#modalTitle').text("Agregar un Síntoma");
-      $('#txtIdSintoma').val("");
-      $('#txtDescripcion').val("");
-      $('#modalFormulario').modal();
-    });
-  }
+// =====================================================
+// AGREGAR NUEVO SÍNTOMA
+// =====================================================
+const agregar = () => {
+  $('#btnAgregar').on('click', function () {
+    $('#modalTitle').text("Nuevo Síntoma");
+    $('#txtIdSintoma').val("");
+    $('#txtDescripcion').val("");
+    $('#modalFormulario').modal();
+  });
+};
 
-  const guardar = () => {
-    $('#btnGuardar').on('click', function() {
-      const id_sintoma = $('#txtIdSintoma').val();
-      const nuevaDescripcion = $('#txtDescripcion').val();
-      const tabla = $('#tbl').DataTable();
+// =====================================================
+// GUARDAR SÍNTOMA (INSERT O UPDATE)
+// =====================================================
+const guardar = () => {
+  $('#btnGuardar').on('click', function () {
+    const id = $('#txtIdSintoma').val();
+    const descripcion_sintoma = $('#txtDescripcion').val().trim();
+    const tabla = $('#tbl').DataTable();
 
-      if(id_sintoma) {
-        // update
-        fetch(`/api/v1/sintomas/${id_sintoma}`, {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-            'X-CSRFToken': CSRFToken
-          },
-          body: JSON.stringify({ descripcion_sintoma: nuevaDescripcion })  // CORREGIDO
-        })
-        .then(resp => resp.json())
-        .then(data => {
-          if(data && !data.error && data.success) {
-            tabla.ajax.reload();
-            Swal.fire("Actualizado", "El síntoma ha sido actualizado correctamente.", "success");
-          } else {
-            Swal.fire(data.error || "No se pudo actualizar.");
-          }
-        }).catch(err => {
-          console.error(err);
-          Swal.fire("Error", "Ocurrió un error al actualizar el síntoma.", "error");
+    // ===== VALIDACIÓN: DESCRIPCIÓN =====
+    if (!descripcion_sintoma) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Campo requerido',
+        text: 'El campo Descripción del Síntoma es obligatorio.'
+      });
+      return;
+    }
+
+    if (!validarTexto(descripcion_sintoma)) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Formato inválido',
+        text: 'La descripción solo puede contener letras, espacios, comas y puntos.'
+      });
+      return;
+    }
+
+    if (!validarPalabraConSentido(descripcion_sintoma)) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Formato inválido',
+        text: 'La descripción debe ser palabras válida.'
+      });
+      return;
+    }
+
+    const payload = {
+      descripcion_sintoma: descripcion_sintoma
+    };
+
+    if (id) {
+      // Update
+      fetch(`/api/v1/sintomas/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': CSRFToken
+        },
+        body: JSON.stringify(payload)
+      })
+      .then(resp => resp.json())
+      .then(data => {
+        if (data && !data.error && data.success) {
+          tabla.ajax.reload();
+          $('#modalFormulario').modal("hide");
+          Swal.fire({
+            icon: 'success',
+            title: 'Actualizado',
+            text: 'El síntoma ha sido actualizado correctamente.'
+          });
+        } else {
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: data.error || 'No se pudo actualizar el síntoma.'
+          });
+        }
+      }).catch(err => {
+        console.error(err);
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'Ocurrió un error al actualizar el síntoma.'
         });
-      } else {
-        // insert
-        fetch(`/api/v1/sintomas`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'X-CSRFToken': CSRFToken
-          },
-          body: JSON.stringify({ descripcion_sintoma: nuevaDescripcion })  // CORREGIDO
+      });
+    } else {
+      // Insert
+      fetch(`/api/v1/sintomas`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': CSRFToken
+        },
+        body: JSON.stringify(payload)
+      })
+      .then(resp => resp.json())
+      .then(data => {
+        if (data && !data.error && data.success) {
+          tabla.ajax.reload();
+          $('#modalFormulario').modal("hide");
+          Swal.fire({
+            icon: 'success',
+            title: 'Agregado',
+            text: 'El síntoma ha sido agregado correctamente.'
+          });
+        } else {
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: data.error || 'No se pudo guardar el síntoma.'
+          });
+        }
+      }).catch(err => {
+        console.error(err);
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'Ocurrió un error al guardar el síntoma.'
+        });
+      });
+    }
+  });
+};
+
+// =====================================================
+// EDITAR SÍNTOMA
+// =====================================================
+const editar = () => {
+  $('#tbl').on('click', 'button[name="btn_editar"]', function () {
+    const id = $(this).data('id');
+    
+    Swal.fire({
+      title: "¿Deseas editar este registro?",
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: "Sí",
+      cancelButtonText: "No",
+      confirmButtonColor: '#17a2b8',
+      cancelButtonColor: '#6c757d'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        $('#modalTitle').text("Editar Síntoma");
+        $('#txtIdSintoma').val(id);
+
+        fetch(`/api/v1/sintomas/${id}`, {
+          method: 'GET',
+          headers: { 'Content-Type': 'application/json' }
         })
         .then(resp => resp.json())
         .then(data => {
-          if(data && !data.error && data.success) {
-            tabla.ajax.reload();
-            Swal.fire("Agregado", "El síntoma ha sido agregado correctamente.", "success");
+          if (data && data.success && data.data) {
+            $('#txtDescripcion').val(data.data.descripcion_sintoma);
+            $('#modalFormulario').modal();
           } else {
-            Swal.fire(data.error || "No se pudo guardar.");
+            Swal.fire({
+              icon: 'error',
+              title: 'Error',
+              text: 'No se pudo cargar el síntoma.'
+            });
           }
-        }).catch(err => {
+        })
+        .catch(err => {
           console.error(err);
-          Swal.fire("Error", "Ocurrió un error al guardar el síntoma.", "error");
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'Ocurrió un error al cargar el síntoma.'
+          });
         });
       }
-      $('#txtDescripcion').val("");
-      $('#modalFormulario').modal("hide");
     });
-  }
-
-  const editar = () => {
-    $('#tbl').on('click', 'button[name="btn_editar"]', function() {
-      Swal.fire({
-        title: "¿Deseas editar este registro?",
-        showCancelButton: true,
-        confirmButtonText: "Sí",
-        cancelButtonText: "No"
-      }).then((result) => {
-        if (result.isConfirmed) {
-          $('#modalTitle').text("Editar un Síntoma");
-
-          const id_sintoma = $(this).data('id_sintoma');
-          $('#txtIdSintoma').val(id_sintoma);
-
-          fetch(`/api/v1/sintomas/${id_sintoma}`, {
-            method: 'GET',
-            headers: {
-              'Content-Type': 'application/json'
-            }
-          })
-          .then(resp => resp.json())
-          .then(data => {
-            $('#txtDescripcion').val(data.data.descripcion_sintoma);  // CORREGIDO
-            $('#modalFormulario').modal();
-          });
-        }
-      });
-    });
-  };
-
-  const eliminar = () => {
-    $('#tbl').on('click', 'button[name="btn_eliminar"]', function() {
-      const id_sintoma = $(this).data('id_sintoma');
-      Swal.fire({
-        title: "¿Deseas eliminar este registro?",
-        showCancelButton: true,
-        confirmButtonText: "Sí",
-        cancelButtonText: "No"
-      }).then((result) => {
-        if (result.isConfirmed) {
-          fetch(`/api/v1/sintomas/${id_sintoma}`, {
-            method: 'DELETE',
-            headers: {
-              'Content-Type': 'application/json',
-              'X-CSRFToken': CSRFToken
-            }
-          })
-          .then(resp => resp.json())
-          .then(data => {
-            if(data && !data.error && data.success) {
-              const fila = $(this).closest('tr');
-              const tabla = $('#tbl').DataTable();
-              tabla.row(fila).remove().draw();
-              Swal.fire("Eliminado", "", "success");
-            } else {
-              Swal.fire(data.error || "No se pudo eliminar.");
-            }
-          }).catch(err => {
-            Swal.fire("Error", "Ocurrió un error al eliminar el síntoma.", "error");
-          });
-        }
-      });
-    });
-  }
-
-  const addEvents = () => {
-    agregar();
-    guardar();
-    editar();
-    eliminar();
-  }
-
-  $(function() {
-    initDatatable();
-    addEvents();
   });
+};
+
+// =====================================================
+// ELIMINAR SÍNTOMA
+// =====================================================
+const eliminar = () => {
+  $('#tbl').on('click', 'button[name="btn_eliminar"]', function () {
+    const id = $(this).data('id');
+    const botonEliminar = $(this);
+    
+    Swal.fire({
+      title: "¿Deseas eliminar este registro?",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: "Sí, eliminar",
+      cancelButtonText: "No, cancelar",
+      confirmButtonColor: '#dc3545',
+      cancelButtonColor: '#6c757d'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        fetch(`/api/v1/sintomas/${id}`, {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': CSRFToken
+          }
+        })
+        .then(resp => resp.json())
+        .then(data => {
+          if (data && !data.error && data.success) {
+            const fila = botonEliminar.closest('tr');
+            const tabla = $('#tbl').DataTable();
+            tabla.row(fila).remove().draw();
+            Swal.fire({
+              icon: 'success',
+              title: 'Eliminado',
+              text: 'El síntoma ha sido eliminado correctamente.'
+            });
+          } else {
+            Swal.fire({
+              icon: 'error',
+              title: 'Error',
+              text: data.error || 'No se pudo eliminar el síntoma.'
+            });
+          }
+        }).catch(err => {
+          console.error(err);
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'Ocurrió un error al eliminar el síntoma.'
+          });
+        });
+      }
+    });
+  });
+};
+
+// =====================================================
+// INICIALIZACIÓN
+// =====================================================
+$(function () {
+  initDatatable();
+  agregar();
+  guardar();
+  editar();
+  eliminar();
+});
+
 </script>
 {% endblock %}

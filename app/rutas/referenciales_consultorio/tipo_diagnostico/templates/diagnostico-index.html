@@ -6,18 +6,26 @@ Diagnósticos
 
 {% block contenido %}
 <div class="container mt-4">
-    <h3>Listar Diagnósticos</h3>
 
-    <!-- tarjeta -->
-    <div class="card">
-      <div class="card-header">
-        <button type="button" class="btn btn-outline-info" id="btnAgregar">Agregar</button>
-      </div>
-      <div class="card-body">
-        <table class="table table-striped" id="tbl">
-          <thead class="table-info">
+  <!-- Card principal -->
+  <div class="card shadow-sm border-0 rounded-lg">
+    <!-- Header: Botón Agregar y Título -->
+    <div class="card-header bg-info text-white d-flex justify-content-between align-items-center">
+      <button type="button" class="btn btn-light btn-sm" id="btnAgregar">
+        <i class="fas fa-plus-circle mr-1"></i> Agregar
+      </button>
+      <h5 class="mb-0 font-weight-bold">
+        <i class="fas fa-notes-medical mr-2"></i> Tipos de Diagnósticos
+      </h5>
+    </div>
+
+    <!-- Body: Tabla de diagnósticos -->
+    <div class="card-body p-2">
+      <div class="table-responsive shadow-sm rounded">
+        <table class="table table-hover table-bordered align-middle text-center" id="tbl">
+          <thead class="bg-info text-white">
             <tr>
-              <th>Diagnóstico</th>
+              <th>Descripción</th>
               <th>Tipo Diagnóstico</th>
               <th>Acciones</th>
             </tr>
@@ -26,40 +34,68 @@ Diagnósticos
         </table>
       </div>
     </div>
-    <!-- /tarjeta -->
+  </div>
 
-    <!-- Modal formulario -->
-    <div class="modal" id="modalFormulario">
-      <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
+  <!-- =========================== -->
+  <!-- Modal Formulario Diagnóstico -->
+  <!-- =========================== -->
+  <div class="modal fade" id="modalFormulario" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+      <div class="modal-content shadow-lg border-0 rounded-lg">
 
-          <div class="modal-header">
-            <h4 class="modal-title" id="modalTitle"></h4>
-            <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <!-- Header -->
+        <div class="modal-header bg-info text-white rounded-top">
+          <h5 class="modal-title font-weight-bold">
+            <i class="fas fa-notes-medical mr-2"></i> <span id="modalTitle">Nuevo Diagnóstico</span>
+          </h5>
+          <button type="button" class="close text-white" data-dismiss="modal">&times;</button>
+        </div>
+
+        <!-- Body -->
+        <div class="modal-body">
+          <input type="hidden" id="txtIdDiagnostico">
+
+          <div class="form-group">
+            <label for="txtDescripcion" class="font-weight-bold">
+              <i class="fas fa-file-medical mr-1"></i> Descripción:
+            </label>
+            <textarea class="form-control" 
+                      placeholder="Ingrese la descripción del diagnóstico" 
+                      id="txtDescripcion" 
+                      rows="3"></textarea>
+            <small class="form-text text-muted">
+              <i class="fas fa-info-circle"></i> Solo se permiten letras, espacios y "/" - Debe contener al menos una vocal.
+            </small>
           </div>
 
-          <div class="modal-body">
-            <input type="hidden" id="txtIdDiagnostico">
-
-            <div class="form-group">
-              <label for="txtDescripcion">Diagnóstico:</label>
-              <textarea type="text" class="form-control" placeholder="Ingrese la descripción del diagnóstico" id="txtDescripcion"></textarea>
-            </div>
-
-            <div class="form-group">
-              <label for="txtTipo">Tipo Diagnóstico:</label>
-              <input type="text" class="form-control" placeholder="Ej: Odontológico, Neurológico, General" id="txtTipo">
-            </div>
-          </div>
-
-          <div class="modal-footer">
-            <button type="button" class="btn btn-primary" id="btnGuardar">Guardar</button>
-            <button type="button" class="btn btn-danger" data-dismiss="modal">Cerrar</button>
+          <div class="form-group">
+            <label for="txtTipo" class="font-weight-bold">
+              <i class="fas fa-tag mr-1"></i> Tipo Diagnóstico:
+            </label>
+            <input type="text" 
+                   class="form-control" 
+                   placeholder="Ej: Odontológico, Neurológico, General" 
+                   id="txtTipo">
+            <small class="form-text text-muted">
+              <i class="fas fa-info-circle"></i> Solo se permiten letras, espacios y "/" - Debe contener al menos una vocal.
+            </small>
           </div>
 
         </div>
+
+        <!-- Footer -->
+        <div class="modal-footer bg-light">
+          <button type="button" class="btn btn-info" id="btnGuardar">
+            <i class="fas fa-save mr-1"></i> Guardar
+          </button>
+          <button type="button" class="btn btn-danger" data-dismiss="modal">
+            <i class="fas fa-times mr-1"></i> Cerrar
+          </button>
+        </div>
+
       </div>
     </div>
+  </div>
 
 </div>
 {% endblock %}
@@ -73,27 +109,48 @@ Diagnósticos
       language: {
         url: "{{ url_for('static', filename='vendor/datatables/es-ES.json') }}",
       },
-      ajax:'/api/v1/diagnosticos',
+      ajax: {
+        url: '/api/v1/diagnosticos',
+        dataSrc: function(json) {
+          if (json.success && json.data) {
+            return json.data;
+          }
+          return [];
+        }
+      },
       columns: [
         { data: 'descripcion_diagnostico' },
         { data: 'tipo_diagnostico' },
-        { data: function(row) {
-            return `
-              <button type="button" name="btn_editar" class="btn btn-info" data-id="${row.id_tipo_diagnostico}" title="Editar">
-                <i class="fas fa-edit"></i>
-              </button>
-              <button type="button" name="btn_eliminar" class="btn btn-danger" data-id="${row.id_tipo_diagnostico}" title="Eliminar">
-                <i class="fas fa-trash-alt"></i>
-              </button>`;
+        { 
+          data: function(row) {
+            return `<button type="button" name="btn_editar" class="btn btn-sm btn-info" data-id="${row.id_tipo_diagnostico}" title="Editar">
+                      <i class="fas fa-edit"></i>
+                    </button>
+                    <button type="button" name="btn_eliminar" class="btn btn-sm btn-danger" data-id="${row.id_tipo_diagnostico}" title="Eliminar">
+                      <i class="fas fa-trash-alt"></i>
+                    </button>`;
           }
         }
-      ]
+      ],
+      order: [[0, 'asc']]
     });
+  }
+
+  // Función auxiliar para validar texto
+  const validarTexto = (texto) => {
+    const patron = /^[A-Za-zÁÉÍÓÚÑáéíóúñ\s/]+$/;
+    return patron.test(texto);
+  }
+
+  // Función auxiliar para validar que contenga vocales
+  const validarPalabraConSentido = (texto) => {
+    const patron = /[aeiouáéíóúAEIOUÁÉÍÓÚ]/;
+    return patron.test(texto);
   }
 
   const agregar = () => {
     $('#btnAgregar').on('click', function(){
-      $('#modalTitle').text("Agregar Diagnóstico");
+      $('#modalTitle').text("Nuevo Diagnóstico");
       $('#txtIdDiagnostico').val("");
       $('#txtDescripcion').val("");
       $('#txtTipo').val("");
@@ -104,9 +161,64 @@ Diagnósticos
   const guardar = () => {
     $('#btnGuardar').on('click', function() {
       const id = $('#txtIdDiagnostico').val();
-      const descripcion_diagnostico = $('#txtDescripcion').val();
-      const tipo_diagnostico = $('#txtTipo').val();
+      const descripcion_diagnostico = $('#txtDescripcion').val().trim();
+      const tipo_diagnostico = $('#txtTipo').val().trim();
       const tabla = $('#tbl').DataTable();
+
+      // Validaciones del cliente
+      if (!descripcion_diagnostico) {
+        Swal.fire({
+          icon: 'warning',
+          title: 'Campo requerido',
+          text: 'El campo Diagnóstico es obligatorio.'
+        });
+        return;
+      }
+
+      if (!tipo_diagnostico) {
+        Swal.fire({
+          icon: 'warning',
+          title: 'Campo requerido',
+          text: 'El campo Tipo Diagnóstico es obligatorio.'
+        });
+        return;
+      }
+
+      if (!validarTexto(descripcion_diagnostico)) {
+        Swal.fire({
+          icon: 'warning',
+          title: 'Formato inválido',
+          text: 'El Diagnóstico solo puede contener letras, espacios y "/"'
+        });
+        return;
+      }
+
+      if (!validarPalabraConSentido(descripcion_diagnostico)) {
+        Swal.fire({
+          icon: 'warning',
+          title: 'Formato inválido',
+          text: 'El Diagnóstico debe contener palabras válidas.'
+        });
+        return;
+      }
+
+      if (!validarTexto(tipo_diagnostico)) {
+        Swal.fire({
+          icon: 'warning',
+          title: 'Formato inválido',
+          text: 'El Tipo Diagnóstico solo puede contener letras, espacios y "/"'
+        });
+        return;
+      }
+
+      if (!validarPalabraConSentido(tipo_diagnostico)) {
+        Swal.fire({
+          icon: 'warning',
+          title: 'Formato inválido',
+          text: 'El Tipo Diagnóstico debe contener palabras válidas.'
+        });
+        return;
+      }
 
       const payload = { descripcion_diagnostico, tipo_diagnostico };
 
@@ -122,14 +234,28 @@ Diagnósticos
         })
         .then(resp => resp.json())
         .then(data => {
-          if (data && data.success) {
+          if (data && !data.error && data.success) {
             tabla.ajax.reload();
-            Swal.fire("Actualizado", "El diagnóstico ha sido actualizado correctamente.", "success");
+            $('#modalFormulario').modal("hide");
+            Swal.fire({
+              icon: 'success',
+              title: 'Actualizado',
+              text: 'El diagnóstico ha sido actualizado correctamente.'
+            });
           } else {
-            Swal.fire("Error", data.error || "No se pudo actualizar.");
+            Swal.fire({
+              icon: 'error',
+              title: 'Error',
+              text: data.error || 'No se pudo actualizar el diagnóstico.'
+            });
           }
-        }).catch(() => {
-          Swal.fire("Error", "Ocurrió un error al actualizar.", "error");
+        }).catch(err => {
+          console.error(err);
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'Ocurrió un error al actualizar el diagnóstico.'
+          });
         });
       } else {
         // Insert
@@ -143,46 +269,75 @@ Diagnósticos
         })
         .then(resp => resp.json())
         .then(data => {
-          if (data && data.success) {
+          if (data && !data.error && data.success) {
             tabla.ajax.reload();
-            Swal.fire("Agregado", "El diagnóstico ha sido agregado correctamente.", "success");
+            $('#modalFormulario').modal("hide");
+            Swal.fire({
+              icon: 'success',
+              title: 'Agregado',
+              text: 'El diagnóstico ha sido agregado correctamente.'
+            });
           } else {
-            Swal.fire("Error", data.error || "No se pudo guardar.");
+            Swal.fire({
+              icon: 'error',
+              title: 'Error',
+              text: data.error || 'No se pudo guardar el diagnóstico.'
+            });
           }
-        }).catch(() => {
-          Swal.fire("Error", "Ocurrió un error al guardar.", "error");
+        }).catch(err => {
+          console.error(err);
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'Ocurrió un error al guardar el diagnóstico.'
+          });
         });
       }
-
-      $('#modalFormulario').modal("hide");
     });
   }
 
   const editar = () => {
     $('#tbl').on('click', 'button[name="btn_editar"]', function() {
       const id = $(this).data('id');
+      
       Swal.fire({
         title: "¿Deseas editar este registro?",
+        icon: 'question',
         showCancelButton: true,
         confirmButtonText: "Sí",
-        cancelButtonText: `No`
+        cancelButtonText: "No",
+        confirmButtonColor: '#17a2b8',
+        cancelButtonColor: '#6c757d'
       }).then((result) => {
         if (result.isConfirmed) {
+          $('#modalTitle').text("Editar Diagnóstico");
+          $('#txtIdDiagnostico').val(id);
+
           fetch(`/api/v1/diagnosticos/${id}`, {
             method: 'GET',
             headers: { 'Content-Type': 'application/json' }
           })
           .then(resp => resp.json())
           .then(data => {
-            if (data.success) {
-              $('#modalTitle').text("Editar Diagnóstico");
-              $('#txtIdDiagnostico').val(data.data.id_tipo_diagnostico);
+            if (data && data.success && data.data) {
               $('#txtDescripcion').val(data.data.descripcion_diagnostico);
               $('#txtTipo').val(data.data.tipo_diagnostico);
               $('#modalFormulario').modal();
             } else {
-              Swal.fire("Error", data.error, "error");
+              Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'No se pudo cargar el diagnóstico.'
+              });
             }
+          })
+          .catch(err => {
+            console.error(err);
+            Swal.fire({
+              icon: 'error',
+              title: 'Error',
+              text: 'Ocurrió un error al cargar el diagnóstico.'
+            });
           });
         }
       });
@@ -192,11 +347,16 @@ Diagnósticos
   const eliminar = () => {
     $('#tbl').on('click', 'button[name="btn_eliminar"]', function(){
       const id = $(this).data('id');
+      const botonEliminar = $(this);
+      
       Swal.fire({
         title: "¿Deseas eliminar este registro?",
+        icon: 'warning',
         showCancelButton: true,
-        confirmButtonText: "Sí",
-        cancelButtonText: `No`
+        confirmButtonText: "Sí, eliminar",
+        cancelButtonText: "No, cancelar",
+        confirmButtonColor: '#dc3545',
+        cancelButtonColor: '#6c757d'
       }).then((result) => {
         if (result.isConfirmed) {
           fetch(`/api/v1/diagnosticos/${id}`, {
@@ -208,15 +368,29 @@ Diagnósticos
           })
           .then(resp => resp.json())
           .then(data => {
-            if (data && data.success) {
+            if (data && !data.error && data.success) {
+              const fila = botonEliminar.closest('tr');
               const tabla = $('#tbl').DataTable();
-              tabla.ajax.reload();
-              Swal.fire("Eliminado", "", "success");
+              tabla.row(fila).remove().draw();
+              Swal.fire({
+                icon: 'success',
+                title: 'Eliminado',
+                text: 'El diagnóstico ha sido eliminado correctamente.'
+              });
             } else {
-              Swal.fire("Error", data.error || "No se pudo eliminar.");
+              Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: data.error || 'No se pudo eliminar el diagnóstico.'
+              });
             }
-          }).catch(() => {
-            Swal.fire("Error", "Ocurrió un error al eliminar.", "error");
+          }).catch(err => {
+            console.error(err);
+            Swal.fire({
+              icon: 'error',
+              title: 'Error',
+              text: 'Ocurrió un error al eliminar el diagnóstico.'
+            });
           });
         }
       });

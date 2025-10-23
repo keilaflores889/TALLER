@@ -1,21 +1,29 @@
 {% extends 'base.html' %}
     
 {% block titulo %}
-Procedimientos
+Procedimientos Médicos
 {% endblock %}
 
 {% block contenido %}
 <div class="container mt-4">
-    <h3>Listar Procedimientos</h3>
 
-    <!-- tarjeta -->
-    <div class="card">
-      <div class="card-header">
-        <button type="button" class="btn btn-outline-info" id="btnAgregar">Agregar</button>
-      </div>
-      <div class="card-body">
-        <table class="table table-striped" id="tbl">
-          <thead class="table-info">
+  <!-- Card principal -->
+  <div class="card shadow-sm border-0 rounded-lg">
+    <!-- Header: Botón Agregar y Título -->
+    <div class="card-header bg-info text-white d-flex justify-content-between align-items-center">
+      <button type="button" class="btn btn-light btn-sm" id="btnAgregar">
+        <i class="fas fa-plus-circle mr-1"></i> Agregar
+      </button>
+      <h5 class="mb-0 font-weight-bold">
+        <i class="fas fa-procedures mr-2"></i> Procedimientos Médicos
+      </h5>
+    </div>
+
+    <!-- Body: Tabla de tipos de procedimientos -->
+    <div class="card-body p-2">
+      <div class="table-responsive shadow-sm rounded">
+        <table class="table table-hover table-bordered align-middle text-center" id="tbl">
+          <thead class="bg-info text-white">
             <tr>
               <th>Procedimiento</th>
               <th>Descripción</th>
@@ -27,222 +35,423 @@ Procedimientos
         </table>
       </div>
     </div>
-    <!-- /tarjeta -->
+  </div>
 
-    <!-- Modal formulario -->
-    <div class="modal" id="modalFormulario">
-      <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
+  <!-- =========================== -->
+  <!-- Modal Formulario Procedimiento Médico -->
+  <!-- =========================== -->
+  <div class="modal fade" id="modalFormulario" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+      <div class="modal-content shadow-lg border-0 rounded-lg">
 
-          <div class="modal-header">
-            <h4 class="modal-title" id="modalTitle"></h4>
-            <button type="button" class="close" data-dismiss="modal">&times;</button>
-          </div>
-
-          <div class="modal-body">
-            <input type="hidden" id="txtIdProcedimiento">
-
-            <div class="form-group">
-              <label for="txtProcedimiento">Procedimiento:</label>
-              <input type="text" class="form-control" placeholder="Ingrese el procedimiento" id="txtProcedimiento">
-            </div>
-
-            <div class="form-group">
-              <label for="txtDescripcion">Descripción:</label>
-              <textarea class="form-control" placeholder="Ingrese la descripción" id="txtDescripcion"></textarea>
-            </div>
-
-            <div class="form-group">
-              <label for="txtDuracion">Duración:</label>
-              <input type="text" class="form-control" placeholder="Ej: 30 minutos, 1 hora" id="txtDuracion">
-            </div>
-          </div>
-
-          <div class="modal-footer">
-            <button type="button" class="btn btn-primary" id="btnGuardar">Guardar</button>
-            <button type="button" class="btn btn-danger" data-dismiss="modal">Cerrar</button>
-          </div>
-
+        <!-- Header -->
+        <div class="modal-header bg-info text-white rounded-top">
+          <h5 class="modal-title font-weight-bold">
+            <i class="fas fa-procedures mr-2"></i> <span id="modalTitle">Nuevo Procedimiento Médico</span>
+          </h5>
+          <button type="button" class="close text-white" data-dismiss="modal">&times;</button>
         </div>
+
+        <!-- Body -->
+        <div class="modal-body">
+          <input type="hidden" id="txtIdProcedimiento">
+
+          <div class="form-group">
+            <label for="txtProcedimiento" class="font-weight-bold">
+              <i class="fas fa-stethoscope mr-1"></i> Procedimiento:
+            </label>
+            <input type="text" 
+                   class="form-control" 
+                   id="txtProcedimiento" 
+                   placeholder="Ingrese el nombre del procedimiento">
+            <small class="form-text text-muted">
+              <i class="fas fa-info-circle"></i> Se permiten letras, números, espacios, guiones, barras, comas y puntos - Debe contener al menos una vocal.
+            </small>
+          </div>
+
+          <div class="form-group">
+            <label for="txtDescripcion" class="font-weight-bold">
+              <i class="fas fa-file-alt mr-1"></i> Descripción:
+            </label>
+            <textarea class="form-control" 
+                      id="txtDescripcion" 
+                      placeholder="Ingrese la descripción del procedimiento" 
+                      rows="3"></textarea>
+            <small class="form-text text-muted">
+              <i class="fas fa-info-circle"></i> Descripción detallada del procedimiento médico.
+            </small>
+          </div>
+
+          <div class="form-group">
+            <label for="txtDuracion" class="font-weight-bold">
+              <i class="fas fa-clock mr-1"></i> Duración:
+            </label>
+            <input type="text" 
+                   class="form-control" 
+                   id="txtDuracion" 
+                   placeholder="Ej: 30 minutos, 1 hora, 2-3 horas">
+            <small class="form-text text-muted">
+              <i class="fas fa-info-circle"></i> Especifique la duración estimada del procedimiento.
+            </small>
+          </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="modal-footer bg-light">
+          <button type="button" class="btn btn-info" id="btnGuardar">
+            <i class="fas fa-save mr-1"></i> Guardar
+          </button>
+          <button type="button" class="btn btn-danger" data-dismiss="modal">
+            <i class="fas fa-times mr-1"></i> Cerrar
+          </button>
+        </div>
+
       </div>
     </div>
+  </div>
 
 </div>
 {% endblock %}
 
 {% block js %}
 <script>
-  const CSRFToken = "{{ csrf_token() }}" || null;
+const CSRFToken = "{{ csrf_token() }}" || null;
 
-  const initDatatable = () => {
-    $('#tbl').DataTable({
-      language: {
-        url: "{{ url_for('static', filename='vendor/datatables/es-ES.json') }}",
-      },
-      ajax:'/api/v1/procedimientos',
-      columns: [
-        { data: 'procedimiento' },
-        { data: 'descripcion' },
-        { data: 'duracion' },
-        { data: function(row) {
-            return `
-              <button type="button" name="btn_editar" class="btn btn-info" data-id="${row.id_tipo_procedimiento}" title="Editar">
-                <i class="fas fa-edit"></i>
-              </button>
-              <button type="button" name="btn_eliminar" class="btn btn-danger" data-id="${row.id_tipo_procedimiento}" title="Eliminar">
-                <i class="fas fa-trash-alt"></i>
-              </button>`;
-          }
+// =====================================================
+// FUNCIONES DE VALIDACIÓN
+// =====================================================
+
+// Función para validar texto (permite letras, números, espacios, guiones, barras, comas y puntos)
+const validarTexto = (texto) => {
+  const patron = /^[A-Za-z0-9ÁÉÍÓÚÑáéíóúñ\s\/\-\,\.]+$/;
+  return patron.test(texto);
+}
+
+// Función para validar que contenga vocales
+const validarPalabraConSentido = (texto) => {
+  const patron = /[aeiouáéíóúAEIOUÁÉÍÓÚ]/;
+  return patron.test(texto);
+}
+
+// =====================================================
+// INICIALIZACIÓN DE DATATABLE
+// =====================================================
+const initDatatable = () => {
+  $('#tbl').DataTable({
+    language: {
+      url: "{{ url_for('static', filename='vendor/datatables/es-ES.json') }}",
+    },
+    ajax: {
+      url: '/api/v1/procedimientos',
+      dataSrc: function(json) {
+        if (json.success && json.data) {
+          return json.data;
         }
-      ]
-    });
-  }
+        return [];
+      }
+    },
+    columns: [
+      { data: 'procedimiento' },
+      { data: 'descripcion' },
+      { data: 'duracion' },
+      {
+        data: function (row) {
+          return `<button type="button" name="btn_editar" class="btn btn-sm btn-info" 
+                      data-id="${row.id_tipo_procedimiento}" title="Editar">
+                    <i class="fas fa-edit"></i>
+                  </button>
+                  <button type="button" name="btn_eliminar" class="btn btn-sm btn-danger" 
+                      data-id="${row.id_tipo_procedimiento}" title="Eliminar">
+                    <i class="fas fa-trash-alt"></i>
+                  </button>`;
+        }
+      }
+    ],
+    order: [[0, 'asc']]
+  });
+};
 
-  const agregar = () => {
-    $('#btnAgregar').on('click', function(){
-      $('#modalTitle').text("Agregar Procedimiento");
-      $('#txtIdProcedimiento').val("");
-      $('#txtProcedimiento').val("");
-      $('#txtDescripcion').val("");
-      $('#txtDuracion').val("");
-      $('#modalFormulario').modal();
-    });
-  }
+// =====================================================
+// AGREGAR NUEVO PROCEDIMIENTO MÉDICO
+// =====================================================
+const agregar = () => {
+  $('#btnAgregar').on('click', function () {
+    $('#modalTitle').text("Nuevo Procedimiento Médico");
+    $('#txtIdProcedimiento').val("");
+    $('#txtProcedimiento').val("");
+    $('#txtDescripcion').val("");
+    $('#txtDuracion').val("");
+    $('#modalFormulario').modal();
+  });
+};
 
-  const guardar = () => {
-    $('#btnGuardar').on('click', function() {
-      const id = $('#txtIdProcedimiento').val();
-      const procedimiento = $('#txtProcedimiento').val();
-      const descripcion = $('#txtDescripcion').val();
-      const duracion = $('#txtDuracion').val();
-      const tabla = $('#tbl').DataTable();
+// =====================================================
+// GUARDAR PROCEDIMIENTO MÉDICO (INSERT O UPDATE)
+// =====================================================
+const guardar = () => {
+  $('#btnGuardar').on('click', function () {
+    const id = $('#txtIdProcedimiento').val();
+    const procedimiento = $('#txtProcedimiento').val().trim();
+    const descripcion = $('#txtDescripcion').val().trim();
+    const duracion = $('#txtDuracion').val().trim();
+    const tabla = $('#tbl').DataTable();
 
-      const payload = { procedimiento, descripcion, duracion };
+    // ===== VALIDACIÓN: PROCEDIMIENTO =====
+    if (!procedimiento) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Campo requerido',
+        text: 'El campo Procedimiento es obligatorio.'
+      });
+      return;
+    }
 
-      if (id) {
-        // Update
-        fetch(`/api/v1/procedimientos/${id}`, {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-            'X-CSRFToken': CSRFToken
-          },
-          body: JSON.stringify(payload)
-        })
-        .then(resp => resp.json())
-        .then(data => {
-          if (data && data.success) {
-            tabla.ajax.reload();
-            Swal.fire("Actualizado", "El procedimiento ha sido actualizado correctamente.", "success");
-          } else {
-            Swal.fire("Error", data.error || "No se pudo actualizar.");
-          }
-        }).catch(() => {
-          Swal.fire("Error", "Ocurrió un error al actualizar.", "error");
+    if (!validarTexto(procedimiento)) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Formato inválido',
+        text: 'El procedimiento solo puede contener letras, números, espacios, guiones, barras, comas y puntos.'
+      });
+      return;
+    }
+
+    if (!validarPalabraConSentido(procedimiento)) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Formato inválido',
+        text: 'El procedimiento debe contener al menos una vocal.'
+      });
+      return;
+    }
+
+    // ===== VALIDACIÓN: DESCRIPCIÓN =====
+    if (!descripcion) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Campo requerido',
+        text: 'El campo Descripción es obligatorio.'
+      });
+      return;
+    }
+
+    if (!validarTexto(descripcion)) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Formato inválido',
+        text: 'La descripción solo puede contener letras, números, espacios, guiones, barras, comas y puntos.'
+      });
+      return;
+    }
+
+    if (!validarPalabraConSentido(descripcion)) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Formato inválido',
+        text: 'La descripción debe contener al menos una vocal.'
+      });
+      return;
+    }
+
+    // ===== VALIDACIÓN: DURACIÓN =====
+    if (!duracion) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Campo requerido',
+        text: 'El campo Duración es obligatorio.'
+      });
+      return;
+    }
+
+    if (!validarTexto(duracion)) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Formato inválido',
+        text: 'La duración solo puede contener letras, números, espacios, guiones, barras, comas y puntos.'
+      });
+      return;
+    }
+
+    const payload = {
+      procedimiento: procedimiento,
+      descripcion: descripcion,
+      duracion: duracion
+    };
+
+    if (id) {
+      // Update
+      fetch(`/api/v1/procedimientos/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': CSRFToken
+        },
+        body: JSON.stringify(payload)
+      })
+      .then(resp => resp.json())
+      .then(data => {
+        if (data && !data.error && data.success) {
+          tabla.ajax.reload();
+          $('#modalFormulario').modal("hide");
+          Swal.fire({
+            icon: 'success',
+            title: 'Actualizado',
+            text: 'El procedimiento médico ha sido actualizado correctamente.'
+          });
+        } else {
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: data.error || 'No se pudo actualizar el procedimiento médico.'
+          });
+        }
+      }).catch(err => {
+        console.error(err);
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'Ocurrió un error al actualizar el procedimiento médico.'
         });
-      } else {
-        // Insert
-        fetch(`/api/v1/procedimientos`, {
-          method: 'POST',
+      });
+    } else {
+      // Insert
+      fetch(`/api/v1/procedimientos`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': CSRFToken
+        },
+        body: JSON.stringify(payload)
+      })
+      .then(resp => resp.json())
+      .then(data => {
+        if (data && !data.error && data.success) {
+          tabla.ajax.reload();
+          $('#modalFormulario').modal("hide");
+          Swal.fire({
+            icon: 'success',
+            title: 'Agregado',
+            text: 'El procedimiento médico ha sido agregado correctamente.'
+          });
+        } else {
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: data.error || 'No se pudo guardar el procedimiento médico.'
+          });
+        }
+      }).catch(err => {
+        console.error(err);
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'Ocurrió un error al guardar el procedimiento médico.'
+        });
+      });
+    }
+  });
+};
+
+// =====================================================
+// EDITAR PROCEDIMIENTO MÉDICO
+// =====================================================
+const editar = () => {
+  $('#tbl').on('click', 'button[name="btn_editar"]', function () {
+    const id = $(this).data('id');
+    
+    fetch(`/api/v1/procedimientos/${id}`)
+      .then(resp => resp.json())
+      .then(data => {
+        if (data && data.success && data.data) {
+          const procedimiento = data.data;
+          $('#modalTitle').text("Editar Procedimiento Médico");
+          $('#txtIdProcedimiento').val(procedimiento.id_tipo_procedimiento);
+          $('#txtProcedimiento').val(procedimiento.procedimiento);
+          $('#txtDescripcion').val(procedimiento.descripcion);
+          $('#txtDuracion').val(procedimiento.duracion);
+          $('#modalFormulario').modal();
+        } else {
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'No se pudo cargar el procedimiento médico.'
+          });
+        }
+      })
+      .catch(err => {
+        console.error(err);
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'Ocurrió un error al cargar el procedimiento médico.'
+        });
+      });
+  });
+};
+
+// =====================================================
+// ELIMINAR PROCEDIMIENTO MÉDICO
+// =====================================================
+const eliminar = () => {
+  $('#tbl').on('click', 'button[name="btn_eliminar"]', function () {
+    const id = $(this).data('id');
+    const tabla = $('#tbl').DataTable();
+
+    Swal.fire({
+      title: '¿Está seguro?',
+      text: "Esta acción eliminará el procedimiento médico de forma permanente.",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: 'Sí, eliminar',
+      cancelButtonText: 'Cancelar'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        fetch(`/api/v1/procedimientos/${id}`, {
+          method: 'DELETE',
           headers: {
-            'Content-Type': 'application/json',
             'X-CSRFToken': CSRFToken
-          },
-          body: JSON.stringify(payload)
+          }
         })
         .then(resp => resp.json())
         .then(data => {
           if (data && data.success) {
             tabla.ajax.reload();
-            Swal.fire("Agregado", "El procedimiento ha sido agregado correctamente.", "success");
+            Swal.fire({
+              icon: 'success',
+              title: 'Eliminado',
+              text: 'El procedimiento médico ha sido eliminado correctamente.'
+            });
           } else {
-            Swal.fire("Error", data.error || "No se pudo guardar.");
+            Swal.fire({
+              icon: 'error',
+              title: 'Error',
+              text: data.error || 'No se pudo eliminar el procedimiento médico.'
+            });
           }
-        }).catch(() => {
-          Swal.fire("Error", "Ocurrió un error al guardar.", "error");
+        })
+        .catch(err => {
+          console.error(err);
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'Ocurrió un error al eliminar el procedimiento médico.'
+          });
         });
       }
-
-      $('#modalFormulario').modal("hide");
     });
-  }
-
-  const editar = () => {
-    $('#tbl').on('click', 'button[name="btn_editar"]', function() {
-      const id = $(this).data('id');
-      Swal.fire({
-        title: "¿Deseas editar este registro?",
-        showCancelButton: true,
-        confirmButtonText: "Sí",
-        cancelButtonText: `No`
-      }).then((result) => {
-        if (result.isConfirmed) {
-          fetch(`/api/v1/procedimientos/${id}`, {
-            method: 'GET',
-            headers: { 'Content-Type': 'application/json' }
-          })
-          .then(resp => resp.json())
-          .then(data => {
-            if (data.success) {
-              $('#modalTitle').text("Editar Procedimiento");
-              $('#txtIdProcedimiento').val(data.data.id_tipo_procedimiento);
-              $('#txtProcedimiento').val(data.data.procedimiento);
-              $('#txtDescripcion').val(data.data.descripcion);
-              $('#txtDuracion').val(data.data.duracion);
-              $('#modalFormulario').modal();
-            } else {
-              Swal.fire("Error", data.error, "error");
-            }
-          });
-        }
-      });
-    });
-  };
-
-  const eliminar = () => {
-    $('#tbl').on('click', 'button[name="btn_eliminar"]', function(){
-      const id = $(this).data('id');
-      Swal.fire({
-        title: "¿Deseas eliminar este registro?",
-        showCancelButton: true,
-        confirmButtonText: "Sí",
-        cancelButtonText: `No`
-      }).then((result) => {
-        if (result.isConfirmed) {
-          fetch(`/api/v1/procedimientos/${id}`, {
-            method: 'DELETE',
-            headers: {
-              'Content-Type': 'application/json',
-              'X-CSRFToken': CSRFToken
-            }
-          })
-          .then(resp => resp.json())
-          .then(data => {
-            if (data && data.success) {
-              const tabla = $('#tbl').DataTable();
-              tabla.ajax.reload();
-              Swal.fire("Eliminado", "", "success");
-            } else {
-              Swal.fire("Error", data.error || "No se pudo eliminar.");
-            }
-          }).catch(() => {
-            Swal.fire("Error", "Ocurrió un error al eliminar.", "error");
-          });
-        }
-      });
-    });
-  }
-
-  const addEvents = () => {
-    agregar();
-    guardar();
-    editar();
-    eliminar();
-  }
-
-  $(function() {
-    initDatatable();
-    addEvents();
   });
+};
+
+// =====================================================
+// INICIALIZACIÓN AL CARGAR EL DOCUMENTO
+// =====================================================
+$(document).ready(function () {
+  initDatatable();
+  agregar();
+  guardar();
+  editar();
+  eliminar();
+});
 </script>
 {% endblock %}

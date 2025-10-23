@@ -6,60 +6,100 @@ Medicamentos
 
 {% block contenido %}
 <div class="container mt-4">
-  <h3>Listar Medicamentos</h3>
 
-  <!-- tarjeta -->
-  <div class="card">
-    <div class="card-header">
-      <button type="button" class="btn btn-outline-info" id="btnAgregar">Agregar</button>
+  <!-- Card principal -->
+  <div class="card shadow-sm border-0 rounded-lg">
+    <!-- Header: Botón Agregar y Título -->
+    <div class="card-header bg-info text-white d-flex justify-content-between align-items-center">
+      <button type="button" class="btn btn-light btn-sm" id="btnAgregar">
+        <i class="fas fa-plus-circle mr-1"></i> Agregar
+      </button>
+      <h5 class="mb-0 font-weight-bold">
+        <i class="fas fa-pills mr-2"></i> Medicamentos
+      </h5>
     </div>
-    <div class="card-body">
-      <table class="table table-striped w-100" id="tbl">
-        <thead class="table-info">
-          <tr>
-            <th>Nombre</th>
-            <th>Dosis</th>
-            <th>Indicaciones</th>
-            <th>Forma Farmacéutica</th>
-            <th>Acciones</th>
-          </tr>
-        </thead>
-        <tbody></tbody>
-      </table>
+
+    <!-- Body: Tabla de medicamentos -->
+    <div class="card-body p-2">
+      <div class="table-responsive shadow-sm rounded">
+        <table class="table table-hover table-bordered align-middle text-center" id="tbl">
+          <thead class="bg-info text-white">
+            <tr>
+              <th>Nombre</th>
+              <th>Dosis</th>
+              <th>Indicaciones</th>
+              <th>Forma Farmacéutica</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
     </div>
   </div>
-  <!-- /tarjeta -->
 
-  <!-- Modal Formulario -->
-  <div class="modal" id="modalFormulario">
-    <div class="modal-dialog modal-dialog-centered modal-lg">
-      <div class="modal-content">
+  <!-- =========================== -->
+  <!-- Modal Formulario Medicamento -->
+  <!-- =========================== -->
+  <div class="modal fade" id="modalFormulario" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+      <div class="modal-content shadow-lg border-0 rounded-lg">
 
-        <div class="modal-header">
-          <h4 class="modal-title" id="modalTitle"></h4>
-          <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <!-- Header -->
+        <div class="modal-header bg-info text-white rounded-top">
+          <h5 class="modal-title font-weight-bold">
+            <i class="fas fa-pills mr-2"></i> <span id="modalTitle">Nuevo Medicamento</span>
+          </h5>
+          <button type="button" class="close text-white" data-dismiss="modal">&times;</button>
         </div>
 
+        <!-- Body -->
         <div class="modal-body">
           <input type="hidden" id="txtId">
 
           <div class="form-group">
-            <label for="txtNombre">Nombre del Medicamento:</label>
-            <input type="text" class="form-control" id="txtNombre" placeholder="Ingrese nombre del medicamento">
+            <label for="txtNombre" class="font-weight-bold">
+              <i class="fas fa-capsules mr-1"></i> Nombre del Medicamento:
+            </label>
+            <input type="text" 
+                   class="form-control" 
+                   id="txtNombre" 
+                   placeholder="Ingrese nombre del medicamento">
+            <small class="form-text text-muted">
+              <i class="fas fa-info-circle"></i> Solo se permiten letras, espacios y "/" - Debe contener al menos una vocal.
+            </small>
           </div>
 
           <div class="form-group">
-            <label for="txtDosis">Dosis:</label>
-            <input type="text" class="form-control" id="txtDosis" placeholder="Ingrese dosis">
+            <label for="txtDosis" class="font-weight-bold">
+              <i class="fas fa-prescription-bottle mr-1"></i> Dosis:
+            </label>
+            <input type="text" 
+                   class="form-control" 
+                   id="txtDosis" 
+                   placeholder="Ej: 500mg, 2.5ml, 10%">
+            <small class="form-text text-muted">
+              <i class="fas fa-info-circle"></i> Formatos válidos: 500mg, 2.5ml, 10%, 100mg/5ml, etc.
+            </small>
           </div>
 
           <div class="form-group">
-            <label for="txtIndicaciones">Indicaciones:</label>
-            <textarea class="form-control" id="txtIndicaciones" placeholder="Ingrese indicaciones"></textarea>
+            <label for="txtIndicaciones" class="font-weight-bold">
+              <i class="fas fa-file-medical-alt mr-1"></i> Indicaciones:
+            </label>
+            <textarea class="form-control" 
+                      id="txtIndicaciones" 
+                      placeholder="Ingrese indicaciones" 
+                      rows="3"></textarea>
+            <small class="form-text text-muted">
+              <i class="fas fa-info-circle"></i> Solo se permiten letras, espacios y "/" - Debe contener al menos una vocal.
+            </small>
           </div>
 
           <div class="form-group">
-            <label for="txtPresentacion">Presentación:</label>
+            <label for="txtPresentacion" class="font-weight-bold">
+              <i class="fas fa-box-open mr-1"></i> Presentación Farmacéutica:
+            </label>
             <select class="form-control" id="txtPresentacion">
               <option value="">-- Seleccione --</option>
               <option value="Tabletas">Tabletas</option>
@@ -72,14 +112,20 @@ Medicamentos
               <option value="Aerosol">Aerosol</option>
               <option value="Otros">Otros</option>
             </select>
+            <small class="form-text text-muted">
+              <i class="fas fa-info-circle"></i> Seleccione la presentación del medicamento.
+            </small>
           </div>
         </div>
 
-        
-
-        <div class="modal-footer">
-          <button type="button" class="btn btn-primary" id="btnGuardar">Guardar</button>
-          <button type="button" class="btn btn-danger" data-dismiss="modal">Cerrar</button>
+        <!-- Footer -->
+        <div class="modal-footer bg-light">
+          <button type="button" class="btn btn-info" id="btnGuardar">
+            <i class="fas fa-save mr-1"></i> Guardar
+          </button>
+          <button type="button" class="btn btn-danger" data-dismiss="modal">
+            <i class="fas fa-times mr-1"></i> Cerrar
+          </button>
         </div>
 
       </div>
@@ -93,18 +139,44 @@ Medicamentos
 <script>
 const CSRFToken = "{{ csrf_token() }}" || null;
 
-// Expresiones regulares para validaciones
-const regexSoloLetras = /^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/;
-const regexDosisValida =/^[a-zA-Z0-9áéíóúÁÉÍÓÚñÑ\s\/\-]+$/; // permite letras, números, espacios, / y -
+// AGREGAR ESTA FUNCIÓN QUE FALTA (después de const CSRFToken)
+const validarTexto = (texto) => {
+  const patron = /^[A-Za-zÁÉÍÓÚÑáéíóúñ\s/]+$/;
+  return patron.test(texto);
+}
 
-const regexIndicaciones = /^[a-zA-Z0-9áéíóúÁÉÍÓÚñÑ\s.,;:()\-]+$/;
+// Función auxiliar para validar indicaciones (permite comas, puntos, paréntesis, etc)
+const validarIndicaciones = (texto) => {
+  const patron = /^[A-Za-zÁÉÍÓÚÑáéíóúñ0-9\s\/\,\.\;\:\(\)\-]+$/;
+  return patron.test(texto);
+}
+
+// Función auxiliar para validar que contenga vocales
+const validarPalabraConSentido = (texto) => {
+  const patron = /[aeiouáéíóúAEIOUÁÉÍÓÚ]/;
+  return patron.test(texto);
+}
+
+// Función auxiliar para validar dosis
+const validarDosis = (dosis) => {
+  const patron = /^[A-Za-z0-9\s\.\,\-\/\%]+$/;
+  return patron.test(dosis);
+}
 
 const initDatatable = () => {
   $('#tbl').DataTable({
     language: {
       url: "{{ url_for('static', filename='vendor/datatables/es-ES.json') }}",
     },
-    ajax: '/api/v1/medicamentos',
+    ajax: {
+      url: '/api/v1/medicamentos',
+      dataSrc: function(json) {
+        if (json.success && json.data) {
+          return json.data;
+        }
+        return [];
+      }
+    },
     columns: [
       { data: 'nombre_medicamento' },
       { data: 'dosis' },
@@ -112,23 +184,24 @@ const initDatatable = () => {
       { data: 'forma_farmaceutica' },
       {
         data: function (row) {
-          return `<button type="button" name="btn_editar" class="btn btn-info" 
+          return `<button type="button" name="btn_editar" class="btn btn-sm btn-info" 
                       data-id="${row.id_medicamento}" title="Editar">
                     <i class="fas fa-edit"></i>
                   </button>
-                  <button type="button" name="btn_eliminar" class="btn btn-danger" 
+                  <button type="button" name="btn_eliminar" class="btn btn-sm btn-danger" 
                       data-id="${row.id_medicamento}" title="Eliminar">
                     <i class="fas fa-trash-alt"></i>
                   </button>`;
         }
       }
-    ]
+    ],
+    order: [[0, 'asc']]
   });
 };
 
 const agregar = () => {
   $('#btnAgregar').on('click', function () {
-    $('#modalTitle').text("Agregar Medicamento");
+    $('#modalTitle').text("Nuevo Medicamento");
     $('#txtId').val("");
     $('#txtNombre').val("");
     $('#txtDosis').val("");
@@ -141,116 +214,239 @@ const agregar = () => {
 const guardar = () => {
   $('#btnGuardar').on('click', function () {
     const id = $('#txtId').val();
-    const nombre = $('#txtNombre').val().trim();
+    const nombre_medicamento = $('#txtNombre').val().trim();
     const dosis = $('#txtDosis').val().trim();
     const indicaciones = $('#txtIndicaciones').val().trim();
-    const forma = $('#txtPresentacion').val();
-
-    const datos = {
-      nombre_medicamento: nombre,
-      dosis: dosis,
-      indicaciones: indicaciones,
-      forma_farmaceutica: forma
-    };
+    const forma_farmaceutica = $('#txtPresentacion').val();
     const tabla = $('#tbl').DataTable();
 
-    // Validaciones
-    if (!nombre) {
-      Swal.fire("Error", "El campo Nombre es obligatorio.", "error");
+    // Validaciones del cliente
+    if (!nombre_medicamento) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Campo requerido',
+        text: 'El campo Nombre del Medicamento es obligatorio.'
+      });
       return;
     }
-    if (!regexSoloLetras.test(nombre)) {
-      Swal.fire("Error", "El nombre solo puede contener letras y espacios.", "error");
+
+    if (!validarTexto(nombre_medicamento)) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Formato inválido',
+        text: 'El nombre del medicamento solo puede contener letras, espacios y "/"'
+      });
+      return;
+    }
+
+    if (!validarPalabraConSentido(nombre_medicamento)) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Formato inválido',
+        text: 'El nombre del medicamento debe contener palabras válidas '
+      });
       return;
     }
 
     if (!dosis) {
-      Swal.fire("Error", "El campo Dosis es obligatorio.", "error");
+      Swal.fire({
+        icon: 'warning',
+        title: 'Campo requerido',
+        text: 'El campo Dosis es obligatorio.'
+      });
       return;
     }
-    if (!regexDosisValida.test(dosis)) {
-      Swal.fire("Error", "La dosis solo puede contener letras, números, espacios, / o -.", "error");
+
+    if (!validarDosis(dosis)) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Formato inválido',
+        text: 'La dosis tiene un formato inválido. Use formatos como: 500mg, 2.5ml, 10%, etc.'
+      });
       return;
     }
 
     if (!indicaciones) {
-      Swal.fire("Error", "El campo Indicaciones es obligatorio.", "error");
-      return;
-    }
-    if (!regexIndicaciones.test(indicaciones)) {
-      Swal.fire("Error", "Las indicaciones contienen caracteres inválidos.", "error");
-      return;
-    }
-
-    if (!forma) {
-      Swal.fire("Error", "Debe seleccionar una Forma Farmacéutica.", "error");
+      Swal.fire({
+        icon: 'warning',
+        title: 'Campo requerido',
+        text: 'El campo Indicaciones es obligatorio.'
+      });
       return;
     }
 
-    const url = id ? `/api/v1/medicamentos/${id}` : '/api/v1/medicamentos';
-    const method = id ? 'PUT' : 'POST';
+    if (!validarIndicaciones(indicaciones)) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Formato inválido',
+        text: 'Las indicaciones solo pueden contener letras, espacios y "/"'
+      });
+      return;
+    }
 
-    fetch(url, {
-      method: method,
-      headers: {
-        'Content-Type': 'application/json',
-        'X-CSRFToken': CSRFToken
-      },
-      body: JSON.stringify(datos)
-    })
+    if (!validarPalabraConSentido(indicaciones)) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Formato inválido',
+        text: 'Las indicaciones deben contener palabras válidas.'
+      });
+      return;
+    }
+
+    if (!forma_farmaceutica) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Campo requerido',
+        text: 'Debe seleccionar una Forma Farmacéutica.'
+      });
+      return;
+    }
+
+    const payload = {
+      nombre_medicamento: nombre_medicamento,
+      dosis: dosis,
+      indicaciones: indicaciones,
+      forma_farmaceutica: forma_farmaceutica
+    };
+
+    if (id) {
+      // Update
+      fetch(`/api/v1/medicamentos/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': CSRFToken
+        },
+        body: JSON.stringify(payload)
+      })
       .then(resp => resp.json())
       .then(data => {
-        if (data && data.success) {
+        if (data && !data.error && data.success) {
           tabla.ajax.reload();
           $('#modalFormulario').modal("hide");
-          Swal.fire("Éxito", id ? "Medicamento actualizado" : "Medicamento agregado", "success");
+          Swal.fire({
+            icon: 'success',
+            title: 'Actualizado',
+            text: 'El medicamento ha sido actualizado correctamente.'
+          });
         } else {
-          Swal.fire("Error", data.error || "No se pudo guardar", "error");
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: data.error || 'No se pudo actualizar el medicamento.'
+          });
         }
-      })
-      .catch(err => {
+      }).catch(err => {
         console.error(err);
-        Swal.fire("Error", "Ocurrió un error al guardar.", "error");
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'Ocurrió un error al actualizar el medicamento.'
+        });
       });
+    } else {
+      // Insert
+      fetch(`/api/v1/medicamentos`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': CSRFToken
+        },
+        body: JSON.stringify(payload)
+      })
+      .then(resp => resp.json())
+      .then(data => {
+        if (data && !data.error && data.success) {
+          tabla.ajax.reload();
+          $('#modalFormulario').modal("hide");
+          Swal.fire({
+            icon: 'success',
+            title: 'Agregado',
+            text: 'El medicamento ha sido agregado correctamente.'
+          });
+        } else {
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: data.error || 'No se pudo guardar el medicamento.'
+          });
+        }
+      }).catch(err => {
+        console.error(err);
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'Ocurrió un error al guardar el medicamento.'
+        });
+      });
+    }
   });
 };
 
 const editar = () => {
   $('#tbl').on('click', 'button[name="btn_editar"]', function () {
     const id = $(this).data('id');
-    fetch(`/api/v1/medicamentos/${id}`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-CSRFToken': CSRFToken
+    
+    Swal.fire({
+      title: "¿Deseas editar este registro?",
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: "Sí",
+      cancelButtonText: "No",
+      confirmButtonColor: '#17a2b8',
+      cancelButtonColor: '#6c757d'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        $('#modalTitle').text("Editar Medicamento");
+        $('#txtId').val(id);
+
+        fetch(`/api/v1/medicamentos/${id}`, {
+          method: 'GET',
+          headers: { 'Content-Type': 'application/json' }
+        })
+        .then(resp => resp.json())
+        .then(data => {
+          if (data && data.success && data.data) {
+            const m = data.data;
+            $('#txtNombre').val(m.nombre_medicamento);
+            $('#txtDosis').val(m.dosis);
+            $('#txtIndicaciones').val(m.indicaciones);
+            $('#txtPresentacion').val(m.forma_farmaceutica);
+            $('#modalFormulario').modal();
+          } else {
+            Swal.fire({
+              icon: 'error',
+              title: 'Error',
+              text: 'No se pudo cargar el medicamento.'
+            });
+          }
+        })
+        .catch(err => {
+          console.error(err);
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'Ocurrió un error al cargar el medicamento.'
+          });
+        });
       }
-    })
-      .then(resp => resp.json())
-      .then(data => {
-        if (data.success) {
-          const m = data.data;
-          $('#modalTitle').text("Editar Medicamento");
-          $('#txtId').val(m.id_medicamento);
-          $('#txtNombre').val(m.nombre_medicamento);
-          $('#txtDosis').val(m.dosis);
-          $('#txtIndicaciones').val(m.indicaciones);
-          $('#txtPresentacion').val(m.forma_farmaceutica); 
-          $('#modalFormulario').modal();
-        } else {
-          Swal.fire("Error", data.error, "error");
-        }
-      });
+    });
   });
 };
 
 const eliminar = () => {
   $('#tbl').on('click', 'button[name="btn_eliminar"]', function () {
     const id = $(this).data('id');
+    const botonEliminar = $(this);
+    
     Swal.fire({
       title: "¿Deseas eliminar este registro?",
+      icon: 'warning',
       showCancelButton: true,
-      confirmButtonText: "Sí",
-      cancelButtonText: "No"
+      confirmButtonText: "Sí, eliminar",
+      cancelButtonText: "No, cancelar",
+      confirmButtonColor: '#dc3545',
+      cancelButtonColor: '#6c757d'
     }).then((result) => {
       if (result.isConfirmed) {
         fetch(`/api/v1/medicamentos/${id}`, {
@@ -260,15 +456,32 @@ const eliminar = () => {
             'X-CSRFToken': CSRFToken
           }
         })
-          .then(resp => resp.json())
-          .then(data => {
-            if (data && data.success) {
-              $('#tbl').DataTable().ajax.reload();
-              Swal.fire("Eliminado", "El medicamento ha sido eliminado", "success");
-            } else {
-              Swal.fire("Error", data.error, "error");
-            }
+        .then(resp => resp.json())
+        .then(data => {
+          if (data && !data.error && data.success) {
+            const fila = botonEliminar.closest('tr');
+            const tabla = $('#tbl').DataTable();
+            tabla.row(fila).remove().draw();
+            Swal.fire({
+              icon: 'success',
+              title: 'Eliminado',
+              text: 'El medicamento ha sido eliminado correctamente.'
+            });
+          } else {
+            Swal.fire({
+              icon: 'error',
+              title: 'Error',
+              text: data.error || 'No se pudo eliminar el medicamento.'
+            });
+          }
+        }).catch(err => {
+          console.error(err);
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'Ocurrió un error al eliminar el medicamento.'
           });
+        });
       }
     });
   });

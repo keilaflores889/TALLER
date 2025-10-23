@@ -1,4 +1,5 @@
 # Data Access Object - DAO
+import re
 from flask import current_app as app
 from app.conexion.Conexion import Conexion
 
@@ -61,6 +62,30 @@ class MedicamentoDao:
             cur.close()
             con.close()
 
+    # ============================
+    # VALIDACIONES
+    # ============================
+
+    def validarTexto(self, texto):
+        """Permite letras (incluyendo ñ y acentuadas), espacios y barra diagonal."""
+        patron = r"^[A-Za-zÁÉÍÓÚáéíóúÑñ\s/]+$"
+        return bool(re.match(patron, texto))
+
+    def validarIndicaciones(self, texto):
+        """Permite letras, espacios, /, comas, puntos y otros caracteres comunes en indicaciones médicas."""
+        patron = r"^[A-Za-zÁÉÍÓÚáéíóúÑñ0-9\s/\,\.\;\:\(\)\-]+$"
+        return bool(re.match(patron, texto))
+
+    def validarPalabraConSentido(self, texto):
+        """Valida que el texto contenga al menos una vocal."""
+        patron = r"[aeiouáéíóúAEIOUÁÉÍÓÚ]"
+        return bool(re.search(patron, texto))
+
+    def validarDosis(self, dosis):
+        """Permite letras, números, espacios y caracteres comunes en dosis (mg, ml, %, /, -, .)."""
+        patron = r"^[A-Za-z0-9\s\.\,\-\/\%]+$"
+        return bool(re.match(patron, dosis))
+
     def existeDuplicado(self, nombre_medicamento, dosis, forma_farmaceutica):
         """
         Verifica si ya existe un medicamento con el mismo nombre, dosis y forma farmacéutica.
@@ -83,6 +108,35 @@ class MedicamentoDao:
         finally:
             cur.close()
             con.close()
+
+    def existeDuplicadoExceptoId(self, nombre_medicamento, dosis, forma_farmaceutica, id_medicamento):
+        """
+        Verifica si existe otro medicamento con el mismo nombre, dosis y forma farmacéutica, 
+        excluyendo el id actual.
+        """
+        sql = """
+        SELECT 1 FROM medicamento
+        WHERE UPPER(nombre_medicamento) = UPPER(%s)
+          AND UPPER(dosis) = UPPER(%s)
+          AND UPPER(forma_farmaceutica) = UPPER(%s)
+          AND id_medicamento != %s
+        """
+        conexion = Conexion()
+        con = conexion.getConexion()
+        cur = con.cursor()
+        try:
+            cur.execute(sql, (nombre_medicamento, dosis, forma_farmaceutica, id_medicamento))
+            return cur.fetchone() is not None
+        except Exception as e:
+            app.logger.error(f"Error al verificar duplicado de medicamento (excepto id): {str(e)}")
+            return False
+        finally:
+            cur.close()
+            con.close()
+
+    # ============================
+    # CRUD
+    # ============================
 
     def guardarMedicamento(self, nombre_medicamento, dosis, indicaciones, forma_farmaceutica):
         sql = """
