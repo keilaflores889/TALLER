@@ -1,19 +1,12 @@
 {% extends 'base.html' %}
     
 {% block titulo %}
-<<<<<<< HEAD
-Estudios
-=======
 Tipo de Estudio
->>>>>>> modulo_consultorio
 {% endblock %}
 
 {% block contenido %}
 <div class="container mt-4">
-<<<<<<< HEAD
-    <h3>Listar Estudios</h3>
-=======
->>>>>>> modulo_consultorio
+  <h3>Listar Estudios</h3>
 
   <!-- Card principal -->
   <div class="card shadow-sm border-0 rounded-lg">
@@ -33,11 +26,7 @@ Tipo de Estudio
         <table class="table table-hover table-bordered align-middle text-center" id="tbl">
           <thead class="bg-info text-white">
             <tr>
-<<<<<<< HEAD
               <th>Estudio</th>
-=======
-              <th>Tipos de Estudios</th>
->>>>>>> modulo_consultorio
               <th>Acciones</th>
             </tr>
           </thead>
@@ -47,38 +36,10 @@ Tipo de Estudio
     </div>
   </div>
 
-<<<<<<< HEAD
-    <!-- Modal formulario -->
-    <div class="modal" id="modalFormulario">
-      <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-
-          <div class="modal-header">
-            <h4 class="modal-title" id="modalTitle"></h4>
-            <button type="button" class="close" data-dismiss="modal">&times;</button>
-          </div>
-
-          <div class="modal-body">
-            <div class="form-group">
-              <input type="hidden" id="txtIdEstudio">
-              <label for="txtDescripcion">Estudio:</label>
-              <textarea type="text" class="form-control" placeholder="Ingrese un tipo de estudio" id="txtDescripcion"></textarea>
-            </div>
-          </div>
-
-          <div class="modal-footer">
-            <button type="button" class="btn btn-primary" id="btnGuardar">Guardar</button>
-            <button type="button" class="btn btn-danger" data-dismiss="modal">Cerrar</button>
-          </div>
-=======
-  <!-- =========================== -->
   <!-- Modal Formulario Tipo de Estudio -->
-  <!-- =========================== -->
   <div class="modal fade" id="modalFormulario" tabindex="-1" role="dialog">
     <div class="modal-dialog modal-dialog-centered" role="document">
       <div class="modal-content shadow-lg border-0 rounded-lg">
->>>>>>> modulo_consultorio
-
         <!-- Header -->
         <div class="modal-header bg-info text-white rounded-top">
           <h5 class="modal-title font-weight-bold">
@@ -114,11 +75,9 @@ Tipo de Estudio
             <i class="fas fa-times mr-1"></i> Cerrar
           </button>
         </div>
-
       </div>
     </div>
   </div>
-
 </div>
 {% endblock %}
 
@@ -126,26 +85,6 @@ Tipo de Estudio
 <script>
 const CSRFToken = "{{ csrf_token() }}" || null;
 
-<<<<<<< HEAD
-  function descripcionValida(descripcion) {
-    const regex = /^[A-Za-z0-9ÁÉÍÓÚÑáéíóúñ\s/]+$/;
-    return regex.test(descripcion.trim());
-  }
-
-  const initDatatable = () => {
-    $('#tbl').DataTable({
-      language: {
-        url: "{{ url_for('static', filename='vendor/datatables/es-ES.json') }}",
-      },
-      ajax:'/api/v1/estudios',
-      columns: [
-        { data: 'descripcion_estudio' },
-        {
-          data: function(row) {
-            return `<button type="button" name="btn_editar" class="btn btn-info" data-id_estudio="${row.id_tipo_estudio}" title="Editar"><i class="fas fa-edit"></i></button>
-                    <button type="button" name="btn_eliminar" class="btn btn-danger" data-id_estudio="${row.id_tipo_estudio}" title="Eliminar"><i class="fas fa-trash-alt"></i></button>`;
-          }
-=======
 // =====================================================
 // FUNCIONES DE VALIDACIÓN
 // =====================================================
@@ -175,33 +114,9 @@ const initDatatable = () => {
       dataSrc: function(json) {
         if (json.success && json.data) {
           return json.data;
->>>>>>> modulo_consultorio
         }
         return [];
       }
-<<<<<<< HEAD
-    });
-  }
-
-  const agregar = () => {
-    $('#btnAgregar').on('click', function(){
-      $('#modalTitle').text("Agregar un Estudio");
-      $('#txtIdEstudio').val("");
-      $('#txtDescripcion').val("");
-      $('#modalFormulario').modal();
-    });
-  }
-
-  const guardar = () => {
-    $('#btnGuardar').on('click', function() {
-      const id_estudio = $('#txtIdEstudio').val();
-      const descripcion = $('#txtDescripcion').val().trim();
-      const tabla = $('#tbl').DataTable();
-
-      if (!descripcionValida(descripcion)) {
-        Swal.fire("Error", "La descripción solo puede contener letras, números, espacios, acentos y '/'.", "error");
-        return;
-=======
     },
     columns: [
       { data: 'descripcion_estudio' },
@@ -216,18 +131,12 @@ const initDatatable = () => {
                     <i class="fas fa-trash-alt"></i>
                   </button>`;
         }
->>>>>>> modulo_consultorio
       }
     ],
     order: [[0, 'asc']]
   });
 };
 
-<<<<<<< HEAD
-      const payload = { descripcion };
-      const url = id_estudio ? `/api/v1/estudios/${id_estudio}` : `/api/v1/estudios`;
-      const method = id_estudio ? 'PUT' : 'POST';
-=======
 // =====================================================
 // AGREGAR NUEVO TIPO DE ESTUDIO
 // =====================================================
@@ -239,7 +148,6 @@ const agregar = () => {
     $('#modalFormulario').modal();
   });
 };
->>>>>>> modulo_consultorio
 
 // =====================================================
 // GUARDAR TIPO DE ESTUDIO (INSERT O UPDATE)
@@ -296,22 +204,12 @@ const guardar = () => {
       .then(data => {
         if (data && !data.error && data.success) {
           tabla.ajax.reload();
-<<<<<<< HEAD
-          Swal.fire(
-            "Éxito",
-            id_estudio ? "El estudio fue actualizado correctamente." : "El estudio fue agregado correctamente.",
-            "success"
-          );
-        } else if (data.error && data.error.includes("ya existe")) {
-          Swal.fire("Atención", "Este estudio ya está registrado.", "warning");
-=======
           $('#modalFormulario').modal("hide");
           Swal.fire({
             icon: 'success',
             title: 'Actualizado',
             text: 'El tipo de estudio ha sido actualizado correctamente.'
           });
->>>>>>> modulo_consultorio
         } else {
           Swal.fire({
             icon: 'error',
@@ -327,32 +225,6 @@ const guardar = () => {
           text: 'Ocurrió un error al actualizar el tipo de estudio.'
         });
       });
-<<<<<<< HEAD
-
-      $('#txtDescripcion').val("");
-      $('#modalFormulario').modal("hide");
-    });
-  }
-
-  const editar = () => {
-    $('#tbl').on('click', 'button[name="btn_editar"]', function() {
-      Swal.fire({
-        title: "¿Deseas editar este registro?",
-        showCancelButton: true,
-        confirmButtonText: "Si",
-        cancelButtonText: "No"
-      }).then((result) => {
-        if (result.isConfirmed) {
-          $('#modalTitle').text("Editar un Estudio");
-          const id_estudio = $(this).data('id_estudio');
-          $('#txtIdEstudio').val(id_estudio);
-
-          fetch(`/api/v1/estudios/${id_estudio}`)
-          .then(resp => resp.json())
-          .then(data => {
-            $('#txtDescripcion').val(data.data.descripcion_estudio);
-            $('#modalFormulario').modal();
-=======
     } else {
       // Insert
       fetch(`/api/v1/estudios`, {
@@ -378,7 +250,6 @@ const guardar = () => {
             icon: 'error',
             title: 'Error',
             text: data.error || 'No se pudo guardar el tipo de estudio.'
->>>>>>> modulo_consultorio
           });
         }
       }).catch(err => {
@@ -389,57 +260,7 @@ const guardar = () => {
           text: 'Ocurrió un error al guardar el tipo de estudio.'
         });
       });
-<<<<<<< HEAD
-    });
-  }
-
-  const eliminar = () => {
-    $('#tbl').on('click', 'button[name="btn_eliminar"]', function() {
-      const id_estudio = $(this).data('id_estudio');
-
-      Swal.fire({
-        title: "¿Deseas eliminar este registro?",
-        showCancelButton: true,
-        confirmButtonText: "Si",
-        cancelButtonText: "No"
-      }).then((result) => {
-        if (result.isConfirmed) {
-          fetch(`/api/v1/estudios/${id_estudio}`, {
-            method: 'DELETE',
-            headers: {
-              'Content-Type': 'application/json',
-              'X-CSRFToken': CSRFToken
-            }
-          })
-          .then(resp => resp.json())
-          .then(data => {
-            if(data && data.success) {
-              const fila = $(this).closest('tr');
-              const tabla = $('#tbl').DataTable();
-              tabla.row(fila).remove().draw();
-              Swal.fire("Eliminado", "", "success");
-            } else {
-              Swal.fire("Error", data.error || "No se pudo eliminar.");
-            }
-          });
-        }
-      });
-    });
-  }
-
-  const addEvents = () => {
-    agregar();
-    guardar();
-    editar();
-    eliminar();
-  }
-
-  $(function() {
-    initDatatable();
-    addEvents();
-=======
     }
->>>>>>> modulo_consultorio
   });
 };
 
